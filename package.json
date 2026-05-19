@@ -1,0 +1,17 @@
+{
+  "name": "memoryos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MemoryOS — AI 记忆、RAG 与 Agent 平台（Monorepo）",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/**\" --filter \"./packages/**\" run dev",
+    "dev:web": "pnpm --filter @memoryos/web dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "format": "pnpm -r run format"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
