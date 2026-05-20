@@ -57,9 +57,28 @@ docs: update README quick start
 
 ## 代码规范
 
-- **前端**：遵循各包 ESLint / Prettier 配置；组件与 Hooks 命名使用 PascalCase / camelCase
-- **后端**：Python 4 空格缩进；路由 → Service → Repository 分层
-- **通用**：不提交 `.env`、密钥、本地数据库数据；敏感配置使用 `.env.example` 模板
+### 全仓库通用（前端 + 后端）
+
+- **Git 分支**：统一使用上文「分支规范」（`feat/*`、`fix/*` 等），前后端不另搞一套。
+- **提交信息**：统一 **Conventional Commits**，通过 `scope` 区分子项目：
+  - 前端：`feat(web): ...`、`fix(web): ...`
+  - 后端：`feat(api): ...`、`fix(api): ...`
+  - 公共：`chore: ...`、`docs: ...`、`feat(shared): ...`（Monorepo 包）
+- **敏感信息**：禁止提交 `.env`、API Key、数据库文件；仅提交 `.env.example`。
+- **PR**：合并前自测；前端 `pnpm lint`，后端（EP01.4 后）`ruff check` / `mypy`（待配置）。
+
+### 前端（`apps/web`、`packages/*`）
+
+- ESLint：共享规则见根目录 `eslint.shared.mjs`（`apps/web` 额外含 Next 规则）。
+- Prettier：引号、分号等**只由 Prettier 管**，ESLint 不配置 `quotes`。
+- 命名：组件 PascalCase，Hooks / 函数 camelCase。
+
+### 后端（`apps/api`）
+
+- Python **4 空格**缩进（与根目录 `.editorconfig` 一致）。
+- 分层：**路由 → Service → Repository**，业务逻辑不写在路由函数体内。
+- 提交 scope 使用 `api`；分支策略与前端相同。
+- 详细工程约定见 `docs/tech/BE-engineering.md`（待编写，EP01.4 / EP03）。
 
 ## Pull Request 流程
 

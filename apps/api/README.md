@@ -45,4 +45,5 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - API 文档：<http://localhost:8000/docs>
 - 健康检查：<http://localhost:8000/health>（Story 1.4）
 
-> 本包为 Python 项目，**不纳入** pnpm workspace；与前端通过 HTTP / SSE 通信。
+> 本包为 Python 项目，**不纳入** pnpm workspace；与前端通过 HTTP / SSE 通信。  
+> **Git 分支、Conventional Commits、PR 流程**与全仓库一致，见根目录 [CONTRIBUTING.md](../../CONTRIBUTING.md)。

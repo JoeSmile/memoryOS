@@ -1,43 +1,64 @@
 # @memoryos/web — 前端应用
 
-基于 **Next.js 15**、**React**、**TypeScript**、**TailwindCSS** 的 Web 客户端。
+基于 **Next.js 15**、**React 19**、**TypeScript**、**TailwindCSS v4** 的 Web 客户端。
 
 ## 技术栈
 
-- 框架：Next.js 15（App Router）
-- 语言：TypeScript
-- 样式：TailwindCSS
-- 状态：Zustand
-- 富文本：react-markdown
-- 流式：ReadableStream / SSE 客户端
+| 类别 | 技术 |
+|:-----|:-----|
+| 框架 | Next.js 15（App Router + Turbopack） |
+| 语言 | TypeScript（路径别名 `@/*`） |
+| 样式 | TailwindCSS v4（`app/globals.css` + `@theme`） |
+| 规范 | ESLint 9 + Prettier + eslint-config-prettier |
+| 状态 | Zustand（EP02） |
+| 共享包 | `@memoryos/shared` |
 
-## 目录约定（Story 1.3 初始化后）
+## 目录结构
 
 ```
 apps/web/
-├── app/              # App Router 页面与布局
-├── components/       # 业务组件
-├── lib/              # 工具、API 客户端
-├── stores/           # Zustand stores
-└── public/           # 静态资源
+├── app/
+│   ├── layout.tsx      # 根布局
+│   ├── page.tsx        # 首页
+│   ├── not-found.tsx   # 404
+│   ├── chat/           # 对话（EP02 占位）
+│   └── globals.css     # Tailwind v4 主题
+├── public/
+├── .env.example
+├── next.config.ts
+├── tsconfig.json
+└── eslint.config.mjs
 ```
 
 ## 启动
 
 ```bash
-# 在仓库根目录
+# 仓库根目录
 pnpm dev:web
 
-# 或在本目录
+# 或本目录
 pnpm dev
 ```
 
-默认地址：<http://localhost:3000>
+- 开发地址：<http://localhost:3000>
+- Turbopack 已启用（`next dev --turbopack`）
 
 ## 环境变量
 
-复制 `.env.example` 为 `.env.local`（Story 1.3 提供模板）：
+```bash
+cp .env.example .env.local
+```
 
 | 变量 | 说明 |
 |:-----|:-----|
-| `NEXT_PUBLIC_API_URL` | 后端 API 地址，如 `http://localhost:8000` |
+| `NEXT_PUBLIC_API_URL` | 后端 API，默认 `http://localhost:8000` |
+
+## 脚本
+
+| 命令 | 说明 |
+|:-----|:-----|
+| `pnpm dev` | 开发服务器 |
+| `pnpm build` | 生产构建 |
+| `pnpm start` | 生产启动 |
+| `pnpm lint` | ESLint 检查 |
+| `pnpm format` | Prettier 格式化 |

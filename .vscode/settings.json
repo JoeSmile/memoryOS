@@ -1,0 +1,26 @@
+{
+  // Markdown：保存时用 Prettier 排版（docs/tech/knowledge 等），无需每次让 AI 改格式
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on"
+  },
+  // 保存自动格式化
+  "editor.formatOnSave": true,
+   // 保存自动修复所有eslint可修复问题
+   "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+   // 优先使用prettier格式化
+   "editor.defaultFormatter": "esbenp.prettier-vscode",
+   // 全局统一双引号
+   "prettier.singleQuote": false,
+  "prettier.jsxSingleQuote": false,
+  "prettier.proseWrap": "always",
+  // markdownlint：与 Prettier 分工（结构规则 vs 排版）
+  "markdownlint.config": {
+    "MD013": false,
+    "MD033": false,
+    "MD041": false
+  }
+}

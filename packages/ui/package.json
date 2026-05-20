@@ -8,8 +8,18 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "lint": "echo \"@memoryos/ui: lint pending Story 1.3+\"",
-    "format": "echo \"@memoryos/ui: format pending\""
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "eslint": "^9",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.12",
+    "typescript": "^5",
+    "typescript-eslint": "^8.32.1"
   },
   "peerDependencies": {
     "react": "^19.0.0",

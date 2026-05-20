@@ -14,7 +14,7 @@
 - **记忆体系** — 短期滑动窗口 + 长期用户画像 + 上下文摘要压缩
 - **工程化部署** — Docker、Nginx、腾讯云、GitHub Actions CI/CD
 
-> 当前处于 **EP01 工程初始化** 阶段，核心业务能力将按 [项目计划](./docs/tasks/memoryos-project-plan.md) 迭代交付。
+> 当前处于 **EP01 工程初始化** 阶段，开发任务与学习路线见 [docs/tasks](./docs/tasks/README.md)。
 
 ## 技术栈
 
@@ -128,7 +128,7 @@ uvicorn app.main:app --reload --port 8000
 
 ## 路线图
 
-详见 [`docs/tasks/memoryos-project-plan.md`](./docs/tasks/memoryos-project-plan.md)。
+详见 [docs/tasks](./docs/tasks/README.md)（史诗任务 + 同步学习路线 + 周度复盘）。
 
 | 阶段 | 史诗 | 目标 |
 |:----:|:-----|:-----|
