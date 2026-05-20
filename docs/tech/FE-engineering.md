@@ -5,6 +5,7 @@
 > 对应代码目录：`apps/web`、`packages/shared`、`packages/ui`。
 
 **文档版本**：2026-05（Story 1.3 完成后）  
+**前端版本**：`next@15.5.18`、`react@19.1.0`（以 `apps/web/package.json` 为准）  
 **维护建议**：每完成一个 EP（如 EP02 流式对话）后，更新「规划栈」与「目录约定」章节。
 
 ---
@@ -27,7 +28,7 @@ memoryOS（pnpm Monorepo）
 | 样式          | Tailwind CSS v4                     |    ✅     |
 | 代码检查      | ESLint 9（Flat Config）             |    ✅     |
 | 代码格式化    | Prettier 3 + Tailwind 插件          |    ✅     |
-| 构建加速      | Turbopack（`next dev --turbopack`） |    ✅     |
+| 构建加速      | Turbopack dev（`next dev --turbopack`）；build 默认 Webpack @15.5 | ✅ |
 | 状态管理      | Zustand                             |  📋 EP02  |
 | 流式通信      | SSE / ReadableStream                |  📋 EP02  |
 | 富文本        | react-markdown + 高亮               |  📋 EP02  |
@@ -90,8 +91,9 @@ pnpm --filter @memoryos/web build
 | :------- | :---------------------------------------------------------------------------------- |
 | 版本     | `next@15.5.18`                                                                      |
 | 路由     | `app/layout.tsx`（根布局）、`app/page.tsx`（`/`）、`app/not-found.tsx`、`app/chat/` |
-| 开发     | `next dev --turbopack`                                                              |
-| 生产构建 | `next build` → `next start`                                                         |
+| 开发     | `next dev --turbopack`（**15.5 稳定**）                                               |
+| 生产构建 | `next build` → **Webpack 默认**；可选 `next build --turbopack`（**15.5 Beta**）     |
+| 启动     | `next start`（配合 `output: "standalone"` 见 §3.3）                                   |
 | 路径别名 | `tsconfig.json`：`"@/*": ["./*"]`                                                   |
 
 ### 优势
@@ -107,7 +109,25 @@ pnpm --filter @memoryos/web build
 - 大版本升级（14→15）需关注 breaking changes。
 - 自建部署需理解 **`standalone` 输出**（见 §3.3，EP08 Docker）。
 
-### 3.1 为什么 Turbopack 开发时 HMR 通常快于 Webpack？
+### 3.1 Turbopack 与 Webpack（按 Next.js 版本）
+
+| Next.js | 开发 `next dev` | 生产 `next build` |
+|:--------|:----------------|:------------------|
+| **15.0** | Turbopack 稳定 | Webpack 默认 |
+| **15.5**（**本项目**） | `--turbopack` | **Webpack 默认**；`--turbopack` 为 **Beta** |
+| **16.0+** | Turbopack 默认 | Turbopack 默认；`--webpack` 回退 |
+
+验证方式（本机）：
+
+```bash
+cd apps/web
+pnpm exec next build          # 标题应为 Next.js 15.5.18（无 Turbopack）
+pnpm exec next build --turbopack  # 标题应为 Next.js 15.5.18 (Turbopack)
+```
+
+升级 **Next 16** 后需改脚本：默认可能不再需要 `--turbopack`；若依赖 `webpack()` 自定义需迁 `turbopack` 配置或显式 `--webpack`。
+
+### 3.1.1 为什么 Turbopack 开发时 HMR 通常快于 Webpack？
 
 | 维度     | Webpack dev（传统）  | Turbopack（`next dev --turbopack`） |
 | :------- | :------------------- | :---------------------------------- |
@@ -126,12 +146,15 @@ Turbopack 快的原因可概括为：
 3. **与 Next
    15 深度集成**：路由、Server/Client 边界由框架告知，减少通用 bundler 的猜测成本。
 
-**注意**：Turbopack 主要用于 **`next dev` 开发**；生产构建仍走
-`next build`（当前默认并非 Turbopack 生产构建）。若某依赖与 Turbopack 不兼容，可临时去掉
-`--turbopack` 对比排查。
+**注意（`next@15.5.18`）**：
 
-更完整的 Vite vs Turbopack 对比见
-[knowledge/vite-vs-turbopack.md](./knowledge/vite-vs-turbopack.md)。
+- **开发**：推荐 `next dev --turbopack`（本项目已启用）。
+- **生产**：`package.json` 中 `next build` 为 **Webpack**；若 CI 要试 Turbopack，改为 `next build --turbopack` 并做全量回归（仍为 Beta）。
+- **Next 16+**：生产默认改为 Turbopack，本文档需同步更新。
+
+不兼容时：dev 可临时 `next dev --webpack` 对比排查。
+
+更完整对比：[knowledge/vite-vs-turbopack.md](./knowledge/vite-vs-turbopack.md)、[nextjs15.md](./knowledge/nextjs15.md)。
 
 ### 3.2 Server / Client Component：我们需要吗？算 SSR 方案吗？
 

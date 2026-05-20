@@ -1,12 +1,12 @@
 # @memoryos/web — 前端应用
 
-基于 **Next.js 15**、**React 19**、**TypeScript**、**TailwindCSS v4** 的 Web 客户端。
+基于 **Next.js 15.5.18**、**React 19**、**TypeScript**、**TailwindCSS v4** 的 Web 客户端。
 
 ## 技术栈
 
 | 类别 | 技术 |
 |:-----|:-----|
-| 框架 | Next.js 15（App Router + Turbopack） |
+| 框架 | Next.js 15.5.18（App Router；dev 用 Turbopack） |
 | 语言 | TypeScript（路径别名 `@/*`） |
 | 样式 | TailwindCSS v4（`app/globals.css` + `@theme`） |
 | 规范 | ESLint 9 + Prettier + eslint-config-prettier |
@@ -58,7 +58,7 @@ cp .env.example .env.local
 | 命令 | 说明 |
 |:-----|:-----|
 | `pnpm dev` | 开发服务器 |
-| `pnpm build` | 生产构建 |
+| `pnpm build` | 生产构建（Webpack 默认 @15.5.18） |
 | `pnpm start` | 生产启动 |
 | `pnpm lint` | ESLint 检查 |
 | `pnpm format` | Prettier 格式化 |
