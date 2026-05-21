@@ -19,30 +19,32 @@
 - [x] 📖 Server Component 默认 vs `'use client'`
       触发条件（Hook、事件、浏览器 API）
 - [x] 📖 路径别名 `@/*` 与 Monorepo `workspace:*`、`transpilePackages`
-- [ ] 📖 `transpileWorkspaces` 社区说法 vs `transpilePackages` 官方方案（见 [nextjs15 附录](../../tech/knowledge/nextjs15.md#附录-monorepo-编译--transpilepackages-与-transpileworkspaces)）
-- [x] 📖 Turbopack（`next@15.5.18`）：dev `--turbopack`；生产默认 `next build`（Webpack），`next build --turbopack` 为 Beta
+- [x] 📖 `transpileWorkspaces` 社区说法 vs `transpilePackages` 官方方案（见
+      [nextjs15 附录](../../tech/knowledge/nextjs15.md#附录-monorepo-编译--transpilepackages-与-transpileworkspaces)）
+- [x] 📖 Turbopack（`next@15.5.18`）：dev `--turbopack`；生产默认
+      `next build`（Webpack），`next build --turbopack` 为 Beta
 - [x] 📖 生产 `standalone`（Docker，EP08）
 - [x] 🔧 `apps/web/`、`docs/tech/FE-engineering.md`
-- [ ] 📖 `next/font`、Metadata API、环境变量 `NEXT_PUBLIC_*` 规则
-- [ ] 🔧 能画出：浏览器请求 `/` → Next 渲染链路（简图即可）
+- [x] 📖 `next/font`、Metadata API、环境变量 `NEXT_PUBLIC_*` 规则
+- [x] 🔧 能画出：浏览器请求 `/` → Next 渲染链路（简图即可）
 
 ### 面试常问
 
-- App Router 和 Pages Router 核心区别？为什么新项目选 App Router？
-- RSC 是什么？为什么能减小客户端 JS？Hydration 发生在什么时候？
-- `NEXT_PUBLIC_` 和普通 env 有什么区别？能否在 RSC 里读私密 key？
+- App Router 和 Pages Router 核心区别？为什么新项目选 App Router？✅
+- RSC 是什么？为什么能减小客户端 JS？Hydration 发生在什么时候？ ✅
+- `NEXT_PUBLIC_` 和普通 env 有什么区别？能否在 RSC 里读私密 key？ ✅
 
 ### 实战易踩坑
 
-| 坑                                   | 现象                  | 规避                                  |
-| :----------------------------------- | :-------------------- | :------------------------------------ |
-| 在 Server Component 里用 `useState`  | 编译/运行报错         | 拆到 Client 子组件并加 `'use client'` |
-| 把 fetch 放在 Client 导致重复请求    | 闪屏、SEO 差          | 首屏数据放 RSC 或 layout 级 fetch     |
-| Monorepo 改 `packages/shared` 不生效 | web 仍用旧代码        | 确认 `transpilePackages` 含包名 + 重启 dev |
-| 误以为 Next 15 生产默认 Turbopack    | 面试说错              | **15.5** 生产默认 Webpack；**16** 才默认 Turbopack |
-| 照抄 `transpileWorkspaces` 未验证     | 构建行为不确定        | 15.5 用稳定 `transpilePackages` 列表；见 nextjs15 附录对比 |
-| `.env.local` 改了不生效              | 变量仍是旧值          | 改 env 必须重启 `next dev`            |
-| 根目录与 `apps/web` 各装依赖         | lockfile 乱、幽灵依赖 | **只在仓库根** `pnpm install`         |
+| 坑                                   | 现象                  | 规避                                                       |
+| :----------------------------------- | :-------------------- | :--------------------------------------------------------- |
+| 在 Server Component 里用 `useState`  | 编译/运行报错         | 拆到 Client 子组件并加 `'use client'`                      |
+| 把 fetch 放在 Client 导致重复请求    | 闪屏、SEO 差          | 首屏数据放 RSC 或 layout 级 fetch                          |
+| Monorepo 改 `packages/shared` 不生效 | web 仍用旧代码        | 确认 `transpilePackages` 含包名 + 重启 dev                 |
+| 误以为 Next 15 生产默认 Turbopack    | 面试说错              | **15.5** 生产默认 Webpack；**16** 才默认 Turbopack         |
+| 照抄 `transpileWorkspaces` 未验证    | 构建行为不确定        | 15.5 用稳定 `transpilePackages` 列表；见 nextjs15 附录对比 |
+| `.env.local` 改了不生效              | 变量仍是旧值          | 改 env 必须重启 `next dev`                                 |
+| 根目录与 `apps/web` 各装依赖         | lockfile 乱、幽灵依赖 | **只在仓库根** `pnpm install`                              |
 
 ---
 
