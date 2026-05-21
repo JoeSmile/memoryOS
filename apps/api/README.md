@@ -30,17 +30,25 @@ apps/api/
 
 ## 启动
 
+**推荐：在仓库根目录**
+
+```bash
+pnpm setup:api   # 首次 / 依赖变更后
+pnpm dev:api     # http://localhost:8000/docs
+```
+
+脚本见 [`scripts/api.sh`](../../scripts/api.sh)。有 Conda 时会用环境 `memoryos-api`，否则用 `apps/api/.venv`。
+
+<details>
+<summary>手动进入 apps/api（可选）</summary>
+
 ```bash
 cd apps/api
-
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-
-pip install -r requirements.txt
-cp .env.example .env        # 编辑数据库、Redis、OpenAI 等配置
-
+conda activate memoryos-api   # 或 source .venv/bin/activate
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+</details>
 
 - API 文档：<http://localhost:8000/docs>
 - 健康检查：<http://localhost:8000/health>（Story 1.4）

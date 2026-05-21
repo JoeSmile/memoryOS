@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "pnpm --parallel --filter \"./apps/**\" --filter \"./packages/**\" run dev",
     "dev:web": "pnpm --filter @memoryos/web dev",
+    "dev:api": "bash scripts/api.sh dev",
+    "dev:all": "pnpm run --parallel dev:web dev:api",
+    "setup:api": "bash scripts/api.sh setup",
+    "install:all": "pnpm install && pnpm setup:api",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format"

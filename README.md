@@ -84,28 +84,40 @@ memoryOS/
 
 ### 安装依赖
 
+在**仓库根目录**执行（不要进子目录单独 `npm install`）：
+
 ```bash
 git clone https://github.com/<your-org>/memoryOS.git
 cd memoryOS
+
+# 前端 + packages（pnpm workspace）
 pnpm install
+
+# 后端 Python（首次或 requirements.txt 变更后）
+pnpm setup:api
+# 一键：pnpm install:all
 ```
 
-### 启动前端（Story 1.3 完成后可用）
+| 范围 | 命令 | 说明 |
+|:-----|:-----|:-----|
+| JS/TS 全仓 | `pnpm install` | 只装 `apps/web`、`packages/*`（见 `pnpm-workspace.yaml`） |
+| Python API | `pnpm setup:api` | Conda 环境 `memoryos-api` 或 `apps/api/.venv` + pip |
+| 给某子包加依赖 | `pnpm --filter @memoryos/web add zustand` | 依赖写在子包 `package.json` |
+| 给 shared 加依赖 | `pnpm --filter @memoryos/shared add lodash-es` | 同上 |
+
+> `apps/api` 是 Python 项目，**不在** pnpm workspace；用根脚本 `setup:api` / `dev:api` 即可。  
+> 已有 Conda 环境 `memoryos-api` 时，日常只需 `pnpm dev:api`（不必每次 `conda activate`）。  
+> 多子包共用 npm 包：各子包须在各自 `package.json` 声明，或集中在 `packages/ui`；详见 [FE-engineering.md §2](./docs/tech/FE-engineering.md#2-monorepopnpm-workspace)。
+
+### 启动开发服务（均在根目录）
 
 ```bash
-pnpm dev:web
-# http://localhost:3000
+pnpm dev:web    # http://localhost:3000
+pnpm dev:api    # http://localhost:8000/docs
+pnpm dev:all    # 前后端并行
 ```
 
-### 启动后端（Story 1.4 完成后可用）
-
-```bash
-cd apps/api
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-# http://localhost:8000/docs
-```
+使用 Conda 时无需每次 `conda activate`：`dev:api` 会通过 `conda run -n memoryos-api` 启动。
 
 ### 环境变量
 
@@ -120,8 +132,12 @@ uvicorn app.main:app --reload --port 8000
 
 | 命令 | 说明 |
 |:-----|:-----|
-| `pnpm install` | 安装 Monorepo 依赖 |
-| `pnpm dev:web` | 启动前端开发服务 |
+| `pnpm install` | 安装 workspace（web + packages） |
+| `pnpm setup:api` | 安装 API Python 依赖，生成 `.env` |
+| `pnpm install:all` | `install` + `setup:api` |
+| `pnpm dev:web` | 启动前端 |
+| `pnpm dev:api` | 启动后端（需先 `setup:api`） |
+| `pnpm dev:all` | 前后端并行 |
 | `pnpm build` | 构建所有 workspace 包 |
 | `pnpm lint` | 运行各包 lint |
 | `pnpm format` | 运行各包格式化 |

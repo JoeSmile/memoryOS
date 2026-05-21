@@ -68,13 +68,64 @@ memoryOS（pnpm Monorepo）
 - 锁文件 `pnpm-lock.yaml` 在根目录维护；子包单独 `npm install`
   容易破坏 workspace 链接。
 
-### 常用命令
+### 常用命令（均在仓库根目录执行）
+
+#### 安装
 
 ```bash
-pnpm install              # 根目录，安装全仓
-pnpm dev:web              # 仅启动前端
-pnpm --filter @memoryos/web build
+pnpm install                                    # 按 pnpm-lock.yaml 安装全 workspace
+pnpm setup:api                                  # Python API（Conda memoryos-api 或 .venv）
+pnpm install:all                                # install + setup:api 一次做完
 ```
+
+#### 给指定子包加依赖
+
+```bash
+pnpm --filter @memoryos/web add zustand         # 写入 apps/web/package.json
+pnpm --filter @memoryos/shared add lodash-es    # 写入 packages/shared/package.json
+pnpm --filter @memoryos/ui add clsx             # 写入 packages/ui/package.json
+```
+
+加 **开发依赖** 时加 `-D`：
+
+```bash
+pnpm --filter @memoryos/web add -D @types/node
+```
+
+#### 启动
+
+```bash
+pnpm dev:web              # 前端 http://localhost:3000
+pnpm dev:api              # 后端 http://localhost:8000（见下方说明）
+pnpm dev:all              # 前后端并行
+pnpm --filter @memoryos/web build
+pnpm -r run lint          # 所有 workspace 包执行 lint
+```
+
+#### API（Python，非 pnpm workspace）
+
+本地已有 Conda 环境 **`memoryos-api`** 时：
+
+| 场景 | 命令 |
+|:-----|:-----|
+| 日常启动 | `pnpm dev:api` 即可（脚本用 `conda run -n memoryos-api`，无需每次 `conda activate`） |
+| 首次克隆 / 换机器 | `pnpm setup:api` |
+| 改了 `apps/api/requirements.txt` | 再跑一次 `pnpm setup:api` |
+
+### 多个 workspace 都要用同一个包（如 zustand）
+
+**不能**指望「装到根目录一次，所有子包自动能用」。pnpm 要求：**谁 `import`，谁的 `package.json` 里就要声明依赖**（或从已声明该依赖的 workspace 包再导出）。
+
+| 做法 | 适用 | 说明 |
+|:-----|:-----|:-----|
+| **只装在 `apps/web`** | 仅页面/路由用状态 | EP02 聊天状态放 web 即可：`pnpm --filter @memoryos/web add zustand` |
+| **装在 `packages/ui`** | 多个 UI 组件共用 store/hooks | `pnpm --filter @memoryos/ui add zustand`，web 通过 `@memoryos/ui` 使用 |
+| **装在 `packages/shared`** | 仅当 store 与 React 无关（少见） | shared 应保持无 React；zustand 一般不放 shared |
+| **根目录 `pnpm add -w zustand`** | 工具链、脚本 | `-w` = workspace root，**不会**自动让 `@memoryos/web` 能 import |
+
+pnpm 会在磁盘上**去重**同版本依赖，各子包各写一条 `dependencies` 不会重复下载多份，但 **package.json 必须各自声明**（或集中在一个中间包声明一次）。
+
+**推荐（MemoryOS）**：EP02 流式对话状态 → 先只加在 `@memoryos/web`；若 `packages/ui` 里也有组件要读 store，再在 `@memoryos/ui` 加 zustand，并把 store 定义放在 `packages/ui` 或 `apps/web/stores` 一处，避免两套 store。
 
 ---
 

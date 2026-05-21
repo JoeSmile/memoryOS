@@ -52,7 +52,7 @@
 
 ### 学什么
 
-- [ ] 📖 三层：Router（HTTP）→ Service（业务）→ Repository（数据访问）
+- [x] 📖 三层：Router（HTTP）→ Service（业务）→ Repository（数据访问）
 - [ ] 📖 `async def` 路由 + `asyncpg` / SQLAlchemy 2.0 异步 Session
 - [ ] 📖 `Depends(get_db)`、`Depends(get_current_user)` 组合与执行顺序
 - [ ] 📖 Pydantic v2：`BaseModel`、`model_validate`、响应 `response_model`

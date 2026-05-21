@@ -6,7 +6,7 @@
 | **优先级** | P0 |
 | **状态** | 🟡 进行中 |
 | **学习路线** | [L01-foundation.md](../learning/L01-foundation.md) |
-| **目标文档** | [FE-engineering.md](../../tech/FE-engineering.md) ✅ · `BE-engineering.md` 📋 |
+| **目标文档** | [FE-engineering.md](../../tech/FE-engineering.md) ✅ · [BE-engineering.md](../../tech/BE-engineering.md) ✅ |
 
 ---
 
@@ -31,15 +31,15 @@
 
 ## Story 1.4 FastAPI 后端初始化
 
-- [ ] Python 虚拟环境 + `requirements.txt` / `pyproject.toml`
-- [ ] 目录：`app/main.py`、`api/`、`core/`、`models/`、`schemas/`
-- [ ] `GET /health`、CORS、全局异常、统一响应
-- [ ] `.env.example`、`uvicorn` 本地可启动
+- [x] Python 虚拟环境 + `requirements.txt` / `pyproject.toml`
+- [x] 目录：`app/main.py`、`api/`、`core/`、`models/`、`schemas/`
+- [x] `GET /health`、CORS、全局异常、统一响应
+- [x] `.env.example`、`uvicorn` 本地可启动
 
 ## Story 1.5 统一规范
 
 - [x] 前端工程说明（FE-engineering）
-- [ ] 后端工程说明（BE-engineering）
+- [x] 后端工程说明（BE-engineering）初稿
 - [ ] 分层规范：路由 → Service → Repository
 - [ ] Conventional Commits（CONTRIBUTING 已写，可选 Husky）
 
@@ -48,8 +48,8 @@
 ## 同步学习（详见 L01）
 
 - [x] Next.js 15 + TS 工程化（理解） · [x] 落地 `apps/web`
-- [ ] FastAPI 分层与依赖注入（理解）
-- [ ] FastAPI 分层与依赖注入（落地 `apps/api`）
+- [x] FastAPI 分层与依赖注入（理解） · [python-getting-started.md](../../tech/python-getting-started.md)
+- [x] FastAPI 分层与依赖注入（落地 `apps/api`）
 - [ ] PostgreSQL 建表与索引（理解）
 - [ ] Redis 业务场景（理解）
 - [x] Git 分支与提交规范（理解） · [x] 落地 `CONTRIBUTING.md`
