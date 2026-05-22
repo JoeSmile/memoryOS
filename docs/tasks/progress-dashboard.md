@@ -8,6 +8,7 @@
 
 | 史诗            | 优先级 | 计划周 | 状态 | 任务文件                               |
 | :-------------- | :----: | :----: | :--: | :------------------------------------- |
+| EP00 AI 协作栈  |   P0   | 1 起   |  🟡  | [EP00](./epics/EP00-ai-collaboration.md) |
 | EP01 工程初始化 |   P0   |  1-2   |  🟡  | [EP01](./epics/EP01-engineering.md)    |
 | EP03 数据存储   |   P0   |  1-2   |  —   | [EP03](./epics/EP03-data-storage.md)   |
 | EP02 流式对话   |   P0   |   3    |  —   | [EP02](./epics/EP02-streaming-chat.md) |
@@ -23,6 +24,7 @@
 
 | 阶段            | 计划周 | 状态 | 学习文件                                     | 配套文档          |
 | :-------------- | :----: | :--: | :------------------------------------------- | :---------------- |
+| L00 协作栈      |  1 起  |  🟡  | [L00](./learning/L00-ai-collab-stack.md)     | ai-collab-stack ✅ |
 | L01 基建        |  1-2   |  🟡  | [L01](./learning/L01-foundation.md)          | FE-engineering ✅ |
 | L02 流式+框架   |   3    |  —   | [L02](./learning/L02-streaming-langgraph.md) | langgraph-chat 📋 |
 | L03 RAG         |  4-5   |  —   | [L03](./learning/L03-rag-dual-stack.md)      | rag-\* 📋         |

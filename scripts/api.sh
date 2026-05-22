@@ -44,6 +44,9 @@ cmd_setup() {
     fi
     echo "→ pip install -r requirements.txt …"
     conda run -n memoryos-api pip install -r requirements.txt
+    if [[ -f requirements-dev.txt ]]; then
+      conda run -n memoryos-api pip install -r requirements-dev.txt
+    fi
   else
     if [[ ! -x .venv/bin/python ]]; then
       echo "→ 未检测到 conda，创建 .venv …"
@@ -51,6 +54,9 @@ cmd_setup() {
     fi
     echo "→ pip install -r requirements.txt …"
     .venv/bin/pip install -r requirements.txt
+    if [[ -f requirements-dev.txt ]]; then
+      .venv/bin/pip install -r requirements-dev.txt
+    fi
   fi
 
   if [[ ! -f .env ]]; then
@@ -77,11 +83,25 @@ cmd_dev() {
   run_in_api_env uvicorn app.main:app --reload --host "$HOST" --port "$PORT"
 }
 
+cmd_exec() {
+  shift
+  if [[ $# -eq 0 ]]; then
+    echo "用法: $0 exec <command...>"
+    exit 1
+  fi
+  if ! use_conda && [[ ! -x .venv/bin/python ]]; then
+    echo "❌ 请先执行: pnpm setup:api"
+    exit 1
+  fi
+  run_in_api_env "$@"
+}
+
 case "${1:-}" in
   setup) cmd_setup ;;
   dev) cmd_dev ;;
+  exec) cmd_exec "$@" ;;
   *)
-    echo "用法: $0 setup | dev"
+    echo "用法: $0 setup | dev | exec <cmd...>"
     exit 1
     ;;
 esac

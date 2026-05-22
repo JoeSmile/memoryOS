@@ -15,7 +15,24 @@
 git clone https://github.com/<your-org>/memoryOS.git
 cd memoryOS
 pnpm install
+pnpm setup:api    # 后端 Python
 ```
+
+## AI 协作栈（OpenSpec · Superpowers · Harness）
+
+参与功能开发前请阅读：
+
+- [ai-collab-stack.md](./docs/tech/ai-collab-stack.md) — 概念与安装  
+- [ai-collab-best-practices.md](./docs/tech/ai-collab-best-practices.md) — **最佳实践（必读）**  
+- [team/onboarding.md](./docs/team/onboarding.md) — **日常用法与新人 onboarding**
+
+| 工具 | 贡献者需知 |
+|:-----|:-----------|
+| **OpenSpec** | 较大功能先 `openspec init`（若仓库已有则 `openspec update`），用 change 文件夹记录 proposal / tasks |
+| **Superpowers** | Cursor 建议先 plan 再实现；PR 避免单次超大 diff |
+| **Harness** | API 变更需通过 `apps/api/tests/harness/`；合并前 `pnpm test:api:harness` |
+
+任务与学习：[EP00](./docs/tasks/epics/EP00-ai-collaboration.md) · [L00](./docs/tasks/learning/L00-ai-collab-stack.md)
 
 ## 分支规范
 
@@ -82,10 +99,30 @@ docs: update README quick start
 
 ## Pull Request 流程
 
-1. Fork 仓库并创建功能分支
-2. 完成改动，确保 `pnpm lint`（如已配置）通过
-3. 填写 PR 描述：背景、改动点、测试方式
-4. 等待 Review 后合并
+1. Fork 仓库并创建功能分支（`feat/<change名>` 推荐）
+2. 较大功能先有 OpenSpec change（见 best-practices）
+3. 完成改动：`pnpm lint` + `pnpm test:api:harness`（API 改动时）
+4. PR 描述使用下方模板（或 GitHub 自动模板）
+5. Review 后合并；**Owner** 执行 `/opsx:archive` 并勾选 epic tasks
+
+### PR 描述模板
+
+```markdown
+## OpenSpec
+- Change: `openspec/changes/____/`
+- Tasks: （已勾选的编号）
+
+## Superpowers / 实现说明
+- Plan 摘要或链接 tasks.md
+
+## 测试
+- [ ] pnpm lint
+- [ ] pnpm test:api:harness
+- [ ] 手动：____
+
+## 关联
+- Epic: EP0x Story x.x
+```
 
 ## 报告问题
 

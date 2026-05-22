@@ -5,7 +5,8 @@
 | **周期** | 第 1-2 周（与 EP01 并行） |
 | **优先级** | P0 |
 | **状态** | ⚪ 待开始 |
-| **学习路线** | [L01-foundation.md](../learning/L01-foundation.md) |
+| **学习路线** | [L01-foundation.md](../learning/L01-foundation.md) · [L00](../learning/L00-ai-collab-stack.md) |
+| **OpenSpec** | 建议 change：`ep03-data-storage`（先 [EP00](./EP00-ai-collaboration.md) Story 0.1–0.3） |
 
 ---
 
@@ -43,6 +44,7 @@
 
 ## 同步学习
 
+- [ ] [L00](../learning/L00-ai-collab-stack.md) OpenSpec 本变更 propose → archive
 - [ ] SQLAlchemy ORM 高阶用法（理解 / 落地）
 - [ ] Alembic 迁移流程（理解 / 落地）
 - [ ] Redis 过期策略与会话缓存设计（理解 / 落地）

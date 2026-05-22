@@ -7,7 +7,7 @@
 
 | 迭代 | 周期 | 史诗 | 阶段目标 | 学习路线 |
 |:----:|:-----|:-----|:---------|:---------|
-| 1 | 第 1-2 周 | EP01 + EP03 | Monorepo + 数据库/缓存底层 | [L01](./learning/L01-foundation.md) |
+| 1 | 第 1-2 周 | EP00 + EP01 + EP03 | 协作栈 + Monorepo + 数据库/缓存 | [L00](./learning/L00-ai-collab-stack.md) + [L01](./learning/L01-foundation.md) |
 | 2 | 第 3 周 | EP02 | 流式对话 + LangGraph + LangSmith | [L02](./learning/L02-streaming-langgraph.md) |
 | 3 | 第 4-5 周 | EP04 | LangChain 快 RAG + LlamaIndex 自研 RAG | [L03](./learning/L03-rag-dual-stack.md) |
 | 4 | 第 6 周 | EP05 | LangGraph Agent 全流程 | [L04](./learning/L04-agent.md) |
@@ -22,6 +22,7 @@
 2. **可观测**全流程接 **LangSmith**，线上线下同一套排查方式。
 3. **知识库**：快迭代用 **LangChain RAG**；深度定制与 Token 强管控用 **LlamaIndex 自研**。
 4. **成本**：切块、拼接、统计三层管控 Token。
+5. **协作**：**OpenSpec** 对齐变更 · **Superpowers** 约束 AI 实现 · **Harness** 回归 Agent/API（见 [ai-collab-stack.md](../tech/ai-collab-stack.md)）。
 
 ## 周度跟踪（完成度手动更新）
 

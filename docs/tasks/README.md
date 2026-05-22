@@ -8,6 +8,7 @@
 | 类型 | 文档 |
 |:-----|:-----|
 | 12 周总览 | [00-iteration-overview.md](./00-iteration-overview.md) |
+| AI 协作栈（Collab） | [EP00](./epics/EP00-ai-collaboration.md) · [L00](./learning/L00-ai-collab-stack.md) · [最佳实践](../tech/ai-collab-best-practices.md) · [团队 onboarding](../team/onboarding.md) |
 | 周度复盘模板 | [weekly-tracker.md](./weekly-tracker.md) |
 | 双轨进度看板 | [progress-dashboard.md](./progress-dashboard.md) |
 | 学习路线索引 | [learning/README.md](./learning/README.md) |
@@ -16,6 +17,7 @@
 
 | 史诗 | 周期 | 任务文件 | 学习路线 |
 |:----:|:-----|:---------|:---------|
+| EP00 | 贯穿 | [epics/EP00-ai-collaboration.md](./epics/EP00-ai-collaboration.md) | [L00 协作栈](./learning/L00-ai-collab-stack.md) |
 | EP01 | 1-2 周 | [epics/EP01-engineering.md](./epics/EP01-engineering.md) | [L01 基建](./learning/L01-foundation.md) |
 | EP03 | 1-2 周并行 | [epics/EP03-data-storage.md](./epics/EP03-data-storage.md) | [L01 基建](./learning/L01-foundation.md) |
 | EP02 | 第 3 周 | [epics/EP02-streaming-chat.md](./epics/EP02-streaming-chat.md) | [L02 流式+LangGraph](./learning/L02-streaming-langgraph.md) |
@@ -57,8 +59,9 @@
 |:-----|:---------|:---------|
 | **Build 轨** | 功能是否可用、能否演示 | `epics/*.md` 任务勾选 |
 | **Learn 轨** | 是否理解原理、能否讲清楚 | `learning/*.md` + 自写 `docs/tech/*` |
+| **Collab 轨** | 需求可追溯、AI 可控、可回归 | [EP00](./epics/EP00-ai-collaboration.md) + OpenSpec + Harness |
 
-**建议比例（按周）**：约 **70% 时间写代码 / 30% 系统学习**。遇到阻塞再临时加大学习比重，避免「只看不写」。
+**建议比例（按周）**：约 **65% Build / 25% Learn / 10% Collab**（第 1 周 Collab 可提到 20%，完成 EP00 0.1–0.2）。遇到阻塞再临时加大学习比重，避免「只看不写」。
 
 ### 2. 每条学习项设两个勾
 
@@ -122,8 +125,9 @@
 
 | 史诗 | Build 进度 | 说明 |
 |:-----|:-----------|:-----|
-| EP01 | 🟡 进行中 | Story 1.1–1.3、1.2 已完成，1.4 FastAPI 待做 |
-| EP03 | ⚪ 未开始 | 与 EP01 第 1-2 周并行 |
+| EP00 | 🟡 进行中 | Superpowers / OpenSpec / Harness 已入文档，待本机 init |
+| EP01 | 🟡 进行中 | Story 1.1–1.4 已完成，1.5 可选 |
+| EP03 | ⚪ 未开始 | 建议先 EP00 0.1–0.2 + propose ep03 |
 | 其余 | ⚪ 未开始 | — |
 
 详细勾选见各 `epics/*.md` 与 [progress-dashboard.md](./progress-dashboard.md)。

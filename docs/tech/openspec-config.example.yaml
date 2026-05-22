@@ -1,0 +1,34 @@
+# 复制到仓库根 openspec/config.yaml（openspec init 后合并）
+# 文档：docs/tech/ai-collab-best-practices.md §1.4
+
+context: |
+  Project: MemoryOS — AI memory, RAG, Agent platform (Monorepo).
+
+  Layout:
+    - apps/web: Next.js 15, App Router, TypeScript, Tailwind v4, pnpm filter @memoryos/web
+    - apps/api: FastAPI, Python 3.11+ (Conda env: memoryos-api), NOT in pnpm workspace
+    - packages/shared, packages/ui: workspace:* consumed by web
+
+  Commands (repo root):
+    - pnpm install / pnpm dev:web / pnpm dev:api / pnpm dev:all
+    - pnpm setup:api / pnpm test:api:harness
+
+  API conventions:
+    - Unified JSON: { code: number, message: string, data: T | null }
+    - Layers: api (router) -> services -> repositories; ORM in models/
+    - Health: GET /health, GET /api/v1/health
+
+  Planning docs:
+    - Epics: docs/tasks/epics/EP*.md
+    - Learning: docs/tasks/learning/L*.md
+    - FE: docs/tech/FE-engineering.md
+    - BE: docs/tech/BE-engineering.md
+    - AI collab: docs/tech/ai-collab-stack.md
+
+  Do not commit secrets; use .env.example only.
+
+rules:
+  - Align each change with one epic Story block; link epic id in proposal.md.
+  - Multi-file or cross web+api changes require this change folder before implementation.
+  - After merge, run /opsx:archive and update docs/tasks/epics checkboxes.
+  - Add or update apps/api/tests/harness for API behavior changes (L1 minimum).

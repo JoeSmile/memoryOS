@@ -29,6 +29,7 @@
 
 | 文件 | 周次 | 史诗 | 体量 |
 |:-----|:-----|:-----|:-----|
+| [L00-ai-collab-stack.md](./L00-ai-collab-stack.md) | 1 起贯穿 | EP00 | Superpowers · OpenSpec · Harness |
 | [L01-foundation.md](./L01-foundation.md) | 1-2 | EP01 + EP03 | 基建 + DB + JWT |
 | [L02-streaming-langgraph.md](./L02-streaming-langgraph.md) | 3 | EP02 | SSE + LangGraph |
 | [L03-rag-dual-stack.md](./L03-rag-dual-stack.md) | 4-5 | EP04 | 双 RAG |
@@ -52,6 +53,8 @@
 |:-----|:-----|
 | Next.js | https://nextjs.org/docs |
 | FastAPI | https://fastapi.tiangolo.com |
+| OpenSpec | https://openspec.dev/ |
+| Superpowers | https://github.com/obra/superpowers |
 | LangGraph | https://langchain-ai.github.io/langgraph/ |
 | LangSmith | https://docs.smith.langchain.com |
 | LlamaIndex | https://docs.llamaindex.ai |

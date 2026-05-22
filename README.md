@@ -115,9 +115,12 @@ pnpm setup:api
 pnpm dev:web    # http://localhost:3000
 pnpm dev:api    # http://localhost:8000/docs
 pnpm dev:all    # 前后端并行
+pnpm test:api:harness   # API 契约测试（Harness L1）
 ```
 
 使用 Conda 时无需每次 `conda activate`：`dev:api` 会通过 `conda run -n memoryos-api` 启动。
+
+**AI 协作栈**（带队可复用）：[入门](./docs/tech/ai-collab-stack.md) · [最佳实践](./docs/tech/ai-collab-best-practices.md) · [团队 onboarding](./docs/team/onboarding.md) · [EP00](./docs/tasks/epics/EP00-ai-collaboration.md) · [L00](./docs/tasks/learning/L00-ai-collab-stack.md)
 
 ### 环境变量
 
@@ -141,6 +144,7 @@ pnpm dev:all    # 前后端并行
 | `pnpm build` | 构建所有 workspace 包 |
 | `pnpm lint` | 运行各包 lint |
 | `pnpm format` | 运行各包格式化 |
+| `pnpm test:api:harness` | API Harness L1 测试 |
 
 ## 路线图
 

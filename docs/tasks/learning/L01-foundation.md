@@ -1,7 +1,8 @@
 # L01 — 基建阶段学习（第 1-2 周）
 
 **对应史诗**：EP01 + EP03  
-**建议时间分配**：学习 30% · 编码 70%  
+**协作栈（建议并行）**：[L00-ai-collab-stack.md](./L00-ai-collab-stack.md)（OpenSpec / Superpowers / Harness）  
+**建议时间分配**：学习 25% · 编码 65% · Collab 10%  
 **知识笔记**：[nextjs15.md](../../tech/knowledge/nextjs15.md) ·
 [vite-vs-turbopack.md](../../tech/knowledge/vite-vs-turbopack.md) ·
 [FE-engineering.md](../../tech/FE-engineering.md)
@@ -56,7 +57,7 @@
 - [ ] 📖 `async def` 路由 + `asyncpg` / SQLAlchemy 2.0 异步 Session
 - [ ] 📖 `Depends(get_db)`、`Depends(get_current_user)` 组合与执行顺序
 - [ ] 📖 Pydantic v2：`BaseModel`、`model_validate`、响应 `response_model`
-- [ ] 📖 全局异常处理器、统一 `{ code, message, data }` 响应体
+- [x] 📖 全局异常处理器、统一 `{ code, message, data }` 响应体
 - [ ] 📖 CORS、请求 ID、日志中间件（结构化 log）
 - [ ] 🔧 `apps/api/app/main.py`、`api/`、`core/`、`services/`、`repositories/`
 - [ ] 🔧 `docs/tech/BE-engineering.md`

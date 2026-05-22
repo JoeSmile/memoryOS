@@ -5,7 +5,7 @@
 | **周期** | 第 1-2 周 |
 | **优先级** | P0 |
 | **状态** | 🟡 进行中 |
-| **学习路线** | [L01-foundation.md](../learning/L01-foundation.md) |
+| **学习路线** | [L01-foundation.md](../learning/L01-foundation.md) · 协作栈 [L00](../learning/L00-ai-collab-stack.md) |
 | **目标文档** | [FE-engineering.md](../../tech/FE-engineering.md) ✅ · [BE-engineering.md](../../tech/BE-engineering.md) ✅ |
 
 ---
