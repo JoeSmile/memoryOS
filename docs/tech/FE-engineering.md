@@ -95,9 +95,12 @@ pnpm --filter @memoryos/web add -D @types/node
 #### 启动
 
 ```bash
+pnpm dev                  # 同 dev:stack：db:up + 前后端
+pnpm dev:stack            # PostgreSQL + dev:web + dev:api
+pnpm db:up                # 仅 Docker Postgres（EP03）
 pnpm dev:web              # 前端 http://localhost:3000
-pnpm dev:api              # 后端 http://localhost:8000（见下方说明）
-pnpm dev:all              # 前后端并行
+pnpm dev:api              # 后端 http://localhost:8000
+pnpm dev:all              # 仅前后端（需已 pnpm db:up）
 pnpm --filter @memoryos/web build
 pnpm -r run lint          # 所有 workspace 包执行 lint
 ```

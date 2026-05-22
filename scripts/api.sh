@@ -85,6 +85,7 @@ cmd_dev() {
 
 cmd_exec() {
   shift
+  cd "${API_DIR}"
   if [[ $# -eq 0 ]]; then
     echo "用法: $0 exec <command...>"
     exit 1

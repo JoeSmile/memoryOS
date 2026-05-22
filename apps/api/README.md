@@ -28,6 +28,25 @@ apps/api/
 └── .env.example
 ```
 
+## 数据库（EP03）
+
+```bash
+pnpm db:up             # 仓库根目录
+cp .env.example .env   # 含 DATABASE_URL
+```
+
+ER 与字段说明：[docs/database.md](../../docs/database.md)。
+
+**迁移（Story 3.2）**：
+
+```bash
+pnpm setup:api          # 安装 sqlalchemy / asyncpg / alembic
+pnpm db:up              # PostgreSQL 就绪
+pnpm db:migrate         # alembic upgrade head
+# 或: cd apps/api && alembic upgrade head
+pnpm db:psql -c "\dt"   # 应看到 users, conversations, messages
+```
+
 ## 启动
 
 **推荐：在仓库根目录**
@@ -51,7 +70,9 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 </details>
 
 - API 文档：<http://localhost:8000/docs>
-- 健康检查：<http://localhost:8000/health>（Story 1.4）
+- 健康检查：<http://localhost:8000/health>
+- 开发用户：`POST /api/v1/users` `{"email":"you@example.com"}`
+- 会话：`GET /api/v1/conversations?user_id=<uuid>`、`POST /api/v1/conversations`
 
 > 本包为 Python 项目，**不纳入** pnpm workspace；与前端通过 HTTP / SSE 通信。  
 > **Git 分支、Conventional Commits、PR 流程**与全仓库一致，见根目录 [CONTRIBUTING.md](../../CONTRIBUTING.md)。

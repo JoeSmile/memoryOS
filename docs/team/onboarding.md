@@ -1,8 +1,8 @@
 # MemoryOS 团队 Onboarding 与协作手册
 
 > **读者**：新加入的开发者、Tech Lead。  
-> **配套**：[ai-collab-stack.md](../tech/ai-collab-stack.md) ·
-> [ai-collab-best-practices.md](../tech/ai-collab-best-practices.md) ·
+> **配套**：[daily-playbook.md](./daily-playbook.md)（**工具太多时只读这篇**）· [ai-collab-stack.md](../tech/ai-collab-stack.md)
+> · [ai-collab-best-practices.md](../tech/ai-collab-best-practices.md) ·
 > [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 ---

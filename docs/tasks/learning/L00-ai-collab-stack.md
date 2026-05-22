@@ -26,12 +26,12 @@
 
 ### 学什么
 
-- [ ] 📖 Spec vs Change：`openspec/specs` 现状 vs `openspec/changes` 提案
-- [ ] 📖 OPSX：`/opsx:propose` → `/opsx:apply` → `/opsx:archive`
-- [ ] 📖 与 `docs/tasks/epics` 的分工（史诗 vs 单次变更）
+- [x] 📖 Spec vs Change：`openspec/specs` 现状 vs `openspec/changes` 提案
+- [x] 📖 OPSX：`/opsx:propose` → `/opsx:apply` → `/opsx:archive`
+- [x] 📖 与 `docs/tasks/epics` 的分工（史诗 vs 单次变更）
 - [ ] 📖 brownfield：在已有 MemoryOS 上迭代，不是重写
-- [ ] 🔧 仓库根 `openspec init` + `openspec/config.yaml` 含项目上下文
-- [ ] 🔧 至少 1 个归档 change（建议：`ep03-data-storage`）
+- [x] 🔧 仓库根 `openspec init` + `openspec/config.yaml` 含项目上下文
+- [x] 🔧 归档 change：`openspec/changes/archive/2026-05-22-ep03-data-storage/`
 
 ### 面试 / 带队常问
 
@@ -92,8 +92,8 @@
 - [ ] 📖 Harness vs Framework（LangGraph 是框架，Harness 是运行时+测试床）
 - [ ] 📖 L1 确定性 / L2 模型评分 / L3 统计 pass rate
 - [ ] 📖 tool simulator：测试不调真 OpenAI、真 DB
-- [ ] 🔧 `apps/api/tests/harness/` 目录 + health 契约测试
-- [ ] 🔧 CI 或本地文档说明如何 `pytest tests/harness`
+- [x] 🔧 `apps/api/tests/harness/` + health / conversations 契约测试
+- [x] 🔧 根目录 `pnpm test:api:harness`
 
 ### 面试 / 带队常问
 
@@ -119,9 +119,9 @@
 
 ### 学什么
 
-- [ ] 📖 能画一张图：OpenSpec → Superpowers → Harness → merge
+- [x] 📖 能画一张图：OpenSpec → Superpowers → Harness → merge
 - [ ] 📖 MemoryOS 单次功能 DoD（见 ai-collab-stack §6）
-- [ ] 🔧 `docs/tech/ai-collab-stack.md` 已读并在 retro 里写过一次实践
+- [x] 🔧 EP03 完整走通 propose → apply → archive
 
 ### 阶段自测（第 1–2 周末）
 

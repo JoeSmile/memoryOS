@@ -1,7 +1,8 @@
 # L01 — 基建阶段学习（第 1-2 周）
 
 **对应史诗**：EP01 + EP03  
-**协作栈（建议并行）**：[L00-ai-collab-stack.md](./L00-ai-collab-stack.md)（OpenSpec / Superpowers / Harness）  
+**协作栈（建议并行）**：[L00-ai-collab-stack.md](./L00-ai-collab-stack.md)（OpenSpec /
+Superpowers / Harness）  
 **建议时间分配**：学习 25% · 编码 65% · Collab 10%  
 **知识笔记**：[nextjs15.md](../../tech/knowledge/nextjs15.md) ·
 [vite-vs-turbopack.md](../../tech/knowledge/vite-vs-turbopack.md) ·
@@ -84,8 +85,8 @@
 
 ### 学什么
 
-- [ ] 📖 表设计：`users`、`conversations`（或 sessions）、`messages` 外键与级联
-- [ ] 📖 索引：`(user_id)`、`(conversation_id, created_at)` 组合索引意义
+- [x] 📖 表设计：`users`、`conversations`（或 sessions）、`messages` 外键与级联
+- [x] 📖 索引：`(user_id)`、`(conversation_id, created_at)` 组合索引意义
 - [ ] 📖 `EXPLAIN ANALYZE` 看 seq scan vs index scan（会认即可）
 - [ ] 📖 Alembic：`revision` 链、`upgrade`/`downgrade`、勿手改已发布 migration
 - [ ] 📖 连接池：`pool_size`、`max_overflow`、超时

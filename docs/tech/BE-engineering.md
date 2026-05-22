@@ -32,11 +32,15 @@ apps/api/
 │   │       └── health.py    # 健康检查
 │   ├── core/
 │   │   ├── config.py        # 环境变量（pydantic-settings）
+│   │   ├── database.py      # async engine、get_db
 │   │   ├── response.py      # 统一响应 { code, message, data }
 │   │   └── exceptions.py    # AppException + 全局 handler
 │   ├── schemas/             # Pydantic 模型（API 契约）
-│   ├── models/              # SQLAlchemy ORM
+│   ├── models/              # SQLAlchemy ORM（User, Conversation, Message）
+│   ├── repositories/        # 数据访问（EP03 §4）
 │   └── services/            # 业务逻辑
+├── alembic/                 # 迁移；revision 001_core_tables
+├── alembic.ini
 ├── requirements.txt
 └── .env.example
 ```
@@ -55,8 +59,7 @@ services/*.py        # 业务：编排、事务边界
 models + Repository  # 数据访问（EP03）
 ```
 
-**Story 1.4**：仅 `main` + `api` + `core` + `schemas`；`services` / `models`
-为占位目录。
+**Story 3.2（EP03）**：`database.py`、`models/`、`repositories/`、`services/`、`api/v1/users` + `conversations`、`alembic/`。
 
 ---
 
@@ -97,6 +100,12 @@ pnpm dev:all      # 与前端并行
 ```
 
 实现：`scripts/api.sh`（Conda `memoryos-api` 或 `apps/api/.venv`）。
+
+数据库迁移（EP03 Story 3.2）：
+
+```bash
+pnpm db:up && pnpm db:migrate
+```
 
 | 地址                                | 说明        |
 | :---------------------------------- | :---------- |
