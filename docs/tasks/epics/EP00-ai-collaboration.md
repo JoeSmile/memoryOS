@@ -32,7 +32,7 @@ OpenSpec（对齐做什么）→ Superpowers（约束怎么做）→ Harness（�
 
 ## Story 0.2 Superpowers 接入
 
-- [ ] Cursor 安装 Superpowers（Plugin Marketplace 或官方 skills 路径）
+- [ ]/add-plugin superpowers
 - [ ] 团队约定：P0 Story 开工前 **brainstorm 或 plan**（记录在 OpenSpec
       proposal 或 issue）
 - [ ] 在 `CONTRIBUTING.md` 或 PR 模板中链接
