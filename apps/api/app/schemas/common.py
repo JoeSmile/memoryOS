@@ -5,6 +5,14 @@ class HealthData(BaseModel):
     status: str = Field("ok", examples=["ok"])
     app: str
     env: str
+    postgres: str = Field(
+        "disabled",
+        description="ok | down | disabled",
+    )
+    redis: str = Field(
+        "disabled",
+        description="ok | down | disabled",
+    )
 
 
 class HealthResponse(BaseModel):

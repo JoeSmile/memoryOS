@@ -19,3 +19,5 @@ async def test_health_returns_unified_envelope():
             assert body["data"]["status"] == "ok"
             assert "app" in body["data"]
             assert "env" in body["data"]
+            assert body["data"]["postgres"] in ("ok", "down", "disabled")
+            assert body["data"]["redis"] in ("ok", "down", "disabled")

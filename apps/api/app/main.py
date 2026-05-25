@@ -6,6 +6,7 @@ from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.response import success
 from app.schemas.common import HealthData
+from app.services.health_service import probe_postgres, probe_redis
 
 app = FastAPI(
     title=settings.app_name,
@@ -28,11 +29,15 @@ register_exception_handlers(app)
 @app.get("/health", tags=["health"])
 async def root_health():
     """根路径健康检查（Story 1.4）。"""
+    postgres = await probe_postgres()
+    redis = await probe_redis()
     return success(
         data=HealthData(
             status="ok",
             app=settings.app_name,
             env=settings.env,
+            postgres=postgres,
+            redis=redis,
         ).model_dump(),
     )
 

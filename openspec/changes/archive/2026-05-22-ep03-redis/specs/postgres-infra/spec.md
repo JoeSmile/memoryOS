@@ -1,10 +1,4 @@
-# postgres-infra Specification
-
-## Purpose
-
-Local PostgreSQL and Redis via Docker Compose for MemoryOS development (EP03).
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Local PostgreSQL via Docker Compose
 

@@ -27,6 +27,21 @@ class Settings(BaseSettings):
         description="postgresql+asyncpg://user:pass@host:5432/dbname",
     )
 
+    redis_url: str | None = Field(
+        default="redis://localhost:6379/0",
+        description="redis://host:6379/0 — unset to disable cache",
+    )
+
+    conversation_list_cache_ttl: int = Field(
+        default=300,
+        description="seconds for memoryos:conversations:user:{id}",
+    )
+
+    stream_cache_ttl: int = Field(
+        default=3600,
+        description="seconds for memoryos:stream:{conversation_id}:{stream_id}",
+    )
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
@@ -39,6 +54,11 @@ def get_settings() -> Settings:
         logger.warning(
             "DATABASE_URL is not set; DB features disabled until configured "
             "(see apps/api/.env.example, run pnpm db:up)."
+        )
+    if not s.redis_url:
+        logger.warning(
+            "REDIS_URL is not set; cache features disabled "
+            "(see apps/api/.env.example)."
         )
     return s
 

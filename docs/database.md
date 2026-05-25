@@ -107,20 +107,35 @@ design 一致；后续可改为 PostgreSQL `ENUM` 类型。
 | :----------- | :--------------------------------------------------------------- |
 | Compose 文件 | `infra/docker/docker-compose.yml`                                |
 | 连接串       | `postgresql+asyncpg://memoryos:memoryos@localhost:5432/memoryos` |
-| 启动         | `cd infra/docker && docker compose up -d`                        |
+| 启动         | `pnpm db:up`（Postgres + Redis）                                 |
+| Redis        | `redis://localhost:6379/0`                                       |
 
 详见 [infra/docker/README.md](../infra/docker/README.md)。
 
 ---
 
-## 后续史诗（不在 Story 3.1–3.2）
+## Redis 缓存（Story 3.3）
 
-| 史诗   | 表/能力                         |
-| :----- | :------------------------------ |
-| EP03.3 | Redis 会话列表缓存              |
-| EP03.4 | JWT、`users.password_hash` 必填 |
-| EP04   | `documents`、`chunks`、pgvector |
-| EP06   | 记忆相关表扩展                  |
+PostgreSQL 为真相源；Redis 用于 Cache-Aside 与流式临时数据。
+
+| Key 模式                                        | TTL        | 说明                                    |
+| :---------------------------------------------- | :--------- | :-------------------------------------- |
+| `memoryos:conversations:user:{user_id}`         | 300s       | 用户会话列表 JSON（`ConversationRead`） |
+| `memoryos:stream:{conversation_id}:{stream_id}` | 3600s      | EP02 SSE partial content                |
+| `memoryos:jwt:blacklist:{jti}`                  | token 寿命 | Story 3.4 预留                          |
+
+实现：`apps/api/app/cache/` · 配置 `REDIS_URL`。
+
+---
+
+## 后续史诗
+
+| 史诗   | 表/能力                          |
+| :----- | :------------------------------- |
+| EP03.3 | ✅ Redis 会话列表 + 流式临时缓存 |
+| EP03.4 | JWT、`users.password_hash` 必填  |
+| EP04   | `documents`、`chunks`、pgvector  |
+| EP06   | 记忆相关表扩展                   |
 
 ---
 

@@ -1,6 +1,6 @@
-# MemoryOS 本地开发 — EP03 Story 3.1
+# MemoryOS 本地开发 — EP03
 # 用法: docker compose up -d
-# API 在宿主机运行时 DATABASE_URL 主机名用 localhost（见 README）
+# API 在宿主机运行时 DATABASE_URL / REDIS_URL 主机名用 localhost（见 README）
 
 services:
   postgres:
@@ -23,21 +23,21 @@ services:
       retries: 5
       start_period: 10s
 
-  # Story 3.3 启用 Redis 时取消注释
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: memoryos-redis
-  #   restart: unless-stopped
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis-data:/data
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 5s
-  #     timeout: 3s
-  #     retries: 5
+  redis:
+    image: redis:7-alpine
+    container_name: memoryos-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
 
 volumes:
   postgres-data:
-  # redis-data:
+  redis-data:

@@ -22,11 +22,24 @@ cmd_up() {
   for i in $(seq 1 30); do
     if docker compose exec -T postgres pg_isready -U memoryos -d memoryos >/dev/null 2>&1; then
       echo "[ok] PostgreSQL ready at localhost:5432 (db: memoryos)"
+      break
+    fi
+    sleep 1
+    if [[ "$i" -eq 30 ]]; then
+      echo "[warn] PostgreSQL timeout; run: pnpm db:logs"
+      exit 1
+    fi
+  done
+
+  echo "[docker] waiting for Redis..."
+  for i in $(seq 1 30); do
+    if docker compose exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; then
+      echo "[ok] Redis ready at localhost:6379"
       return 0
     fi
     sleep 1
   done
-  echo "[warn] timeout; run: pnpm db:logs"
+  echo "[warn] Redis timeout; run: pnpm db:logs redis"
   exit 1
 }
 
