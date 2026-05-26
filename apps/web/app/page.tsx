@@ -47,8 +47,20 @@ export default function Home() {
 
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/chat"
+            href="/register"
             className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          >
+            注册
+          </Link>
+          <Link
+            href="/login"
+            className="rounded-lg border border-zinc-300 px-5 py-2.5 text-sm font-medium transition hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          >
+            登录
+          </Link>
+          <Link
+            href="/chat"
+            className="rounded-lg border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-500 transition hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
           >
             进入对话（EP02）
           </Link>
