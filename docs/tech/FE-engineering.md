@@ -29,6 +29,7 @@ memoryOS（pnpm Monorepo）
 | 代码检查      | ESLint 9（Flat Config）             |    ✅     |
 | 代码格式化    | Prettier 3 + Tailwind 插件          |    ✅     |
 | 构建加速      | Turbopack dev（`next dev --turbopack`）；build 默认 Webpack @15.5 | ✅ |
+| API 客户端    | `lib/api-client.ts` + Bearer        |    ✅ EP03.4 |
 | 状态管理      | Zustand                             |  📋 EP02  |
 | 流式通信      | SSE / ReadableStream                |  📋 EP02  |
 | 富文本        | react-markdown + 高亮               |  📋 EP02  |
@@ -473,7 +474,7 @@ pnpm --filter @memoryos/web lint
 apps/web/
 ├── app/                 # 路由与页面（App Router）
 ├── components/          # 仅 web 使用的业务组件
-├── lib/                 # API 客户端、工具函数
+├── lib/                 # API 客户端（`api-client.ts`）、`auth-token.ts`
 ├── stores/              # Zustand stores（EP02）
 ├── hooks/               # 自定义 Hooks
 └── public/              # 静态资源

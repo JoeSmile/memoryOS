@@ -51,7 +51,7 @@ erDiagram
 | :-------------- | :------------- | :------------------------------ | :-------------------------- |
 | `id`            | `UUID`         | PK, default `gen_random_uuid()` | 用户 ID                     |
 | `email`         | `VARCHAR(255)` | UNIQUE, NOT NULL                | 登录标识（EP03.4 JWT）      |
-| `password_hash` | `VARCHAR(255)` | NULL                            | bcrypt 哈希；Story 3.1 可空 |
+| `password_hash` | `VARCHAR(255)` | NULL                            | bcrypt 哈希；`auth/register` 必填，旧 harness 用户可空 |
 | `created_at`    | `TIMESTAMPTZ`  | NOT NULL, default `now()`       | UTC                         |
 | `updated_at`    | `TIMESTAMPTZ`  | NOT NULL, default `now()`       | UTC                         |
 
@@ -114,6 +114,17 @@ design 一致；后续可改为 PostgreSQL `ENUM` 类型。
 
 ---
 
+## 鉴权（Story 3.4）
+
+- 注册：`POST /api/v1/auth/register` → 写入 `password_hash`（bcrypt）。
+- 登录：`POST /api/v1/auth/login` → JWT access token（HS256，`JWT_SECRET`）。
+- 当前用户：`GET /api/v1/me`，Header `Authorization: Bearer <token>`。
+- Redis key `memoryos:jwt:blacklist:{jti}` 已预留；本 Story 未实现 refresh/黑名单。
+
+详见 [BE-engineering.md](./tech/BE-engineering.md) §4.1。
+
+---
+
 ## Redis 缓存（Story 3.3）
 
 PostgreSQL 为真相源；Redis 用于 Cache-Aside 与流式临时数据。
@@ -133,7 +144,7 @@ PostgreSQL 为真相源；Redis 用于 Cache-Aside 与流式临时数据。
 | 史诗   | 表/能力                          |
 | :----- | :------------------------------- |
 | EP03.3 | ✅ Redis 会话列表 + 流式临时缓存 |
-| EP03.4 | JWT、`users.password_hash` 必填  |
+| EP03.4 | ✅ JWT、`auth/register` 写入 `password_hash` |
 | EP04   | `documents`、`chunks`、pgvector  |
 | EP06   | 记忆相关表扩展                   |
 

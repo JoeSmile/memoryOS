@@ -14,7 +14,7 @@
 | ORM    | SQLAlchemy + Alembic  | EP03 落地                          |
 | 数据库 | PostgreSQL + pgvector | EP03                               |
 | 缓存   | Redis                 | EP03                               |
-| 鉴权   | JWT                   | EP03                               |
+| 鉴权   | JWT (PyJWT + bcrypt)  | EP03 Story 3.4 ✅                  |
 
 Python 零基础入门见 [python-getting-started.md](./python-getting-started.md)。
 
@@ -33,6 +33,8 @@ apps/api/
 │   ├── core/
 │   │   ├── config.py        # 环境变量（pydantic-settings）
 │   │   ├── database.py      # async engine、get_db
+│   │   ├── security.py      # bcrypt、JWT 签发/校验
+│   │   ├── deps.py          # get_current_user（Bearer）
 │   │   ├── response.py      # 统一响应 { code, message, data }
 │   │   └── exceptions.py    # AppException + 全局 handler
 │   ├── schemas/             # Pydantic 模型（API 契约）
@@ -91,6 +93,28 @@ HTTP 状态码与 `code` 可分离：例如鉴权失败 HTTP 401，`code` 为业
 
 ---
 
+## 4.1 JWT 鉴权（Story 3.4）
+
+| 路由 | 说明 |
+|:-----|:-----|
+| `POST /api/v1/auth/register` | 注册，`password` 写入 `users.password_hash`（bcrypt） |
+| `POST /api/v1/auth/login` | 登录，返回 `{ access_token, token_type: "bearer" }` |
+| `GET /api/v1/me` | 需 `Authorization: Bearer <token>`，返回当前用户 |
+
+**环境变量**（`apps/api/.env.example`）：`JWT_SECRET`、`JWT_ALGORITHM`（默认 HS256）、`ACCESS_TOKEN_EXPIRE_MINUTES`、`PASSWORD_MIN_LENGTH`。
+
+**实现要点**：
+
+- `app/core/security.py`：`hash_password` / `verify_password`、`create_access_token` / `decode_access_token`；payload `{ sub: user_uuid, exp }`。
+- `app/core/deps.py`：`get_current_user` 解析 Bearer，失败 `401` + `code` 40101。
+- `POST /api/v1/users` 保留供 harness/开发，**deprecated**（无密码快捷建用户）。
+
+**业务码**：`40101` 未认证/无效 token · `40102` 登录凭证错误 · `40901` 邮箱已存在 · `50301` JWT 未配置（`JWT_SECRET` 缺失时 login/me）。
+
+**前端**：`apps/web/lib/api-client.ts` 自动附加 Bearer；已登录时 HTTP 401 清 `localStorage` 的 `memoryos_access_token` 并跳转 `/login`（首版 localStorage，EP09 可改 httpOnly）。
+
+---
+
 ## 5. 本地开发
 
 在 Monorepo **根目录**：
@@ -131,6 +155,6 @@ pnpm db:up && pnpm db:migrate
 
 | Epic  | 后端增量                                           |
 | :---- | :------------------------------------------------- |
-| EP03  | `models/`、`DATABASE_URL`、JWT、`core/security.py` |
+| EP03  | `models/`、`DATABASE_URL`、JWT、`core/security.py`、`auth` + `GET /me` |
 | EP02  | `api/v1/chat.py`、SSE、`services/chat.py`          |
 | EP04+ | RAG、Agent、记忆 API                               |

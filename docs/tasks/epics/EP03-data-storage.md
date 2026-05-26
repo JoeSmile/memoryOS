@@ -4,8 +4,8 @@
 | :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **周期**     | 第 1-2 周（与 EP01 并行）                                                                                                                                    |
 | **优先级**   | P0                                                                                                                                                           |
-| **状态**     | 🟡 进行中（3.1–3.3 完成，3.4+ 待做）                                                                                                                         |
-| **OpenSpec** | 已归档 [`ep03-redis`](../../../openspec/changes/archive/2026-05-22-ep03-redis/) · [`ep03-data-storage`](../../../openspec/changes/archive/2026-05-22-ep03-data-storage/) |
+| **状态**     | 🟡 进行中（3.1–3.4 完成，3.5 待做）                                                                                                                          |
+| **OpenSpec** | 已归档 [`ep03-jwt`](../../../openspec/changes/archive/2026-05-22-ep03-jwt/) · 进行中 [`ep03-db-optimize`](../../../openspec/changes/ep03-db-optimize/) · 已归档 [`ep03-redis`](../../../openspec/changes/archive/2026-05-22-ep03-redis/) |
 | **学习路线** | [L01-foundation.md](../learning/L01-foundation.md) · [L00](../learning/L00-ai-collab-stack.md)                                                               |
 
 ---
@@ -33,9 +33,9 @@
 
 ## Story 3.4 JWT 鉴权
 
-- [ ] 注册 / 登录、bcrypt
-- [ ] Bearer 中间件、`GET /me`
-- [ ] 前端登录页 + Token 拦截器
+- [x] 注册 / 登录、bcrypt
+- [x] Bearer 中间件、`GET /me`
+- [x] 前端登录/注册页 + Token 拦截器（`/login`、`/register`、`lib/api-client.ts`）
 
 ## Story 3.5 优化
 
