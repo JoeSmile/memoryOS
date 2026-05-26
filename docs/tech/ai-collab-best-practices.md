@@ -5,7 +5,7 @@
 
 ---
 
-## 0. 黄金法则（三条）
+## 0. 黄金法则（四条）
 
 1. **没有 change，没有大 PR** — 超过 3 个文件或跨 `apps/web` + `apps/api`
    的改动，必须先有 OpenSpec change（或 epic 已拆好的 Story）。
@@ -13,6 +13,7 @@
    列出小步；禁止「帮我实现整个 EP03」。
 3. **没有 Harness 绿，不合并 API/Agent**
    — 至少 L1；EP02+ 的 LLM 路径必须有 L2 说明或 waived 理由（Tech Lead 批准）。
+4. **单 task 可 review** — 用 **`/work-next`**（代码五条见 [code-quality.md](./code-quality.md) §1；体量/停步见 work-next，不在此重复）。
 
 ---
 
@@ -72,7 +73,7 @@ rules:
 
 - [ ] proposal 写清了 **Why / What / Out of scope**
 - [ ] design 标了影响的目录（`apps/api/...`、`apps/web/...`）
-- [ ] tasks 可勾选、粒度 ≤ 半天
+- [ ] tasks 可勾选、粒度 ≤ 半天，每条含 **预计文件 / 层**（见 [openspec-tasks-template.md](./openspec-tasks-template.md)）
 - [ ] 与 epic Story 编号能对应（如 EP03 Story 3.2）
 - [ ] 合并前已 archive 或 PR 说明「archive 在 merge 后由作者执行」
 

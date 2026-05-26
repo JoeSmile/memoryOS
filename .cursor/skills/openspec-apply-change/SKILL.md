@@ -139,7 +139,8 @@ What would you like to do?
 ```
 
 **Guardrails**
-- Keep going through tasks until done or blocked
+- **MemoryOS + `/work-next`**: complete **one task per session**, output Review 摘要, stop for human review; continue only if user says so (do not loop all tasks in one run unless user explicitly requests batch mode)
+- Without work-next: keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates

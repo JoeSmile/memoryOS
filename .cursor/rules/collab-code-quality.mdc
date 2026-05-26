@@ -1,0 +1,22 @@
+---
+description: MemoryOS 代码五条 + 小步协作；流程细节见 work-next，不在此重复。
+alwaysApply: true
+---
+
+# Collab 代码质量
+
+- **代码五条**（全文）：`docs/tech/code-quality.md` §1  
+- **流程**（单 task、Review 摘要、harness、commit）：`/work-next` → `.cursor/skills/work-next/`
+
+## 代码五条（摘要）
+
+1. 目录与 ESLint/命名（BE / FE engineering）  
+2. 一函数一事；handler 薄  
+3. 关键分支/异常：写「为什么」  
+4. 无未使用依赖；无无关改动  
+5. 复杂逻辑拆到可单测模块  
+
+## 写码时额外遵守（来自 work-next，非与五条冲突）
+
+- 当前 **只做一个 OpenSpec task**；完成后 **Review 摘要** 并停止  
+- 单 task ≤3 文件；API 变更走 harness  

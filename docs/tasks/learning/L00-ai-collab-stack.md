@@ -58,10 +58,10 @@
 
 ### 学什么
 
-- [ ] 📖 流程：brainstorm → plan → TDD → review → finish
-- [ ] 📖 与 OpenSpec 配合点：proposal 通过后再大规模 apply
-- [ ] 📖 subagent / worktree 适用场景（大史诗可拆）
-- [ ] 🔧 Cursor 已安装 Superpowers（或 skills 等价配置）
+- [x] 📖 流程：brainstorm → plan → TDD → review → finish
+- [x] 📖 与 OpenSpec 配合点：proposal 通过后再大规模 apply
+- [x] 📖 subagent / worktree 适用场景（大史诗可拆）
+- [x] 🔧 Cursor 已安装 Superpowers（或 skills 等价配置）
 - [ ] 🔧 至少 1 次「先 plan 后写」的 EP03 或 EP01 小改动记录路径
 
 ### 面试 / 带队常问
@@ -75,8 +75,8 @@
 | 坑              | 现象              | 规避                       |
 | :-------------- | :---------------- | :------------------------- |
 | 跳过 brainstorm | 返工多            | EP02+ 必须先澄清流式协议   |
-| plan 粒度太大   | AI 一次改 10 文件 | 任务 ≤ 1 模块              |
-| 无 review 关    | 明显 bug 进 main  | 对照 OpenSpec tasks 逐项勾 |
+| plan 粒度太大   | AI 一次改 10 文件 | 任务 ≤ 1 模块；见 [code-quality.md](../../tech/code-quality.md) |
+| 无 review 关    | 明显 bug 进 main  | 对照 OpenSpec tasks + 每 task Review 摘要 |
 
 ### 参考
 

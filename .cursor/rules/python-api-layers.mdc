@@ -1,0 +1,21 @@
+---
+description: FastAPI 分层——Router 薄、Service 编排、Repository 仅 PG、cache 仅 Redis
+globs: apps/api/**/*.py
+alwaysApply: false
+---
+
+# Python API 分层
+
+见 `docs/tech/BE-engineering.md` §3、`docs/tech/code-quality.md` §1.3。
+
+```
+api/v1/*.py  →  Depends、调 Service、success() 包装
+services/    →  业务、事务边界、Cache-Aside 编排
+repositories/→  仅 async SQLAlchemy 查询
+cache/       →  仅 Redis；JSON 序列化 DTO，不 pickle ORM
+schemas/     →  Request/Response 契约
+core/        →  config、database、redis、exceptions
+```
+
+- 新建路由先找是否已有 Service 可扩展，避免在 router 堆逻辑。
+- 缓存失效在 **DB commit 之后**（见 conversations 路由模式）。

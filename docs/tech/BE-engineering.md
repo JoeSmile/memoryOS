@@ -49,6 +49,8 @@ apps/api/
 
 ## 3. 分层规范（目标形态）
 
+> 可审查代码细则（函数粒度、diff 预算、注释）：[code-quality.md](./code-quality.md)
+
 ```
 HTTP Request
     ↓

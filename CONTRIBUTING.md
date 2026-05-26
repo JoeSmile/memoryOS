@@ -31,8 +31,11 @@ pnpm setup:api    # 后端 Python
 | **OpenSpec** | 较大功能先 `openspec init`（若仓库已有则 `openspec update`），用 change 文件夹记录 proposal / tasks |
 | **Superpowers** | Cursor 建议先 plan 再实现；PR 避免单次超大 diff |
 | **Harness** | API 变更需通过 `apps/api/tests/harness/`；合并前 `pnpm test:api:harness` |
+| **代码质量** | [code-quality.md](./docs/tech/code-quality.md) — 分层、小步 diff、review 摘要 |
+| **PR** | 填写 [PR 模板](.github/PULL_REQUEST_TEMPLATE.md) 中的 Review 摘要 |
+| **CI** | API 改动依赖 `api-harness` workflow（见 Actions） |
 
-任务与学习：[EP00](./docs/tasks/epics/EP00-ai-collaboration.md) · [L00](./docs/tasks/learning/L00-ai-collab-stack.md)
+任务与学习：[EP00](./docs/tasks/epics/EP00-ai-collaboration.md) · [L00](./docs/tasks/learning/L00-ai-collab-stack.md) · Cursor **`work-next`** skill
 
 ## 分支规范
 

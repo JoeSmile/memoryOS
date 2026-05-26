@@ -1,0 +1,73 @@
+# API L1 Harness — 需 Postgres + Redis（与本地 pnpm db:up 一致）
+name: API Harness
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "infra/docker/**"
+      - "scripts/api.sh"
+      - "scripts/docker.sh"
+      - "package.json"
+      - ".github/workflows/api-harness.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "infra/docker/**"
+      - "scripts/api.sh"
+      - "scripts/docker.sh"
+      - "package.json"
+      - ".github/workflows/api-harness.yml"
+
+concurrency:
+  group: api-harness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  harness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start Postgres and Redis
+        working-directory: infra/docker
+        run: |
+          docker compose up -d
+          for i in $(seq 1 60); do
+            docker compose exec -T postgres pg_isready -U memoryos -d memoryos && break
+            sleep 2
+          done
+          for i in $(seq 1 30); do
+            docker compose exec -T redis redis-cli ping | grep -q PONG && break
+            sleep 2
+          done
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: apps/api/requirements*.txt
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Configure env and migrate
+        working-directory: apps/api
+        run: |
+          cp .env.example .env
+          .venv/bin/alembic upgrade head
+
+      - name: Run harness (L1)
+        working-directory: apps/api
+        run: .venv/bin/pytest tests/harness -q
+
+      - name: Run unit tests
+        working-directory: apps/api
+        run: .venv/bin/pytest tests/unit -q

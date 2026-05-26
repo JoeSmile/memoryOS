@@ -28,13 +28,12 @@
 
 | 作用                          | 和 OpenSpec 关系                               |
 | :---------------------------- | :--------------------------------------------- |
-| brainstorm、plan、TDD、review | OpenSpec 已写 tasks 时，**可不用** Superpowers |
+| brainstorm、plan、TDD、review | 见下表 |
 
-**简化规则：**
+**简化规则（与 [code-quality.md](../tech/code-quality.md) 一致）：**
 
-- **有 OpenSpec `tasks.md`** → 直接按 task 写代码，不必再开 Superpowers plan。
-- **需求很模糊**（不知道表怎么设计）→ 用 Superpowers **brainstorm**
-  一次，结果写进 OpenSpec `design.md`。
+- **有 OpenSpec `tasks.md`** → 用 **`/work-next`**；可跳过 **brainstorm/plan**，**不跳过** API 的 harness/TDD 与 verification。
+- **需求很模糊** → Superpowers **brainstorm**，结论写入 OpenSpec `design.md`。
 
 ### Harness
 

@@ -33,10 +33,12 @@ OpenSpec（What）  →  Superpowers（How）  →  Harness（Prove it works）
 **推荐节奏**（每个 Epic 或 Story 块）：
 
 1. 在 `epics/EP0x` 勾选本周 Build 目标
-2. **`/opsx:propose`** 为本变更建 OpenSpec 文件夹（比聊天历史可追溯）
-3. 用 **Superpowers** 做 plan / 小步 TDD（大功能禁止一次生成整文件）
-4. 合并前补 **Harness** 用例（至少 Layer 1 确定性测试）
-5. **`/opsx:archive`** 把 spec 并回主规格
+2. **`/work-next <change>`** 或 Cursor skill **work-next** — 编排下方 3–5 步
+3. **`/opsx:propose`** 为本变更建 OpenSpec 文件夹（比聊天历史可追溯）
+4. 用 **Superpowers** 做 plan / 小步 TDD（大功能禁止一次生成整文件；小改可跳过）
+5. 合并前补 **Harness** 用例（至少 Layer 1；CI `api-harness` 在 PR 上应绿）
+6. **小 PR + Review 摘要** — 见 [code-quality.md](./code-quality.md) 与 PR 模板
+7. **`/opsx:archive`** 把 spec 并回主规格
 
 ---
 

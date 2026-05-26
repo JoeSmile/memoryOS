@@ -32,10 +32,10 @@ OpenSpec（对齐做什么）→ Superpowers（约束怎么做）→ Harness（�
 
 ## Story 0.2 Superpowers 接入
 
-- [ ]/add-plugin superpowers
-- [ ] 团队约定：P0 Story 开工前 **brainstorm 或 plan**（记录在 OpenSpec
-      proposal 或 issue）
-- [ ] 在 `CONTRIBUTING.md` 或 PR 模板中链接
+- [x] /add-plugin superpowers
+- [x] 团队约定：P0 Story 开工前 **brainstorm 或 plan**（记录在 OpenSpec
+      proposal 或 issue）— 见 Cursor skill **`work-next`**
+- [x] 在 `CONTRIBUTING.md` 或 PR 模板中链接
       [ai-collab-stack.md](../../tech/ai-collab-stack.md)
 
 ## Story 0.3 OpenSpec 与 EP03 首次闭环
@@ -50,7 +50,7 @@ OpenSpec（对齐做什么）→ Superpowers（约束怎么做）→ Harness（�
 - [x] 创建 `apps/api/tests/harness/` + `README.md`
 - [x] L1：`test_health_contract.py`（状态码、`code/message/data` 结构）
 - [x] 根目录 `pnpm test:api:harness` + `test_conversations_contract.py`
-- [ ] （可选）CI 占位：EP08 前在 GitHub Actions 跑 harness
+- [x] CI：`/.github/workflows/api-harness.yml`（push/PR 跑 harness + unit，需 Docker 服务）
 
 ## Story 0.5 贯穿史诗的协作节奏（持续）
 

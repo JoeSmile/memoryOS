@@ -1,0 +1,17 @@
+---
+description: Next.js 前端分层——页面薄、组件展示、Hook/lib 承载逻辑
+globs: apps/web/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# 前端分层（EP02 起严格执行）
+
+见 `docs/tech/FE-engineering.md`、`docs/tech/code-quality.md` §1.4。
+
+- **Server Component 默认**；仅交互处 `'use client'`。
+- **components/**：展示与组合，业务状态进 hooks/stores。
+- **hooks/**：SSE、fetch、表单、Zustand 副作用。
+- **lib/**：纯函数、API client、与 UI 无关的工具。
+- 遵循 ESLint Flat Config + Prettier；不引入未在 package.json 声明的依赖。
+
+单 task ≤3 文件；新 UI 行为配 Storybook 或测试计划（EP02+ 在 OpenSpec tasks 中写明）。

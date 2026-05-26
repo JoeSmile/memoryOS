@@ -103,6 +103,7 @@ After completing all artifacts, summarize:
   - These guide what you write, but should never appear in the output
 
 **Guardrails**
+- For `tasks.md`, follow [docs/tech/openspec-tasks-template.md](../../../docs/tech/openspec-tasks-template.md): each task ≤3 files / ~150 lines, include **预计文件** and **层** per task
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
