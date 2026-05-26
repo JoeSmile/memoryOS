@@ -52,6 +52,8 @@ Implement tasks from an OpenSpec change.
    - **spec-driven**: proposal, specs, design, tasks
    - Other schemas: follow the contextFiles from CLI output
 
+4.5 **Task Review Gate** — read `tasks.md` §0. If `Tasks reviewed by human` unchecked and user did not say **tasks 人审通过** / **继续实现** / **approve tasks**: output Task Review Pack and **STOP** (no code). See `.cursor/skills/work-next/task-review-gate.md`.
+
 5. **Show current progress**
 
    Display:
@@ -61,6 +63,8 @@ Implement tasks from an OpenSpec change.
    - Dynamic instruction from CLI
 
 6. **Implement tasks (loop until done or blocked)**
+
+   **Prerequisite:** §0 Human review passed.
 
    For each pending task:
    - Show which task is being worked on
@@ -135,7 +139,9 @@ What would you like to do?
 ```
 
 **Guardrails**
-- Keep going through tasks until done or blocked
+- **Task Review Gate** before any code (step 4.5)
+- MemoryOS `/work-next`: one task per session unless user requests batch
+- Keep going through tasks until done or blocked (after gate passed)
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates

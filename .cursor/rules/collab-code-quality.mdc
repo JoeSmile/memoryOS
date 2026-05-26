@@ -8,6 +8,18 @@ alwaysApply: true
 - **代码五条**（全文）：`docs/tech/code-quality.md` §1  
 - **流程**（单 task、Review 摘要、harness、commit）：`/work-next` → `.cursor/skills/work-next/`
 
+## OpenSpec Task Review Gate（硬门禁）
+
+- **`/opsx:propose` 完成后必须停止** — 输出 Task Review Pack，**禁止**同会话写 `apps/` 业务代码  
+- **`/opsx:apply` / `/work-next` 前** — 检查 `tasks.md` §0 `Tasks reviewed by human` 已勾选，或用户本轮明确说 **tasks 人审通过** / **继续实现**  
+- 仅说「继续」**不算** tasks 批准（若 §0 未勾选仍须停止）  
+- 细则：`.cursor/skills/work-next/task-review-gate.md`
+
+## 分支（每个 task 开始前）
+
+- §0 人审后：`pnpm branch:change <name>` → `pnpm branch:task <name> [task-id]`  
+- 详见 `docs/tech/branch-strategy.md`；**禁止**未建分支就在 `main` 上堆 task 代码（除非用户明确要求）
+
 ## 代码五条（摘要）
 
 1. 目录与 ESLint/命名（BE / FE engineering）  

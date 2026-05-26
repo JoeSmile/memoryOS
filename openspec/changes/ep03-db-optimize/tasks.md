@@ -1,3 +1,18 @@
+## 0. Human review（apply 前必过）
+
+> propose 完成后 **必须停在这里**等人审；未勾选前 **禁止** 写业务代码。
+
+- [ ] **Tasks reviewed by human** — 人审通过后再 `/opsx:apply`、`/work-next` 或说「继续实现」
+
+### Review checklist
+
+- [ ] 前后端 scope 成对；Harness 覆盖 design scenarios
+- [ ] 与 EP03 Story 3.5 一致；每条 task ≤3 文件
+
+**Reviewer notes:**
+
+---
+
 ## 1. Migration
 
 - [ ] 1.1 Alembic `002` 复合索引 + 更新 `docs/database.md`

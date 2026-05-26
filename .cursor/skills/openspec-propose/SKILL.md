@@ -79,18 +79,25 @@ When ready to implement, run /opsx:apply
       - Use **AskUserQuestion tool** to clarify
       - Then continue with creation
 
-5. **Show final status**
+   d. **When writing `tasks.md`**:
+      - Follow [docs/tech/openspec-tasks-template.md](../../../docs/tech/openspec-tasks-template.md)
+      - **Must include §0 Human review** at the top (checkbox `Tasks reviewed by human`)
+
+5. **Show final status — then HARD STOP (do NOT implement)**
    ```bash
    openspec status --change "<name>"
    ```
 
 **Output**
 
-After completing all artifacts, summarize:
-- Change name and location
-- List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run `/opsx:apply` or ask me to implement to start working on the tasks."
+After completing all artifacts:
+
+1. Summarize change name, artifact paths, tasks 一览表
+2. Output **Task Review Pack** per [.cursor/skills/work-next/task-review-gate.md](../work-next/task-review-gate.md)
+3. **STOP** — do NOT run `/opsx:apply`, do NOT modify `apps/` business code in this session
+4. Prompt: 「请阅读并修改 `tasks.md`；满意后说 **tasks 人审通过** 或 **继续实现**」
+
+**Do NOT** end with only "Run `/opsx:apply` to start implementing" without the human review gate.
 
 **Artifact Creation Guidelines**
 
@@ -103,8 +110,9 @@ After completing all artifacts, summarize:
   - These guide what you write, but should never appear in the output
 
 **Guardrails**
-- For `tasks.md`, follow [docs/tech/openspec-tasks-template.md](../../../docs/tech/openspec-tasks-template.md): each task ≤3 files / ~150 lines, include **预计文件** and **层** per task
+- For `tasks.md`, follow [docs/tech/openspec-tasks-template.md](../../../docs/tech/openspec-tasks-template.md): §0 Human review + each task ≤3 files / ~150 lines, include **预计文件** and **层** per task
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
+- **After all artifacts: HARD STOP for human task review** — never auto-implement in the same turn as propose
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
 - If a change with that name already exists, ask if user wants to continue it or create a new one

@@ -33,11 +33,12 @@ OpenSpec（What）  →  Superpowers（How）  →  Harness（Prove it works）
 **推荐节奏**（每个 Epic 或 Story 块）：
 
 1. 在 `epics/EP0x` 勾选本周 Build 目标
-2. **`/work-next <change>`** 或 Cursor skill **work-next** — 编排下方 3–5 步
-3. **`/opsx:propose`** 为本变更建 OpenSpec 文件夹（比聊天历史可追溯）
-4. 用 **Superpowers** 做 plan / 小步 TDD（大功能禁止一次生成整文件；小改可跳过）
-5. 合并前补 **Harness** 用例（至少 Layer 1；CI `api-harness` 在 PR 上应绿）
-6. **小 PR + Review 摘要** — 见 [code-quality.md](./code-quality.md) 与 PR 模板
+2. **`/opsx:propose`** 为本变更建 OpenSpec 文件夹（proposal / design / tasks）
+3. **Task Review Gate（必做）** — 人读并改 `tasks.md`，勾选 §0 或说「tasks 人审通过」；**AI 不得跳过**
+4. **`pnpm branch:task <change> [id]`** — 当前 task 工作分支（§0 人审后）
+5. **`/work-next <change>`** 或 **`/opsx:apply`** — 按 tasks 逐条实现（一次一条）
+5. 用 **Superpowers** TDD / harness（大功能可 skip brainstorm，不 skip L1）
+6. 合并前 **Review** + `pnpm test:api:harness`
 7. **`/opsx:archive`** 把 spec 并回主规格
 
 ---
@@ -92,8 +93,7 @@ brainstorm → 写计划（小任务）→ TDD（红绿重构）→ code review 
 1. Cursor **Plugin Marketplace**
    搜索安装 Superpowers（或按官方 README 配置 skills）。
 2. 大功能开发前显式触发：**brainstorming** / **writing-plans** 类技能。
-3. 与 OpenSpec 配合：**proposal 人审通过后**再 `/opsx:apply`
-   或 Superpowers 实现。
+3. 与 OpenSpec 配合：**tasks 人审通过（§0 勾选）后**再 `/opsx:apply` 或 `/work-next` 写码。
 
 ### 带团队时
 

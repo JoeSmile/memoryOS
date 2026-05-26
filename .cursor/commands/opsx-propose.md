@@ -75,18 +75,21 @@ When ready to implement, run /opsx:apply
       - Use **AskUserQuestion tool** to clarify
       - Then continue with creation
 
-5. **Show final status**
+   d. **When writing `tasks.md`**: include **§0 Human review** per `docs/tech/openspec-tasks-template.md`
+
+5. **Show final status — HARD STOP (do not implement)**
    ```bash
    openspec status --change "<name>"
    ```
 
 **Output**
 
-After completing all artifacts, summarize:
-- Change name and location
-- List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run `/opsx:apply` to start implementing."
+After completing all artifacts:
+
+1. Summarize artifacts and tasks 一览
+2. Output **Task Review Pack** (`.cursor/skills/work-next/task-review-gate.md`)
+3. **STOP** — do NOT implement code; do NOT run `/opsx:apply` in the same turn
+4. Prompt: 请阅读 `tasks.md`；满意后说 **tasks 人审通过** 或 **继续实现**
 
 **Artifact Creation Guidelines**
 
@@ -99,6 +102,8 @@ After completing all artifacts, summarize:
   - These guide what you write, but should never appear in the output
 
 **Guardrails**
+- Include §0 Human review in every `tasks.md`
+- **Never** auto-implement after propose in the same session
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum

@@ -5,6 +5,23 @@
 
 ---
 
+## §0 Human review（apply 前必过 — propose 后 AI 必须停在这里）
+
+> **禁止** propose 完成后同会话直接写业务代码。人审勾选前，仅允许改 OpenSpec 文档。
+
+- [ ] **Tasks reviewed by human** — 人审通过后再 `/opsx:apply`、`/work-next` 或说「继续实现」
+
+### Review checklist（人审时可对照）
+
+- [ ] 前后端 scope 成对（例：有 `auth/register` API → tasks 含注册页，不能只有登录页）
+- [ ] design 里每条 Scenario 有对应 task 或 Harness
+- [ ] 与 `docs/tasks/epics/` Story 勾选一致；无遗漏、无 scope 膨胀
+- [ ] 每条 task ≤3 文件 / ~150 行，预计层正确
+
+**Reviewer notes:**（可选）
+
+---
+
 ## 写法约定
 
 - 每条 task 用 `- [ ] X.Y 描述`（apply 阶段勾选 `- [x]`）。
@@ -49,6 +66,12 @@
 
 - [ ] 2.2 Bearer 依赖 `get_current_user`
   - 预计文件：2 · 层：`core/deps.py` + 受保护路由
+
+## 3. Frontend
+
+- [ ] 3.1 登录页 `/login`
+- [ ] 3.2 注册页 `/register`（与 register API 成对）
+- [ ] 3.3 `lib/api-client.ts` Bearer + 401
 ```
 
 ---
@@ -57,6 +80,7 @@
 
 | 阶段 | 动作 |
 |:-----|:-----|
-| propose | 用本模板拆 task，写清「预计文件」 |
+| propose | 用本模板拆 task（**含 §0**），写清「预计文件」→ **Task Review Pack → 停止** |
+| 人审 | 你改 `tasks.md`，勾选 §0 或说「tasks 人审通过」 |
 | apply | 一次只做一条 → Review 摘要 → **checkpoint commit**（用户要求时） |
 | PR | 从 Review 摘要粘贴到 [PR 模板](../../.github/PULL_REQUEST_TEMPLATE.md) |

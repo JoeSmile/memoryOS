@@ -56,6 +56,20 @@ Implement tasks from an OpenSpec change.
    - **spec-driven**: proposal, specs, design, tasks
    - Other schemas: follow the contextFiles from CLI output
 
+4.5 **Task Review Gate (required before any code)**
+
+   Read `tasks.md` §0 **Human review**. See [.cursor/skills/work-next/task-review-gate.md](../work-next/task-review-gate.md).
+
+   **If `- [ ] **Tasks reviewed by human**` is unchecked:**
+   - Unless the user's **current message** explicitly approves tasks (`tasks 人审通过`, `approve tasks`, `继续实现`, `tasks approved`, `开始实现`):
+     - Output Task Review Pack (tasks table + checklist)
+     - **STOP — do not write business code**
+   - If user explicitly approved this turn: set §0 to `- [x] **Tasks reviewed by human**` and proceed
+
+   **If §0 already checked:** proceed to step 5.
+
+   **Not approval:** bare `继续`, `/work-next`, or change name alone — still STOP if §0 unchecked.
+
 5. **Show current progress**
 
    Display:
@@ -65,6 +79,8 @@ Implement tasks from an OpenSpec change.
    - Dynamic instruction from CLI
 
 6. **Implement tasks (loop until done or blocked)**
+
+   **Prerequisite:** §0 Human review passed (step 4.5).
 
    For each pending task:
    - Show which task is being worked on
@@ -139,6 +155,7 @@ What would you like to do?
 ```
 
 **Guardrails**
+- **Task Review Gate**: never implement if `tasks.md` §0 unchecked unless user explicitly approved this message (see task-review-gate.md)
 - **MemoryOS + `/work-next`**: complete **one task per session**, output Review 摘要, stop for human review; continue only if user says so (do not loop all tasks in one run unless user explicitly requests batch mode)
 - Without work-next: keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)

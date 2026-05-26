@@ -5,11 +5,18 @@
 
 ## Propose（`tasks.md`）
 
-- 模板：[openspec-tasks-template.md](../../../docs/tech/openspec-tasks-template.md)  
+- 模板：[openspec-tasks-template.md](../../../docs/tech/openspec-tasks-template.md)（**含 §0 人审门禁**）  
 - 每条：预计 **≤3 文件**、**层**、是否先写 harness  
+- propose 结束：**Task Review Pack → 停止**，不写码
 
-## 每个 task
+## Task Review Gate（apply 前）
 
+- [ ] `tasks.md` §0 **`Tasks reviewed by human`** 已勾选，或用户本轮明确批准（见 [task-review-gate.md](task-review-gate.md)）  
+- [ ] 核对：前后端 scope 成对、Harness 覆盖 design scenarios
+
+## 每个 task（开始前）
+
+- [ ] `pnpm branch:task <change> <task-id>`（或 `branch:change` 后手动切分支）— 见 [branch-strategy.md](../../../docs/tech/branch-strategy.md)  
 - [ ] 只做 **当前一条**；对照 tasks 里的预计文件/层  
 - [ ] 读同目录现有文件 1–2 个；遵守代码五条  
 - [ ] API：先/同步 harness L1，再实现  
