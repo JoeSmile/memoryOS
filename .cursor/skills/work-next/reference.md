@@ -51,6 +51,8 @@ Change 命名：`ep<NN>-<topic>`（如 `ep03-jwt`、`ep02-chat-sse`）。
 pnpm db:up
 pnpm db:migrate
 pnpm test:api:harness
+pnpm branch:change <change>
+pnpm branch:task <change> [task-id]
 pnpm dev:stack
 bash scripts/api.sh exec pytest tests/unit -q
 ```
@@ -59,8 +61,8 @@ bash scripts/api.sh exec pytest tests/unit -q
 
 ## Definition of Done（摘自 ai-collab-stack §6）
 
-- [ ] Epic / OpenSpec `tasks.md` 已勾选
-- [ ] change propose → apply → **archive**（或 PR 链到 change）
+- [ ] Epic / OpenSpec `tasks.md` 已勾选（**含 §0 人审**）
+- [ ] change propose → **task review gate** → apply → **archive**（或 PR 链到 change）
 - [ ] Harness L1 绿（AI 功能附 L2/L3 计划）
 - [ ] verification 证据已贴出
 - [ ] 必要时有 `docs/tech/knowledge/` 沉淀

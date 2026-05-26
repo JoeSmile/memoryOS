@@ -61,10 +61,11 @@ pnpm test:api:harness        # API 契约
 | :--: | :--------------------------------------------------------------------------------- |
 |  1   | 在 `docs/tasks/epics/` 找到本周 Story（如 EP03 Story 3.2）                         |
 |  2   | Cursor：`/opsx:propose "ep03-data-storage"`（或更细的 change 名）                  |
-|  3   | 自己 + （可选）他人审 `proposal.md` / `design.md` / `tasks.md`                     |
-|  4   | Superpowers：**brainstorm**（需求不清时）→ **writing-plans**（细化 tasks）         |
-|  5   | 先写 Harness / pytest（红）→ 实现（绿）                                            |
-|  6   | 分支开发：`feat/ep03-sqlalchemy`                                                   |
+|  3   | **Task Review Gate**：人审 `tasks.md` §0 + checklist；勾选或说「tasks 人审通过」     |
+|  4   | `pnpm branch:change <name>` → `pnpm branch:task <name> [id]`（见 [branch-strategy](../tech/branch-strategy.md)） |
+|  5   | **禁止** propose 后同会话直接写码；人审 + 分支后再 `/work-next` 或 `/opsx:apply`     |
+|  5   | Superpowers：**brainstorm**（需求不清时）；API 先 Harness（红）→ 实现（绿）        |
+|  6   | checkpoint commit；PR：`feat/<change>-t…` → `feat/<change>` → `main`               |
 |  7   | PR：贴 [PR 检查表](../tech/ai-collab-best-practices.md#41-单次功能检查表复制到-pr) |
 |  8   | 合并后：`/opsx:archive`，勾选 epic + L00/L01                                       |
 

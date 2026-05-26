@@ -49,6 +49,23 @@ pnpm setup:api    # 后端 Python
 
 从 `main` 拉取最新代码后创建功能分支，合并前请 rebase 保持提交历史清晰。
 
+### OpenSpec 对齐分支（推荐）
+
+与 `openspec/changes/<name>/tasks.md` 及 `/work-next` 配套，详见 [branch-strategy.md](./docs/tech/branch-strategy.md)。
+
+| 分支 | 何时 | 示例 |
+|:-----|:-----|:-----|
+| `feat/<change>` | §0 人审通过后、change 第一个 task 前 | `feat/ep03-db-optimize` |
+| `feat/<change>-t<major>-<minor>-<slug>` | 每个 task 开始前 | `feat/ep03-db-optimize-t2-1-harness` |
+
+```bash
+pnpm branch:change ep03-db-optimize      # 集成分支
+pnpm branch:task ep03-db-optimize 2.1    # 当前 task 工作分支
+pnpm branch:task ep03-db-optimize        # 自动选第一条未勾选 task
+```
+
+**不要**在 propose 完成、tasks 未人审时建分支写码。Task 分支合并到 `feat/<change>`，change 归档前再 PR 到 `main`。
+
 ## 提交规范（Conventional Commits）
 
 ```
@@ -102,7 +119,7 @@ docs: update README quick start
 
 ## Pull Request 流程
 
-1. Fork 仓库并创建功能分支（`feat/<change名>` 推荐）
+1. `tasks.md` §0 人审通过 → `pnpm branch:change <name>`（可选）→ `pnpm branch:task <name> [task-id]`
 2. 较大功能先有 OpenSpec change（见 best-practices）
 3. 完成改动：`pnpm lint` + `pnpm test:api:harness`（API 改动时）
 4. PR 描述使用下方模板（或 GitHub 自动模板）

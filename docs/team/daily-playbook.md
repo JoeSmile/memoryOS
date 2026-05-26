@@ -17,8 +17,8 @@
 **你只需要记住 3 个命令：**
 
 ```text
-/opsx-propose   → 开工前：建 change、写 proposal/tasks
-/opsx-apply     → 实现时：按 tasks 逐条做（也可不用，自己写代码也行）
+/opsx-propose   → 开工前：建 change、写 proposal/tasks → **停，等人审 §0**
+/opsx-apply     → 人审通过后：按 tasks 逐条做
 /opsx-archive   → 做完后：归档 change
 ```
 
@@ -41,6 +41,8 @@
 | :--------------- | :---------------------- |
 | 日常开发（推荐） | `pnpm dev` 或 `pnpm dev:stack`（db + 前后端） |
 | 仅起数据库       | `pnpm db:up`            |
+| task 开工前      | `pnpm branch:task <change> [task-id]` |
+| change 集成分支  | `pnpm branch:change <change>` |
 | API 改完、提交前 | `pnpm test:api:harness` |
 
 Harness L2/L3 等 EP02 再说。
@@ -78,6 +80,15 @@ Harness L2/L3 等 EP02 再说。
                     ┌───────────▼─────────────┐
                     │ /opsx-propose           │  ← 只做一次 / 每个 change
                     │ (openspec/changes/...)  │
+                    └───────────┬─────────────┘
+                                │
+                    ┌───────────▼─────────────┐
+                    │ **人审 tasks.md §0**    │  ← 必做；AI 在此停止
+                    │ Task Review Gate        │
+                    └───────────┬─────────────┘
+                                │
+                    ┌───────────▼─────────────┐
+                    │ pnpm branch:task …      │  ← 当前 task 工作分支
                     └───────────┬─────────────┘
                                 │
               ┌─────────────────┼─────────────────┐

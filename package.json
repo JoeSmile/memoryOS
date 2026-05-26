@@ -17,6 +17,8 @@
     "db:migrate": "bash scripts/api.sh exec alembic upgrade head",
     "setup:api": "bash scripts/api.sh setup",
     "test:api:harness": "bash scripts/api.sh exec pytest tests/harness -q",
+    "branch:change": "bash scripts/branch-task.sh --change-only",
+    "branch:task": "bash scripts/branch-task.sh",
     "install:all": "pnpm install && pnpm setup:api",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
