@@ -11,6 +11,8 @@
 
 **Reviewer notes:**
 
+**EP02 Program：** 本 change = [`ep02-program`](../ep02-program/tasks.md) **Phase 1**（须先 archive 再进入 Phase 2）。
+
 ---
 
 ## 1. Migration

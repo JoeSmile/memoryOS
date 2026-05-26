@@ -5,7 +5,7 @@
 | **周期**     | 第 1-2 周（与 EP01 并行）                                                                                                                                    |
 | **优先级**   | P0                                                                                                                                                           |
 | **状态**     | 🟡 进行中（3.1–3.4 完成，3.5 待做）                                                                                                                          |
-| **OpenSpec** | 已归档 [`ep03-jwt`](../../../openspec/changes/archive/2026-05-22-ep03-jwt/) · 进行中 [`ep03-db-optimize`](../../../openspec/changes/ep03-db-optimize/) · 已归档 [`ep03-redis`](../../../openspec/changes/archive/2026-05-22-ep03-redis/) |
+| **OpenSpec** | 进行中 [`ep03-db-optimize`](../../../openspec/changes/ep03-db-optimize/)（**EP02 Program Phase 1**）· 已归档 [`ep03-jwt`](../../../openspec/changes/archive/2026-05-22-ep03-jwt/) · [`ep03-redis`](../../../openspec/changes/archive/2026-05-22-ep03-redis/) |
 | **学习路线** | [L01-foundation.md](../learning/L01-foundation.md) · [L00](../learning/L00-ai-collab-stack.md)                                                               |
 
 ---
