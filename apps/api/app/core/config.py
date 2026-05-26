@@ -42,6 +42,15 @@ class Settings(BaseSettings):
         description="seconds for memoryos:stream:{conversation_id}:{stream_id}",
     )
 
+    jwt_secret: str | None = Field(
+        default=None,
+        description="HS256 signing secret — required for auth endpoints",
+    )
+    jwt_algorithm: str = Field(default="HS256")
+    access_token_expire_minutes: int = Field(default=60)
+    password_min_length: int = Field(default=8)
+    password_max_length: int = Field(default=128)
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
@@ -58,6 +67,11 @@ def get_settings() -> Settings:
     if not s.redis_url:
         logger.warning(
             "REDIS_URL is not set; cache features disabled "
+            "(see apps/api/.env.example)."
+        )
+    if not s.jwt_secret:
+        logger.warning(
+            "JWT_SECRET is not set; auth endpoints disabled until configured "
             "(see apps/api/.env.example)."
         )
     return s

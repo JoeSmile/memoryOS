@@ -14,7 +14,7 @@ async def create_user(
     body: UserCreate,
     db: AsyncSession = Depends(get_db),
 ):
-    """开发/测试用：创建用户（JWT 前临时接口）。"""
+    """Deprecated — 开发/测试用：无密码创建用户。请使用 `POST /api/v1/auth/register`。"""
     service = UserService(db)
     user = await service.create(email=body.email)
     await db.commit()
