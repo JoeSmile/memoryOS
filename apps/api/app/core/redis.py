@@ -20,15 +20,18 @@ def create_redis_client() -> Redis | None:
     )
 
 
-async def get_redis() -> AsyncGenerator[Redis | None, None]:
-    """Per-request Redis; yields None when REDIS_URL is unset."""
+async def ensure_redis() -> Redis | None:
+    """懒加载共享连接，供 Depends 与健康检查复用。"""
     global _redis
     if not settings.redis_url:
-        yield None
-        return
+        return None
     if _redis is None:
         _redis = create_redis_client()
-    yield _redis
+    return _redis
+
+
+async def get_redis() -> AsyncGenerator[Redis | None, None]:
+    yield await ensure_redis()
 
 
 async def close_redis() -> None:

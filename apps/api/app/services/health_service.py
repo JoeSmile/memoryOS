@@ -2,7 +2,8 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.core.database import engine
-from app.core.redis import create_redis_client, ping_redis
+from app.core.redis import ensure_redis, ping_redis
+from app.schemas.common import HealthData
 
 
 async def probe_postgres() -> str:
@@ -19,11 +20,18 @@ async def probe_postgres() -> str:
 async def probe_redis() -> str:
     if not settings.redis_url:
         return "disabled"
-    client = create_redis_client()
+    client = await ensure_redis()
     if client is None:
         return "disabled"
-    try:
-        ok = await ping_redis(client)
-        return "ok" if ok else "down"
-    finally:
-        await client.aclose()
+    return "ok" if await ping_redis(client) else "down"
+
+
+async def build_health_data() -> dict:
+    """根路径与 /api/v1/health 共用。"""
+    return HealthData(
+        status="ok",
+        app=settings.app_name,
+        env=settings.env,
+        postgres=await probe_postgres(),
+        redis=await probe_redis(),
+    ).model_dump()

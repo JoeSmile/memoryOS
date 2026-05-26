@@ -21,3 +21,5 @@
 
 - [nextjs15.md](./nextjs15.md) — Next.js 15.5.18 复盘（含 Turbopack 版本表）
 - [vite-vs-turbopack.md](./vite-vs-turbopack.md) — Vite 与 Turbopack 对比
+- [redis-ep03.md](./redis-ep03.md) — EP03 Story 3.3 Redis 缓存（Cache-Aside、踩坑）
+- [postgres-sqlalchemy.md](./postgres-sqlalchemy.md) — PostgreSQL + SQLAlchemy 实战

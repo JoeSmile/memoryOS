@@ -113,13 +113,17 @@ Superpowers / Harness）
 
 ## 4. Redis
 
+> 落地笔记（EP03 Story
+> 3.3）：[redis-ep03.md](../../tech/knowledge/redis-ep03.md)
+
 ### 学什么
 
-- [ ] 📖 五种结构在本项目的可能用途：String（缓存）、Hash（会话元数据）、List（队列入门）
-- [ ] 📖 TTL、缓存穿透/击穿/雪崩及**本项目可接受方案**（击穿用互斥或短期空值）
-- [ ] 📖 Key 命名：`memoryos:session:{id}:meta`、`memoryos:ratelimit:{userId}`
-- [ ] 📖 与 DB 一致性：Cache Aside（先更 DB 再删缓存）
-- [ ] 🔧 `docker-compose` Redis + `core/redis.py` 封装
+- [x] 📖 五种结构在本项目的可能用途：String（缓存）、Hash（会话元数据）、List（队列入门）
+- [x] 📖 TTL、缓存穿透/击穿/雪崩及**本项目可接受方案**（击穿：写后删 key + TTL）
+- [x] 📖
+      Key 命名：`memoryos:conversations:user:{id}`、`memoryos:stream:…`（见 redis-ep03）
+- [x] 📖 与 DB 一致性：Cache Aside（先写 DB、**commit 后**再删缓存）
+- [x] 🔧 `docker-compose` Redis + `core/redis.py` + `app/cache/` 封装
 
 ### 面试常问
 
@@ -128,12 +132,13 @@ Superpowers / Harness）
 
 ### 实战易踩坑
 
-| 坑                          | 现象         | 规避                |
-| :-------------------------- | :----------- | :------------------ |
-| 无 TTL                      | 内存涨满     | 所有缓存 key 带 TTL |
-| 把 Redis 当唯一数据源       | 重启丢会话   | 关键数据以 PG 为准  |
-| `KEYS *` 生产使用           | Redis 卡顿   | 用 `SCAN`           |
-| 序列化 ORM 对象直接进 Redis | 反序列化失败 | 存 DTO/JSON         |
+| 坑                          | 现象         | 规避                   |
+| :-------------------------- | :----------- | :--------------------- |
+| 无 TTL                      | 内存涨满     | 所有缓存 key 带 TTL    |
+| 把 Redis 当唯一数据源       | 重启丢会话   | 关键数据以 PG 为准     |
+| `KEYS *` 生产使用           | Redis 卡顿   | 用 `SCAN`              |
+| 序列化 ORM 对象直接进 Redis | 反序列化失败 | 存 DTO/JSON            |
+| commit 前删缓存             | 并发脏列表   | commit 后再 invalidate |
 
 ---
 

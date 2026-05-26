@@ -1,18 +1,30 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.database import engine
 from app.core.exceptions import register_exception_handlers
+from app.core.redis import close_redis
 from app.core.response import success
-from app.schemas.common import HealthData
-from app.services.health_service import probe_postgres, probe_redis
+from app.services.health_service import build_health_data
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    yield
+    await close_redis()
+    await engine.dispose()
+
 
 app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -29,17 +41,7 @@ register_exception_handlers(app)
 @app.get("/health", tags=["health"])
 async def root_health():
     """根路径健康检查（Story 1.4）。"""
-    postgres = await probe_postgres()
-    redis = await probe_redis()
-    return success(
-        data=HealthData(
-            status="ok",
-            app=settings.app_name,
-            env=settings.env,
-            postgres=postgres,
-            redis=redis,
-        ).model_dump(),
-    )
+    return success(data=await build_health_data())
 
 
 app.include_router(api_router, prefix="/api/v1")

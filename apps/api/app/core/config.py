@@ -28,8 +28,8 @@ class Settings(BaseSettings):
     )
 
     redis_url: str | None = Field(
-        default="redis://localhost:6379/0",
-        description="redis://host:6379/0 — unset to disable cache",
+        default=None,
+        description="redis://host:6379/0 — leave unset or empty to disable cache",
     )
 
     conversation_list_cache_ttl: int = Field(
