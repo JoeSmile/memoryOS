@@ -135,10 +135,12 @@
 
 ### 学什么
 
-- [ ] 📖 环境变量：`LANGCHAIN_TRACING_V2`、`LANGCHAIN_API_KEY`、`LANGCHAIN_PROJECT`
+- [x] 📖 环境变量：`LANGCHAIN_TRACING_V2`、`LANGCHAIN_API_KEY`、`LANGCHAIN_PROJECT`
 - [ ] 📖 Trace 结构：Run → 子 Run（LLM、Retriever、Tool）
 - [ ] 📖 用 trace 看：延迟在 prompt 组装还是 model 还是网络
 - [ ] 📖 数据集 / 回放（入门即可）
+- [ ] 📖 与 **TruLens（§7）**
+      分工：LangSmith 看 LangChain 生态 Run 树；TruLens 深挖 LangGraph 节点、`@task`、反馈评估
 - [ ] 🔧 dev 项目与 prod 项目分离；`.env.example` 注明
 
 ### 面试常问
@@ -155,7 +157,45 @@
 
 ---
 
-## 7. Prompt 与多轮上下文
+## 7. TruLens（LangGraph 调试与评估）
+
+> **用途**：EP02 起在本地/联调阶段用 **TruGraph**
+> 看清图内每一步（节点、`@task`、工具），并预留 **Feedback**
+> 做回答质量评估；生产主 trace 仍以 LangSmith（§6）为准。
+
+### 学什么
+
+- [ ] 📖 TruLens 定位：OTel 兼容 trace + 可选 Feedback（groundedness、相关性等）
+- [ ] 📖 与 LangSmith：**互补** — LangSmith 看整条链路与线上；TruLens 看
+      **GRAPH_NODE / GRAPH_TASK**、多 Agent 图内路径
+- [ ] 📖 包：`trulens-apps-langgraph`；`TruGraph(graph, app_name=..., app_version=...)`
+- [ ] 📖 用法：`with tru_recorder:` 或 `session.App(...)` 包住 `invoke` /
+      `astream`
+- [ ] 📖 自动 instrument：`@task`、LangChain 子调用无需手改节点代码
+- [ ] 📖
+      OTel 模式：`TRULENS_OTEL_TRACING=1`（与 Jaeger/Tempo 等栈互通，入门知即可）
+- [ ] 📖 Dashboard / `TruSession` 查看 record：输入输出、节点耗时、异常栈
+- [ ] 🔧 `apps/api/scripts/sandbox_trulens_langgraph.py`（最小图 + 一次 invoke）
+- [ ] 🔧 `docs/tech/langgraph-chat.md` §6 记录「何时开 TruLens vs LangSmith」
+
+### 面试常问
+
+- LangGraph 调试时 LangSmith 不够用时，TruLens 多看到什么？（节点级、task 装饰器、反馈指标）
+- Feedback function 和 trace 的关系？能否无标注先跑 trace 再补评估？
+
+### 实战易踩坑
+
+| 坑                             | 现象                     | 规避                                        |
+| :----------------------------- | :----------------------- | :------------------------------------------ |
+| 只开 LangSmith 不看图内节点    | 不知卡在哪条边/哪个 node | 联调时并行开 TruGraph 包一层 compile 后的图 |
+| 忘记 `with tru_recorder`       | 无 record                | 脚本/单测固定 context manager 模式          |
+| dev 全量 Feedback 调 Judge LLM | 慢、贵                   | 先 trace，稳定后再加 1–2 条核心 Feedback    |
+| TruLens + LangSmith 双开未采样 | 本地磁盘/额度涨          | 本地全开；压测/生产 TruLens 仅抽样或关      |
+| 图未 `compile()` 就 wrap       | instrument 失败          | 对 **compiled** graph 建 TruGraph           |
+
+---
+
+## 8. Prompt 与多轮上下文
 
 ### 学什么
 
@@ -179,9 +219,13 @@
 
 - [ ] 🔧 `apps/api/scripts/sandbox_langgraph_minimal.py`
 - [ ] 🔧 `apps/api/scripts/sandbox_langsmith_trace.py`
+- [ ] 🔧 `apps/api/scripts/sandbox_trulens_langgraph.py`（TruGraph +
+      1 次 invoke，对照节点 span）
 
 ## 阶段自测
 
-- [ ] 白板：用户输入 → LangGraph → SSE → Zustand → Markdown 渲染  
-- [ ] LangSmith 截 1 成功 + 1 失败 trace 写入 `docs/tech/langgraph-chat.md`  
-- [ ] 能讲 3 个 SSE/LangGraph 相关踩坑
+- [ ] 白板：用户输入 → LangGraph → SSE → Zustand → Markdown 渲染
+- [ ] LangSmith 截 1 成功 + 1 失败 trace 写入 `docs/tech/langgraph-chat.md`
+- [ ] TruLens：同一条对话在 Dashboard 能指出 **至少 2 个 graph 步骤**（如
+      `call_model` → END）
+- [ ] 能讲 LangSmith vs TruLens 分工 + 3 个 SSE/LangGraph 相关踩坑

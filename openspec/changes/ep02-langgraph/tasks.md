@@ -1,20 +1,20 @@
 ## 0. Human review（apply 前必过）
 
-- [ ] **Tasks reviewed by human**
+- [x] **Tasks reviewed by human**
 
 ### Review checklist
 
-- [ ] Phase 2 `langgraph-chat.md` 草稿已存在或与本 change 同步
-- [ ] Mock 路径满足 CI
-- [ ] 依赖版本与 Python 3.11 兼容
+- [x] Phase 2 `langgraph-chat.md` 草稿已存在或与本 change 同步
+- [x] Mock 路径满足 CI
+- [x] 依赖版本与 Python 3.11 兼容
 
-**Reviewer notes:**
+**Reviewer notes:** 用户确认「tasks 人审通过」；按 task 1.1 起 apply。
 
 ---
 
 ## 1. LangSmith & dependencies（Phase 3）
 
-- [ ] 1.1 LangSmith + OpenAI settings、`.env.example`、`requirements.txt`（langgraph、langchain-openai）
+- [x] 1.1 LangSmith + OpenAI settings、`.env.example`、`requirements.txt`（langgraph、langchain-openai）
   - 预计文件：3 · 层：config、requirements、.env.example
 
 ## 2. Graph core

@@ -1,13 +1,15 @@
 ## 0. Human review（apply 前必过）
 
-> 本 change 为 **总控编排**，不写业务代码。人审通过后按 Phase 1→7 执行子 change。
+> 本 change 为 **总控编排**，不写业务代码。人审通过后按 Phase
+> 1→7 执行子 change。
 
-- [ ] **Tasks reviewed by human** — 同意 7 Phase 顺序与 EP04+ 栅栏
+- [x] **Tasks reviewed by human** — 同意 7 Phase 顺序与 EP04+ 栅栏
 
 ### Review checklist
 
 - [ ] Phase 6（最小 /chat）合并在 `ep02-chat-sse` 是否接受
-- [ ] 子 change 列表完整：`ep03-db-optimize` → `ep02-langgraph` → `ep02-chat-sse` → `ep02-chat-ui`
+- [ ] 子 change 列表完整：`ep03-db-optimize` → `ep02-langgraph` →
+      `ep02-chat-sse` → `ep02-chat-ui`
 - [ ] Phase 2 学习产出可验收
 
 **Reviewer notes:**
@@ -27,8 +29,11 @@
 
 **产出：** 文档 + L02 理解（**无** `apps/api` 生产图代码）
 
-- [ ] 2.1 阅读并完成 [L02 §5 LangGraph](../../../docs/tasks/learning/L02-streaming-langgraph.md) 必读项勾选
-- [ ] 2.2 撰写 `docs/tech/langgraph-chat.md` 初稿（State/Node/Edge/流式策略 ≥1 页）
+- [x] 2.1 阅读并完成
+      [L02 §5 LangGraph](../../../docs/tasks/learning/L02-streaming-langgraph.md)
+      必读项勾选
+- [x] 2.2 撰写 `docs/tech/langgraph-chat.md`
+      初稿（State/Node/Edge/流式策略 ≥1 页）
 
 ---
 
@@ -36,8 +41,9 @@
 
 **并入：** `ep02-langgraph` task 1.1（本 Phase 以子 change 勾选为准）
 
-- [ ] 3.1 LangSmith dev Project + API Key 写入本地 `.env`（不提交密钥）
-- [ ] 3.2 `apps/api/.env.example` 含 `LANGCHAIN_TRACING_V2`、`LANGCHAIN_API_KEY`、`LANGCHAIN_PROJECT` 说明
+- [x] 3.1 LangSmith dev Project + API Key 写入本地 `.env`（不提交密钥）
+- [x] 3.2 `apps/api/.env.example` 含
+      `LANGCHAIN_TRACING_V2`、`LANGCHAIN_API_KEY`、`LANGCHAIN_PROJECT` 说明
 
 **Phase 3 Done 条件：** `ep02-langgraph` archive 且 3.1–3.2 已勾。
 
@@ -55,7 +61,8 @@
 ## Phase 5 — SSE 管道 + Graph 上游
 
 **子 change：** [`ep02-chat-sse`](../ep02-chat-sse/)（后端 1–3 节）  
-**Done：** `POST /chat/completions` SSE 由 **LangGraph** 驱动；`pnpm test:api:harness` 绿
+**Done：** `POST /chat/completions` SSE 由 **LangGraph**
+驱动；`pnpm test:api:harness` 绿
 
 - [ ] 5.1 完成 `ep02-chat-sse` 后端 tasks（2.x–3.x）并 harness 绿
 

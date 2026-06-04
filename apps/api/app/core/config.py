@@ -1,4 +1,5 @@
 import logging
+import os
 from functools import lru_cache
 
 from pydantic import Field
@@ -51,14 +52,65 @@ class Settings(BaseSettings):
     password_min_length: int = Field(default=8)
     password_max_length: int = Field(default=128)
 
+    openai_api_key: str | None = Field(
+        default=None,
+        description="OpenAI API key — unset enables mock LLM in ep02-langgraph",
+    )
+    openai_model: str = Field(
+        default="qwen-turbo",
+        description="ChatOpenAI model name when openai_api_key is set",
+    )
+    openai_api_base: str | None = Field(
+        default="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        validation_alias="OPENAI_BASE_URL",
+        description="OpenAI-compatible API base (DashScope for qwen-turbo)",
+    )
+
+    langsmith_tracing: bool = Field(
+        default=False,
+        description="Enable LangSmith tracing (LANGSMITH_TRACING)",
+    )
+    langsmith_api_key: str | None = Field(
+        default=None,
+        description="LangSmith API key (LANGSMITH_API_KEY)",
+    )
+    langsmith_project: str = Field(
+        default="memoryOS-dev",
+        description="LangSmith project name (LANGSMITH_PROJECT)",
+    )
+    langsmith_endpoint: str = Field(
+        default="https://api.smith.langchain.com",
+        description="LangSmith API endpoint (LANGSMITH_ENDPOINT)",
+    )
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def use_mock_llm(self) -> bool:
+        return not (self.openai_api_key and self.openai_api_key.strip())
+
+
+def _sync_llm_observability_env(s: Settings) -> None:
+    """Expose .env values to LangChain / LangSmith SDKs (read os.environ)."""
+    if s.openai_api_key:
+        os.environ["OPENAI_API_KEY"] = s.openai_api_key
+    if s.openai_model:
+        os.environ["OPENAI_MODEL"] = s.openai_model
+    if s.openai_api_base:
+        os.environ["OPENAI_BASE_URL"] = s.openai_api_base
+    os.environ["LANGSMITH_TRACING"] = "true" if s.langsmith_tracing else "false"
+    if s.langsmith_api_key:
+        os.environ["LANGSMITH_API_KEY"] = s.langsmith_api_key
+    os.environ["LANGSMITH_PROJECT"] = s.langsmith_project
+    os.environ["LANGSMITH_ENDPOINT"] = s.langsmith_endpoint
 
 
 @lru_cache
 def get_settings() -> Settings:
     s = Settings()
+    _sync_llm_observability_env(s)
     if not s.database_url:
         logger.warning(
             "DATABASE_URL is not set; DB features disabled until configured "
@@ -73,6 +125,10 @@ def get_settings() -> Settings:
         logger.warning(
             "JWT_SECRET is not set; auth endpoints disabled until configured "
             "(see apps/api/.env.example)."
+        )
+    if s.use_mock_llm:
+        logger.info(
+            "OPENAI_API_KEY is not set; chat graph will use mock LLM (CI/harness)."
         )
     return s
 
