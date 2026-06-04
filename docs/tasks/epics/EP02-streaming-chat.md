@@ -18,9 +18,9 @@
 | Phase | 内容 | OpenSpec / 产出 | 状态 |
 |:-----:|:-----|:----------------|:-----|
 | **1** | 数据层收尾 | [`ep03-db-optimize`](../../../openspec/changes/ep03-db-optimize/) | ⬜ |
-| **2** | LangGraph 学习 | L02 §5 + `langgraph-chat.md` 草稿 | ⬜ |
-| **3** | LangSmith 环境 | 并入 Phase 4 task 1.1 | ⬜ |
-| **4** | 最小 LangGraph | [`ep02-langgraph`](../../../openspec/changes/ep02-langgraph/) | ⬜ |
+| **2** | LangGraph 学习 | L02 §5 + `langgraph-chat.md` | ✅ |
+| **3** | LangSmith 环境 | 并入 Phase 4（`.env.example`） | ✅ |
+| **4** | 最小 LangGraph | [`ep02-langgraph`](../../../openspec/changes/archive/2026-06-03-ep02-langgraph/) | ✅ |
 | **5** | SSE + Graph 上游 | [`ep02-chat-sse`](../../../openspec/changes/ep02-chat-sse/) 后端 | ⬜ |
 | **6** | 最小 `/chat` 冒烟 | [`ep02-chat-sse`](../../../openspec/changes/ep02-chat-sse/) 前端 + archive | ⬜ |
 | **7** | 完整 UI + Markdown | [`ep02-chat-ui`](../../../openspec/changes/ep02-chat-ui/) | ⬜ |
@@ -64,15 +64,15 @@
 
 ## Story 2.6 LangGraph 对话编排（核心）
 
-- [ ] 废弃业务层裸调 OpenAI → **Phase 4–5**
-- [ ] Chat State、节点、边 → **Phase 4**
+- [ ] 废弃业务层裸调 OpenAI → **Phase 5**（`ep02-chat-sse` 接 `ChatGraphRunner`）
+- [x] Chat State、节点、边 → **Phase 4** [`langgraph-chat.md`](../../tech/langgraph-chat.md)
 - [ ] 条件分支（EP05 预留）→ 后续
 
 ## Story 2.7 LangSmith
 
-- [ ] 账号 / Project / API Key → **Phase 3–4**
-- [ ] 环境变量分 dev/prod → **Phase 3–4**
-- [ ] trace 可查 → **Phase 4+**
+- [x] 账号 / Project / API Key → `.env.example` + 本地 `.env`（不提交密钥）
+- [x] 环境变量分 dev/prod → `LANGSMITH_PROJECT` 等见 `.env.example`
+- [ ] trace 可查 → 本地开 tracing 后手工验证（`ep02-chat-sse` 后联调）
 
 ---
 

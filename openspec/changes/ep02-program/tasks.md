@@ -51,10 +51,10 @@
 
 ## Phase 4 — LangGraph 最小对话图
 
-**子 change：** [`ep02-langgraph`](../ep02-langgraph/)  
+**子 change：** [`ep02-langgraph`](../archive/2026-06-03-ep02-langgraph/)  
 **Done：** archive；Harness/unit 可流式出 token（mock 或 Key）
 
-- [ ] 4.1 完成并 archive `ep02-langgraph`
+- [x] 4.1 完成并 archive `ep02-langgraph`
 
 ---
 

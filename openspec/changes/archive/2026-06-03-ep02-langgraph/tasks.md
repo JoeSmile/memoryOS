@@ -30,7 +30,7 @@
 - [x] 3.1 `tests/unit/test_chat_graph.py` mock 流式；无网络
   - 预计文件：1 · 层：tests/unit
 
-- [ ] 3.2 完成 `docs/tech/langgraph-chat.md`；archive 前勾选 EP02 Story 2.6–2.7 基础项
+- [x] 3.2 完成 `docs/tech/langgraph-chat.md`；archive 前勾选 EP02 Story 2.6–2.7 基础项
   - 预计文件：2 · docs、epic
 
 **前置：** `ep02-program` Phase 1 完成。  

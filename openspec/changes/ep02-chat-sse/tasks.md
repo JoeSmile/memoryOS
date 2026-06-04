@@ -12,7 +12,7 @@
 
 ---
 
-**前置（必须）：** `ep02-langgraph` archive  
+**前置（必须）：** `ep02-langgraph` archive ✅（`archive/2026-06-03-ep02-langgraph`）  
 **前置（推荐）：** `ep03-db-optimize` archive  
 **编排：** [`ep02-program`](../ep02-program/tasks.md) Phase 5–6
 

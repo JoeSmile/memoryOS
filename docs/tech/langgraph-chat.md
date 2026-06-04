@@ -1,9 +1,8 @@
 # LangGraph 对话编排（EP02）
 
-> **状态**：Phase 2 初稿（`ep02-program` 2.2）— `ep02-langgraph`
-> apply 时与代码逐条对齐。  
+> **状态**：`ep02-langgraph` 已落地（2026-06）— 与 `apps/api/app/graphs/` 对齐。  
 > **学习**：[L02 §5–§7](../tasks/learning/L02-streaming-langgraph.md)  
-> **OpenSpec**：[`ep02-langgraph`](../../openspec/changes/ep02-langgraph/) · 下游
+> **OpenSpec**：[`ep02-langgraph`（archived）](../../openspec/changes/archive/2026-06-03-ep02-langgraph/) · 下游
 > [`ep02-chat-sse`](../../openspec/changes/ep02-chat-sse/)
 
 ---
@@ -70,16 +69,8 @@ message 类型对齐）。
   在每次请求前从 DB 加载最近 N 条（首版可全量会话；EP06 再做裁剪）。
 - 图执行 **不** 直接写库；落库在 Service 的 `done` 之后（`ep02-chat-sse`）。
 
-```python
-# 目标形态（ep02-langgraph 2.1）— 示意，以实现为准
-from typing import Annotated
-from typing_extensions import TypedDict
-from langgraph.graph.message import add_messages
-
-class ChatState(TypedDict):
-    messages: Annotated[list, add_messages]
-    user_id: str
-```
+实现见 [`apps/api/app/graphs/chat_state.py`](../../apps/api/app/graphs/chat_state.py)。
+`messages` 使用 `add_messages` reducer：节点返回 `{"messages": [AIMessage(...)]}` 时 **追加**，非整表替换。
 
 ---
 
@@ -111,7 +102,7 @@ START ──► call_model ──► END
 
 ---
 
-## 5. 目录与模块（计划）
+## 5. 目录与模块（已实现）
 
 | 路径                             | 职责                                                         |
 | :------------------------------- | :----------------------------------------------------------- |
@@ -141,14 +132,15 @@ async def stream_tokens(self, state: ChatState) -> AsyncIterator[str]:
 - 每个 `str` 为 **增量 token**（可为单字或短片段，由模型 chunk 决定）。
 - 流结束即 iterator 完成；**不** 在 runner 内写 SSE 格式。
 
-### 6.2 图内实现（推荐）
+### 6.2 图内实现
 
-- 使用 `graph.astream_events(input, config, version="v2")`（或项目选定
-  `stream_mode`）。
-- 过滤 `event["event"] == "on_chat_model_stream"`（或等价）提取
-  `chunk.content`。
-- `ChatService` 将 token 写入 `StreamCache` 并 `yield` SSE 帧（见
-  `ep02-chat-sse` design D1）。
+[`ChatGraphRunner.stream_tokens`](../../apps/api/app/graphs/runner.py)：
+
+- **Mock**（无 `OPENAI_API_KEY`）：`mock_stream_tokens()` → `["你","好","！"]`
+- **真模型**：`graph.astream_events(..., version="v2")`，过滤
+  `on_chat_model_stream` 的 `chunk.content`
+
+`ChatService`（`ep02-chat-sse`）消费该 iterator 并写 SSE / `StreamCache`。
 
 ### 6.3 与 SSE 事件映射
 
@@ -254,12 +246,19 @@ Harness（`ep02-chat-sse`）依赖同一 mock 路径，保证 `pnpm test:api:har
 
 ---
 
-## 12. 验收清单（Phase 2 / ep02-langgraph）
+## 12. 验收清单
 
-- [x] 本文档：State / Node / Edge / 流式策略 ≥1 页
-- [ ] `ep02-langgraph` 1.1–3.2 代码与单测落地
+- [x] 本文档与代码对齐
+- [x] `ep02-langgraph` 1.1–3.2（config、图、runner、单测）
 - [ ] `ep02-chat-sse` 将 `ChatService` 接到 `stream_tokens`
-- [ ] LangSmith 手工 trace 截图或链接记入 retro（可选）
+- [ ] LangSmith 手工 trace（本地 `LANGSMITH_TRACING=true` + Key，可选）
+
+**验证命令（2026-06）：**
+
+```bash
+cd apps/api && pytest tests/unit/test_chat_graph.py -q   # 2 passed
+pnpm test:api:harness                                     # 9 passed
+```
 
 ---
 
