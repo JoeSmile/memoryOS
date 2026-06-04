@@ -20,6 +20,32 @@ use_conda() {
   conda_env_exists
 }
 
+conda_pip() {
+  conda run -n memoryos-api --no-capture-output python -m pip "$@"
+}
+
+# 不完整下载会导致 "Wheel ... is invalid"；常见原因：系统代理、旧 pip 缓存
+pip_install_requirements() {
+  unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY 2>/dev/null || true
+  export NO_PROXY="${NO_PROXY:-*}"
+  export PIP_DISABLE_PIP_VERSION_CHECK=1
+
+  local pip_args=(python -m pip install --no-cache-dir -U pip)
+  if use_conda; then
+    conda run -n memoryos-api --no-capture-output "${pip_args[@]}" || true
+    conda_pip install --no-cache-dir -r requirements.txt
+    if [[ -f requirements-dev.txt ]]; then
+      conda_pip install --no-cache-dir -r requirements-dev.txt
+    fi
+  else
+    .venv/bin/python -m "${pip_args[@]}" || true
+    .venv/bin/pip install --no-cache-dir -r requirements.txt
+    if [[ -f requirements-dev.txt ]]; then
+      .venv/bin/pip install --no-cache-dir -r requirements-dev.txt
+    fi
+  fi
+}
+
 run_in_api_env() {
   if use_conda; then
     conda run -n memoryos-api --no-capture-output "$@"
@@ -42,21 +68,15 @@ cmd_setup() {
     else
       echo "→ 使用已有 Conda 环境 memoryos-api"
     fi
-    echo "→ pip install -r requirements.txt …"
-    conda run -n memoryos-api pip install -r requirements.txt
-    if [[ -f requirements-dev.txt ]]; then
-      conda run -n memoryos-api pip install -r requirements-dev.txt
-    fi
+    echo "→ pip install -r requirements.txt（Conda memoryos-api, --no-cache-dir）…"
+    pip_install_requirements
   else
     if [[ ! -x .venv/bin/python ]]; then
       echo "→ 未检测到 conda，创建 .venv …"
       python3 -m venv .venv
     fi
-    echo "→ pip install -r requirements.txt …"
-    .venv/bin/pip install -r requirements.txt
-    if [[ -f requirements-dev.txt ]]; then
-      .venv/bin/pip install -r requirements-dev.txt
-    fi
+    echo "→ pip install -r requirements.txt（.venv, --no-cache-dir）…"
+    pip_install_requirements
   fi
 
   if [[ ! -f .env ]]; then
