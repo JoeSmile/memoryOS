@@ -1,9 +1,6 @@
-from langchain_core.messages import AIMessage, BaseMessage
-
 from app.core.config import settings
 from app.graphs.chat_state import ChatState
-
-MOCK_ASSISTANT_TEXT = "你好！"
+from app.graphs.nodes.mock_model import mock_invoke
 
 
 def _build_chat_openai():
@@ -17,14 +14,10 @@ def _build_chat_openai():
     return ChatOpenAI(**kwargs)
 
 
-async def _mock_response(_messages: list[BaseMessage]) -> AIMessage:
-    return AIMessage(content=MOCK_ASSISTANT_TEXT)
-
-
 async def call_model(state: ChatState) -> dict:
     messages = state["messages"]
     if settings.use_mock_llm:
-        response = await _mock_response(messages)
+        response = await mock_invoke(messages)
     else:
         llm = _build_chat_openai()
         response = await llm.ainvoke(messages)

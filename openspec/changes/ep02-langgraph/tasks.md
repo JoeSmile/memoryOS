@@ -22,12 +22,12 @@
 - [x] 2.1 `ChatState` + `chat_graph.py` 最小图（START → call_model → END）
   - 预计文件：2 · 层：graphs/
 
-- [ ] 2.2 `MockModelNode` + `stream_tokens` runner（async generator）
+- [x] 2.2 `MockModelNode` + `stream_tokens` runner（async generator）
   - 预计文件：2 · 层：graphs/ 或 services/
 
 ## 3. Tests & docs
 
-- [ ] 3.1 `tests/unit/test_chat_graph.py` mock 流式；无网络
+- [x] 3.1 `tests/unit/test_chat_graph.py` mock 流式；无网络
   - 预计文件：1 · 层：tests/unit
 
 - [ ] 3.2 完成 `docs/tech/langgraph-chat.md`；archive 前勾选 EP02 Story 2.6–2.7 基础项
