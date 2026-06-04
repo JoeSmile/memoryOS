@@ -19,7 +19,7 @@
 
 ## 2. Graph core
 
-- [ ] 2.1 `ChatState` + `chat_graph.py` 最小图（START → call_model → END）
+- [x] 2.1 `ChatState` + `chat_graph.py` 最小图（START → call_model → END）
   - 预计文件：2 · 层：graphs/
 
 - [ ] 2.2 `MockModelNode` + `stream_tokens` runner（async generator）
