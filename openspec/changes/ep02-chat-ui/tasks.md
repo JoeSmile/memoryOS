@@ -30,7 +30,7 @@
       Query 同步（替代 minimal-chat 内联状态）
   - 预计文件：2 · stores、hooks
 
-- [ ] 2.2 消息管理 MVP：`message.id` 稳定、助手「重新生成」、上下文条数提示
+- [x] 2.2 消息管理 MVP：`message.id` 稳定、助手「重新生成」、上下文条数提示
   - 预计文件：2 · components/chat
 
 ## 3. Markdown & polish

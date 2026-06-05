@@ -13,6 +13,7 @@ import { getAccessToken } from "@/lib/auth-token";
 import { chatQueryKeys } from "@/lib/chat-query-keys";
 import {
   EMPTY_MESSAGES,
+  getTextFromUIMessage,
   messagesFingerprint,
   toUIMessages,
   type ConversationRead,
@@ -208,6 +209,27 @@ export function useChatSession() {
     await sendMessage({ text });
   }
 
+  async function regenerateLatest() {
+    if (!conversationId || isStreaming) {
+      return;
+    }
+
+    const lastUserMessage = [...messages].reverse().find(
+      (message) => message.role === "user",
+    );
+    if (!lastUserMessage) {
+      return;
+    }
+
+    const text = getTextFromUIMessage(lastUserMessage).trim();
+    if (!text) {
+      return;
+    }
+
+    setError(null);
+    await sendMessage({ text });
+  }
+
   return {
     conversationId,
     messages,
@@ -216,8 +238,10 @@ export function useChatSession() {
     isStreaming,
     loading,
     streamingMessageId,
+    loadedMessageCount: persistedMessages.length,
     errorMessage: queryErrorMessage ?? error,
     handleSubmit,
+    regenerateLatest,
     stop,
   };
 }

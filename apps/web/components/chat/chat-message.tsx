@@ -5,9 +5,16 @@ import { getTextFromUIMessage } from "@/lib/chat-types";
 type ChatMessageProps = {
   message: UIMessage;
   isStreaming?: boolean;
+  showRegenerate?: boolean;
+  onRegenerate?: () => void;
 };
 
-export function ChatMessage({ message, isStreaming = false }: ChatMessageProps) {
+export function ChatMessage({
+  message,
+  isStreaming = false,
+  showRegenerate = false,
+  onRegenerate,
+}: ChatMessageProps) {
   const isUser = message.role === "user";
 
   return (
@@ -18,10 +25,21 @@ export function ChatMessage({ message, isStreaming = false }: ChatMessageProps) 
           : "mr-8 border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
       }`}
     >
-      <p className="mb-1 text-xs font-medium uppercase tracking-wide opacity-60">
-        {isUser ? "你" : "助手"}
-        {!isUser && isStreaming ? " · 生成中" : ""}
-      </p>
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <p className="text-xs font-medium uppercase tracking-wide opacity-60">
+          {isUser ? "你" : "助手"}
+          {!isUser && isStreaming ? " · 生成中" : ""}
+        </p>
+        {showRegenerate && onRegenerate ? (
+          <button
+            type="button"
+            onClick={onRegenerate}
+            className="text-xs text-emerald-600 hover:underline dark:text-emerald-400"
+          >
+            重新生成
+          </button>
+        ) : null}
+      </div>
       <p className="whitespace-pre-wrap">{getTextFromUIMessage(message)}</p>
     </div>
   );

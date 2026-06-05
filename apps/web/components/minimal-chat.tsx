@@ -16,8 +16,10 @@ export function MinimalChat() {
     isStreaming,
     loading,
     streamingMessageId,
+    loadedMessageCount,
     errorMessage,
     handleSubmit,
+    regenerateLatest,
     stop,
   } = useChatSession();
 
@@ -27,7 +29,7 @@ export function MinimalChat() {
 
   return (
     <ChatShell
-      header={<ChatHeader />}
+      header={<ChatHeader loadedMessageCount={loadedMessageCount} />}
       footer={
         <ChatComposer
           input={input}
@@ -43,6 +45,8 @@ export function MinimalChat() {
       <ChatMessageList
         messages={messages}
         streamingMessageId={streamingMessageId}
+        isStreaming={isStreaming}
+        onRegenerate={() => void regenerateLatest()}
       />
     </ChatShell>
   );
