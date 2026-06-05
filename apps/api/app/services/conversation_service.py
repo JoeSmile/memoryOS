@@ -6,8 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.cache import ConversationCache
 from app.core.exceptions import AppException
 from app.models import Conversation
-from app.repositories import ConversationRepository, UserRepository
+from app.repositories import (
+    ConversationRepository,
+    MessageRepository,
+    UserRepository,
+)
 from app.schemas.conversation import ConversationRead
+from app.schemas.message import MessageRead
 
 
 class ConversationService:
@@ -18,7 +23,22 @@ class ConversationService:
     ) -> None:
         self.users = UserRepository(db)
         self.conversations = ConversationRepository(db)
+        self.messages = MessageRepository(db)
         self.cache = ConversationCache(redis)
+
+    async def get_owned_conversation(
+        self,
+        conversation_id: uuid.UUID,
+        user_id: uuid.UUID,
+    ) -> Conversation:
+        conversation = await self.conversations.get_by_id(conversation_id)
+        if conversation is None or conversation.user_id != user_id:
+            raise AppException(
+                code=40401,
+                message="conversation_not_found",
+                status_code=404,
+            )
+        return conversation
 
     async def list_for_user(self, user_id: uuid.UUID) -> list[ConversationRead]:
         user = await self.users.get_by_id(user_id)
@@ -42,3 +62,12 @@ class ConversationService:
     async def invalidate_list_cache(self, user_id: uuid.UUID) -> None:
         """在 DB commit 之后调用，避免并发下用未提交数据回填缓存。"""
         await self.cache.invalidate(user_id)
+
+    async def list_messages_for_user(
+        self,
+        conversation_id: uuid.UUID,
+        user_id: uuid.UUID,
+    ) -> list[MessageRead]:
+        await self.get_owned_conversation(conversation_id, user_id)
+        rows = await self.messages.list_by_conversation_id(conversation_id)
+        return [MessageRead.model_validate(m) for m in rows]

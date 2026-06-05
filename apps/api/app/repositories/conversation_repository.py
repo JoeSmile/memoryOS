@@ -18,6 +18,12 @@ class ConversationRepository:
         )
         return list(result.scalars().all())
 
+    async def get_by_id(self, conversation_id: uuid.UUID) -> Conversation | None:
+        result = await self.db.execute(
+            select(Conversation).where(Conversation.id == conversation_id)
+        )
+        return result.scalar_one_or_none()
+
     async def create(self, user_id: uuid.UUID, title: str) -> Conversation:
         conversation = Conversation(user_id=user_id, title=title)
         self.db.add(conversation)
