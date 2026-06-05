@@ -25,9 +25,44 @@ export type WebVitalsAlert = {
 
 const isDev = process.env.NODE_ENV === "development";
 const verbose = process.env.NEXT_PUBLIC_WEB_VITALS_VERBOSE === "1";
+const STORAGE_PREFIX = "memoryos:wv:";
+
+/** 内存兜底：sessionStorage 不可用时 */
+const memoryAlertedKeys = new Set<string>();
 
 export function isWebVitalsAlert(rating: WebVitalsRating | undefined): boolean {
-  return rating === "needs-improvement" || rating === "poor";
+  if (rating === "poor") {
+    return true;
+  }
+  if (verbose && rating === "needs-improvement") {
+    return true;
+  }
+  return false;
+}
+
+function storageKey(path: string, name: WebVitalsMetricName): string {
+  return `${STORAGE_PREFIX}${path}:${name}`;
+}
+
+export function shouldEmitWebVitalsAlert(
+  path: string,
+  name: WebVitalsMetricName,
+): boolean {
+  const key = storageKey(path, name);
+
+  try {
+    if (sessionStorage.getItem(key)) {
+      return false;
+    }
+    sessionStorage.setItem(key, "1");
+    return true;
+  } catch {
+    if (memoryAlertedKeys.has(key)) {
+      return false;
+    }
+    memoryAlertedKeys.add(key);
+    return true;
+  }
 }
 
 export function formatWebVitalValue(name: WebVitalsMetricName, value: number): string {
@@ -47,40 +82,25 @@ export function formatWebVitalLine(
   return `${metric.name}=${formatWebVitalValue(metric.name, metric.value)} (${rating})`;
 }
 
-export function reportWebVitalInDev(metric: WebVitalsMetric): void {
-  if (!isDev) {
-    return;
+/** @returns whether a throttled alert was emitted */
+export function reportWebVitalInDev(metric: WebVitalsMetric): boolean {
+  if (!isDev || !isWebVitalsAlert(metric.rating)) {
+    if (isDev && verbose) {
+      console.info(
+        `[WebVitals] ${formatWebVitalLine(metric)} id=${metric.id}`,
+      );
+    }
+    return false;
   }
 
-  const line = formatWebVitalLine(metric);
-
-  if (isWebVitalsAlert(metric.rating)) {
-    console.warn(`[WebVitals ⚠] ${line}`);
-    void postDevVitalsBeacon(metric);
-    return;
+  const path =
+    typeof window !== "undefined" ? window.location.pathname : "/";
+  if (!shouldEmitWebVitalsAlert(path, metric.name)) {
+    return false;
   }
 
-  if (verbose) {
-    console.info(`[WebVitals] ${line} id=${metric.id}`);
-  }
-}
-
-async function postDevVitalsBeacon(metric: WebVitalsMetric): Promise<void> {
-  try {
-    await fetch("/api/dev/vitals", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: metric.name,
-        value: metric.value,
-        rating: metric.rating,
-        path: window.location.pathname,
-      }),
-      keepalive: true,
-    });
-  } catch {
-    // Dev-only helper; ignore network errors during HMR or offline.
-  }
+  console.warn(`[WebVitals ⚠] ${path} ${formatWebVitalLine(metric)}`);
+  return true;
 }
 
 export function toWebVitalsAlert(metric: WebVitalsMetric): WebVitalsAlert {
@@ -88,7 +108,7 @@ export function toWebVitalsAlert(metric: WebVitalsMetric): WebVitalsAlert {
     id: metric.id,
     name: metric.name,
     value: metric.value,
-    rating: metric.rating ?? "needs-improvement",
+    rating: metric.rating ?? "poor",
     path: window.location.pathname,
   };
 }

@@ -544,7 +544,7 @@ flowchart LR
 | **设计规范**      | Figma / 色板 / 间距 token                        | 与 `globals.css` 中 `@theme` 对齐                                         |
 | **API 契约**      | OpenAPI 生成 TS 类型                             | 与 FastAPI 同步，减少手写类型                                             |
 | **错误监控**      | Sentry / 前端埋点                                | 上线后（EP08）补充                                                        |
-| **性能预算**      | Web Vitals（dev 异常告警）+ Lighthouse `/chat`、bundle 分析 | 默认仅 `needs-improvement`/`poor` → 终端 `[WebVitals ⚠]` + 页角小条；`NEXT_PUBLIC_WEB_VITALS_VERBOSE=1` 打全量；`pnpm lighthouse:chat` |
+| **性能预算**      | Web Vitals（dev 异常告警）+ Lighthouse `/chat`、bundle 分析 | 默认仅 `poor` → 浏览器 Console + 页角小条（无 HTTP beacon）；`NEXT_PUBLIC_WEB_VITALS_VERBOSE=1` 含 needs-improvement；`pnpm lighthouse:chat` |
 | **浏览器支持**    | browserslist                                     | 明确最低 Chrome/Safari 版本                                               |
 | **Node 版本锁定** | `.nvmrc` 或 `.node-version`                      | 与 `engines.node >= 20` 一致                                              |
 

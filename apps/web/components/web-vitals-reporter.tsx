@@ -29,9 +29,9 @@ export function WebVitalsReporter() {
       rating: metric.rating,
     };
 
-    reportWebVitalInDev(snapshot);
+    const emitted = reportWebVitalInDev(snapshot);
 
-    if (isWebVitalsAlert(snapshot.rating)) {
+    if (emitted && isWebVitalsAlert(snapshot.rating)) {
       setAlert(toWebVitalsAlert(snapshot));
     }
   });

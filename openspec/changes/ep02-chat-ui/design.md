@@ -53,7 +53,7 @@
 
 ### D6: Web Vitals 本地优先（异常告警）
 
-- **选择**：`useReportWebVitals` 按 Google `rating` 过滤；异常时 `console.warn` + `POST /api/dev/vitals` 打到 **Next 终端** + 右下角 12s 角标；全量日志用 env 开关。
+- **选择**：`useReportWebVitals` 按 Google `rating` 过滤；异常时仅 `console.warn` + 右下角 12s 角标（**不发 HTTP**；`/api/dev/vitals` 仅保留 204 stub 兼容旧 bundle）；全量日志用 env 开关。
 - **理由**：开发时视线在终端/编辑器，不必盯 Console；角标作备用且不 modal；生产上报留 EP08。
 
 ## Risks / Trade-offs

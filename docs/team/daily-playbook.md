@@ -308,15 +308,14 @@ pnpm db:up      # 仅 Docker（Postgres + Redis）
 
 ### 7.5 前端性能（本地）
 
-**默认「仅异常告警」**——指标正常时静默；`needs-improvement` / `poor` 时：
+**默认「仅 poor 告警」**——`needs-improvement` 不打扰；同页同指标 **session 内只报一次**（不发 HTTP，避免 `/api/dev/vitals` 拖慢 dev server）：
 
 | 渠道 | 你会看到什么 |
 |:-----|:-------------|
-| **终端**（推荐） | 跑 `pnpm dev:web` 的窗口出现 `[WebVitals ⚠] /chat LCP=3200ms (poor)` |
-| **页面角标** | 右下角小条 12s 后自动消失，可点 × 关掉，不挡操作 |
-| **浏览器 Console** | 同上，仅 `console.warn`，无弹窗 |
+| **浏览器 Console** | `[WebVitals ⚠] /chat LCP=3200ms (poor)` |
+| **页面角标** | 仅 poor 时右下角小条 12s，可点 × |
 
-需要看全部指标时，在 `apps/web/.env.local` 加 `NEXT_PUBLIC_WEB_VITALS_VERBOSE=1` 后重启 Web。
+需要连 `needs-improvement` 也看：`.env.local` 加 `NEXT_PUBLIC_WEB_VITALS_VERBOSE=1` 后重启 Web。
 
 | 方式 | 命令 / 操作 |
 |:-----|:------------|
