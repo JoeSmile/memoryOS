@@ -26,7 +26,7 @@
 
 ## 2. 状态 & 消息管理
 
-- [ ] 2.1 `useChatStore`：整理 `useChat` +
+- [x] 2.1 `useChatStore`：整理 `useChat` +
       Query 同步（替代 minimal-chat 内联状态）
   - 预计文件：2 · stores、hooks
 
