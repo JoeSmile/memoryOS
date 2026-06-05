@@ -78,10 +78,11 @@
 
 ---
 
-## Phase 7 — 完整聊天 UI + Markdown
+## Phase 7 — 分析向聊天壳（单会话 + Markdown）
 
 **子 change：** [`ep02-chat-ui`](../ep02-chat-ui/)  
-**Done：** archive；EP02 Story 2.1–2.2、2.5 勾选
+**产品向：** 世界杯分析 Web 复用；**无侧栏**；消息管理 + 上下文提示  
+**Done：** archive；EP02 Story 2.1–2.2、2.5 勾选（侧栏项移出或标 N/A）
 
 - [ ] 7.1 完成并 archive `ep02-chat-ui`
 
@@ -97,5 +98,5 @@
 ```bash
 pnpm db:up && pnpm test:api:harness
 pnpm --filter @memoryos/web build
-# 浏览器：/chat 流式 + 侧栏会话列表
+# 浏览器：/chat 单会话流式 + Markdown + 消息管理/上下文提示（无侧栏）
 ```

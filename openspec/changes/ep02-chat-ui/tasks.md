@@ -4,38 +4,40 @@
 
 ### Review checklist
 
-- [ ] `ep02-chat-sse` 已 archive
-- [ ] JWT 与 conversations 列表策略明确
+- [x] `ep02-chat-sse` 已 archive
+- [x] 产品方向：世界杯向 **单会话**（无侧栏）；业务 UI 在 EP11
+- [ ] 消息管理 MVP 范围（regenerate stub / 编辑重发）可接受
+- [ ] 上下文提示仅 UI 展示、后端裁剪不在本 change
 - [ ] 依赖加入 `apps/web/package.json`
 
-**Reviewer notes:**
+**Reviewer notes:** 用户确认按世界杯向产品调整 Phase 7：去掉侧栏，聚焦会话内消息管理与上下文可见性。
 
 ---
 
-## 1. Dependencies & layout
+## 1. Dependencies & 单会话布局
 
-- [ ] 1.1 添加 zustand、react-markdown、remark-gfm、高亮库
+- [ ] 1.1 添加 zustand、react-markdown、remark-gfm、代码高亮库
   - 预计文件：1 · `apps/web/package.json`
-  - **已提前接入（Phase 6+）：** `@tanstack/react-query`、`ai`、`@ai-sdk/react`
+  - **已接入：** `@tanstack/react-query`、`ai`、`@ai-sdk/react`
 
-- [ ] 1.2 侧栏 + 主区布局骨架 `components/chat/*`
-  - 预计文件：3 · 层：components、app/chat
+- [ ] 1.2 单会话主区布局 `components/chat/*`（无侧栏）
+  - 预计文件：3 · components、app/chat
 
-## 2. Zustand & 会话列表
+## 2. 状态 & 消息管理
 
-- [ ] 2.1 `useSessionStore` + 对接 `GET /conversations`
-  - 预计文件：2 · stores、lib
-
-- [ ] 2.2 `useChatStore` + send/abort 接 `sse-client`
+- [ ] 2.1 `useChatStore`：整理 `useChat` + Query 同步（替代 minimal-chat 内联状态）
   - 预计文件：2 · stores、hooks
-  - **已部分实现：** `useChat` + `TextStreamChatTransport`（`/api/chat` BFF）；Zustand 仍待做
+
+- [ ] 2.2 消息管理 MVP：`message.id` 稳定、助手「重新生成」、上下文条数提示
+  - 预计文件：2 · components/chat
 
 ## 3. Markdown & polish
 
-- [ ] 3.1 `MessageContent` Markdown + 流式边界
+- [ ] 3.1 `MessageContent` Markdown + 流式边界（done 后 GFM）
   - 预计文件：2 · components
 
-- [ ] 3.2 滚底、Loading、空态；EP02 Story 2.1–2.2、2.5 勾选
-  - 预计文件：2 · components、docs/epic
+- [ ] 3.2 滚底、Loading、空态、错误态；更新 EP02 epic / docs
+  - 预计文件：2 · components、docs
 
-**前置：** `ep02-program` Phase 6 完成。
+**前置：** `ep02-program` Phase 6 完成。  
+**下一步史诗：** EP11 世界杯业务页复用本聊天壳（独立 change）。
