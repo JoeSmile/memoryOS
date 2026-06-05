@@ -44,13 +44,13 @@
 
 ## Phase 6 — 最小前端（后端绿后）
 
-- [ ] 3.1 `lib/sse-client.ts`
+- [x] 3.1 `lib/sse-client.ts`
   - 预计文件：1 · lib/
 
-- [ ] 3.2 `/chat` 最小流式 UI + 停止按钮
+- [x] 3.2 `/chat` 最小流式 UI + 停止按钮
   - 预计文件：2 · app/chat、components
 
-- [ ] 3.3 历史消息 + 未登录跳转；docs；**archive 本 change**
+- [x] 3.3 历史消息 + 未登录跳转；docs；**archive 本 change**
   - 预计文件：2 · app/chat、docs
 
 **下一步 change：** `ep02-chat-ui`（Program Phase 7）

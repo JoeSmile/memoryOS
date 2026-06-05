@@ -31,7 +31,8 @@ memoryOS（pnpm Monorepo）
 | 构建加速      | Turbopack dev（`next dev --turbopack`）；build 默认 Webpack @15.5 | ✅ |
 | API 客户端    | `lib/api-client.ts` + Bearer        |    ✅ EP03.4 |
 | 状态管理      | Zustand                             |  📋 EP02  |
-| 流式通信      | SSE / ReadableStream                |  📋 EP02  |
+| 流式通信      | Vercel AI SDK `useChat` + BFF `/api/chat` |    ✅ EP02  |
+| 服务端状态    | TanStack Query（`@tanstack/react-query`） |    ✅ EP02  |
 | 富文本        | react-markdown + 高亮               |  📋 EP02  |
 | 单元测试      | —                                   | ❌ 未选型 |
 | E2E           | —                                   | ❌ 未选型 |
@@ -461,7 +462,7 @@ pnpm --filter @memoryos/web lint
 | 能力     | 计划选型                                 | 典型场景                       |
 | :------- | :--------------------------------------- | :----------------------------- |
 | 状态管理 | Zustand                                  | 会话列表、流式 loading、错误态 |
-| 流式     | `fetch` + ReadableStream / SSE           | Token 级渲染、停止生成         |
+| 流式     | `lib/sse-client.ts`（`streamChatCompletion`） | `/chat` 最小页；完整 UI 在 `ep02-chat-ui` |
 | Markdown | react-markdown + rehype/shiki            | 助手消息、代码块               |
 | 长列表   | 虚拟滚动（如 `@tanstack/react-virtual`） | 历史消息、文档列表             |
 | 上传     | 分片 + 进度                              | 知识库 PDF（EP04）             |
@@ -474,9 +475,10 @@ pnpm --filter @memoryos/web lint
 apps/web/
 ├── app/                 # 路由与页面（App Router）
 ├── components/          # 仅 web 使用的业务组件
-├── lib/                 # API 客户端（`api-client.ts`）、`auth-token.ts`
-├── stores/              # Zustand stores（EP02）
-├── hooks/               # 自定义 Hooks
+├── lib/                 # `api-client.ts`、`auth-token.ts`、`sse-frames.ts`、`memoryos-upstream.ts`
+├── app/api/chat/        # BFF：MemoryOS SSE → AI SDK 文本流
+├── stores/              # Zustand stores（`ep02-chat-ui`）
+├── hooks/               # React Query hooks、后续 chat hooks
 └── public/              # 静态资源
 ```
 

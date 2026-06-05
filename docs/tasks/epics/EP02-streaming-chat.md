@@ -21,8 +21,8 @@
 | **2** | LangGraph 学习 | L02 §5 + `langgraph-chat.md` | ✅ |
 | **3** | LangSmith 环境 | 并入 Phase 4（`.env.example`） | ✅ |
 | **4** | 最小 LangGraph | [`ep02-langgraph`](../../../openspec/changes/archive/2026-06-03-ep02-langgraph/) | ✅ |
-| **5** | SSE + Graph 上游 | [`ep02-chat-sse`](../../../openspec/changes/ep02-chat-sse/) 后端 | ⬜ |
-| **6** | 最小 `/chat` 冒烟 | [`ep02-chat-sse`](../../../openspec/changes/ep02-chat-sse/) 前端 + archive | ⬜ |
+| **5** | SSE + Graph 上游 | [`ep02-chat-sse`](../../../openspec/changes/archive/2026-06-03-ep02-chat-sse/) 后端 | ✅ |
+| **6** | 最小 `/chat` 冒烟 | [`ep02-chat-sse`](../../../openspec/changes/archive/2026-06-03-ep02-chat-sse/) 前端 + archive | ✅ |
 | **7** | 完整 UI + Markdown | [`ep02-chat-ui`](../../../openspec/changes/ep02-chat-ui/) | ⬜ |
 
 执行：`/work-next ep02-program` 或按 Phase 对子 change 说「继续实现」。  
@@ -46,25 +46,25 @@
 
 ## Story 2.3 SSE 后端
 
-- [ ] `POST /api/v1/chat/completions` SSE 契约 → **Phase 5**
-- [ ] 对接大模型流式（经 LangGraph）→ **Phase 4–5**
-- [ ] 客户端断开时取消上游 → **Phase 5**
+- [x] `POST /api/v1/chat/completions` SSE 契约 → **Phase 5**
+- [x] 对接大模型流式（经 LangGraph）→ **Phase 4–5**
+- [x] 客户端断开时取消上游 → **Phase 5**
 
 ## Story 2.4 前端流式
 
-- [ ] ReadableStream / fetch 流式客户端 → **Phase 6**
-- [ ] Token 实时渲染、`AbortController` → **Phase 6**
+- [x] ReadableStream / fetch 流式客户端 → **Phase 6**
+- [x] Token 实时渲染、`AbortController` → **Phase 6**
 - [ ] 网络异常与重试提示 → **Phase 6–7**
 
 ## Story 2.5 会话数据
 
-- [ ] 会话 CRUD、历史消息加载 → **Phase 1 + 5–6**
+- [x] 会话 CRUD、历史消息加载 → **Phase 1 + 5–6**（列表仍 query `user_id`；消息列表已 JWT）
 - [ ] 会话标题自动生成 → **Phase 7 或 follow-up**
 - [ ] Zustand → **Phase 7**
 
 ## Story 2.6 LangGraph 对话编排（核心）
 
-- [ ] 废弃业务层裸调 OpenAI → **Phase 5**（`ep02-chat-sse` 接 `ChatGraphRunner`）
+- [x] 废弃业务层裸调 OpenAI → **Phase 5**（`ep02-chat-sse` 接 `ChatGraphRunner`）
 - [x] Chat State、节点、边 → **Phase 4** [`langgraph-chat.md`](../../tech/langgraph-chat.md)
 - [ ] 条件分支（EP05 预留）→ 后续
 
@@ -80,7 +80,7 @@
 
 - [ ] React 高复用组件封装 → Phase 7 前
 - [ ] Zustand 实战 → Phase 7
-- [ ] SSE 原理与前后端联动 → Phase 5–6
+- [x] SSE 原理与前后端联动 → Phase 5–6
 - [ ] LangGraph：State、Node、Edge → **Phase 2–4**
 - [ ] LangSmith 配置与排错 → **Phase 3–4**
 - [ ] 多轮上下文拼接与 Prompt 基础 → Phase 4+

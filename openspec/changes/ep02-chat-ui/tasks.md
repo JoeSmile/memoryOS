@@ -16,6 +16,7 @@
 
 - [ ] 1.1 添加 zustand、react-markdown、remark-gfm、高亮库
   - 预计文件：1 · `apps/web/package.json`
+  - **已提前接入（Phase 6+）：** `@tanstack/react-query`、`ai`、`@ai-sdk/react`
 
 - [ ] 1.2 侧栏 + 主区布局骨架 `components/chat/*`
   - 预计文件：3 · 层：components、app/chat
@@ -27,6 +28,7 @@
 
 - [ ] 2.2 `useChatStore` + send/abort 接 `sse-client`
   - 预计文件：2 · stores、hooks
+  - **已部分实现：** `useChat` + `TextStreamChatTransport`（`/api/chat` BFF）；Zustand 仍待做
 
 ## 3. Markdown & polish
 

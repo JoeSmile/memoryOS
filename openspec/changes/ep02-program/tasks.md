@@ -64,7 +64,7 @@
 **Done：** `POST /chat/completions` SSE 由 **LangGraph**
 驱动；`pnpm test:api:harness` 绿
 
-- [ ] 5.1 完成 `ep02-chat-sse` 后端 tasks（2.x–3.x）并 harness 绿
+- [x] 5.1 完成 `ep02-chat-sse` 后端 tasks（2.x–3.x）并 harness 绿
 
 ---
 
@@ -73,8 +73,8 @@
 **子 change：** 仍属 [`ep02-chat-sse`](../ep02-chat-sse/)（前端 4.x）  
 **Done：** `/chat` 可登录后发消息、看流式、停止；非侧栏完整 UI
 
-- [ ] 6.1 完成 `ep02-chat-sse` 前端 tasks（4.x）+ docs 5.1
-- [ ] 6.2 archive `ep02-chat-sse`
+- [x] 6.1 完成 `ep02-chat-sse` 前端 tasks（4.x）+ docs 5.1
+- [x] 6.2 archive `ep02-chat-sse`
 
 ---
 
