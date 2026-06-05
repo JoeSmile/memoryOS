@@ -212,7 +212,7 @@ async def health():
 | Conda 里 `pip` 装错包        | 先 `conda activate memoryos-api`，再 `which pip` 确认路径在 `envs/memoryos-api` |
 | `ModuleNotFoundError: app`   | 须在 `apps/api` 目录启动，或设置 `PYTHONPATH`                                   |
 | 改代码不生效                 | 确认 `--reload`；或重启 uvicorn                                                 |
-| 端口 8000 占用               | `lsof -i :8000` 杀掉进程或改 `.env` 里 `PORT`                                   |
+| 端口 8000 占用 / `Address already in use` | 见 [daily-playbook §7](../team/daily-playbook.md#7-本地-dev-排障端口占用)；`lsof -nP -iTCP:8000 -sTCP:LISTEN` → `kill <PID>` 或 `kill -9 <PID>` → `pnpm dev:api` |
 | pip 很慢                     | `pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple`   |
 
 ---

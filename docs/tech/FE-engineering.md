@@ -107,6 +107,8 @@ pnpm --filter @memoryos/web build
 pnpm -r run lint          # 所有 workspace 包执行 lint
 ```
 
+**端口占用**（`Address already in use`、:3000 / :8000）：见 [daily-playbook §7](../team/daily-playbook.md#7-本地-dev-排障端口占用)。
+
 #### API（Python，非 pnpm workspace）
 
 本地已有 Conda 环境 **`memoryos-api`** 时：

@@ -237,9 +237,80 @@ EP03 里 users/conversations/messages 表字段是否合理？参考 docs/projec
 
 ---
 
-## 7. 相关链接
+## 7. 本地 dev 排障（端口占用）
+
+`pnpm dev:stack` 会并行起 **API :8000**、**Web :3000**，并确保 **PostgreSQL :5432**、**Redis :6379**（Docker）可用。
+
+### 7.1 查看谁在监听
+
+```bash
+lsof -nP -iTCP:8000 -sTCP:LISTEN   # FastAPI / uvicorn
+lsof -nP -iTCP:3000 -sTCP:LISTEN   # Next.js
+lsof -nP -iTCP:5432 -sTCP:LISTEN   # PostgreSQL（多为 com.docker）
+lsof -nP -iTCP:6379 -sTCP:LISTEN   # Redis（多为 com.docker）
+```
+
+`COMMAND` / `PID` 列即占用进程；`node` 多为前端，`Python` + `uvicorn` 多为 API。
+
+### 7.2 `Address already in use`（最常见）
+
+终端出现：
+
+```text
+ERROR: [Errno 48] Address already in use
+```
+
+表示 **端口已被占用**（常常是上次 `dev:stack` 未关干净）。**不是** LangGraph 的 `LangChainPendingDeprecationWarning` 导致——那条可忽略。
+
+**先判断服务是否已在跑：**
+
+```bash
+curl -s --max-time 3 http://127.0.0.1:8000/api/v1/health
+curl -s -o /dev/null -w "%{http_code}\n" --max-time 3 http://127.0.0.1:3000
+```
+
+若 health 返回 `{"code":0,...}`、Web 为 `200`，可直接用 http://localhost:3000 ，**不必再起一份**。
+
+### 7.3 干净重启（结束旧进程）
+
+```bash
+# 将 <PID> 换成 lsof 输出的数字
+kill <PID>
+
+# 普通 kill 无效时（进程卡死、占端口不响应）
+kill -9 <PID>
+```
+
+然后：
+
+```bash
+pnpm dev:stack
+```
+
+**只重启某一端：**
+
+```bash
+pnpm dev:api    # 仅 API :8000
+pnpm dev:web    # 仅 Web :3000
+pnpm db:up      # 仅 Docker（Postgres + Redis）
+```
+
+### 7.4 其它现象
+
+| 现象 | 处理 |
+|:-----|:-----|
+| API 占 8000 但 `curl` health 超时 | 多为僵尸 uvicorn → `kill -9` 后 `pnpm dev:api` |
+| Docker 容器已在跑 | `pnpm db:up` 显示 Running 即可，无需重复起 |
+| 改 API 代码不生效 | 确认带 `--reload`（`pnpm dev:api` 默认有）或重启 API |
+| 想换 API 端口 | `apps/api/.env` 的 `PORT`，并同步 `apps/web/.env.local` 的 `NEXT_PUBLIC_API_URL` |
+
+更细的后端 FAQ 见 [python-getting-started.md](../tech/python-getting-started.md) §6。
+
+---
+
+## 8. 相关链接
 
 - [onboarding.md](./onboarding.md) — 组队与新人
 - [ai-collab-best-practices.md](../tech/ai-collab-best-practices.md)
   — 细节与反模式
-- [EP03](../tasks/epics/EP03-data-storage.md) — 当前 Build 目标
+- [EP02-streaming-chat.md](../tasks/epics/EP02-streaming-chat.md) — 当前 Build 主线（Program Phase 7 起）
