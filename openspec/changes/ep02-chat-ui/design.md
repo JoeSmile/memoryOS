@@ -14,6 +14,7 @@
 - **Markdown**：流式中纯文本；`done` 后 GFM + 代码高亮。
 - **Zustand**：`useChatStore` 统一 streaming / messages 与 API 同步策略。
 - 自动滚底：用户在底部时才滚。
+- **Web Vitals（本地）**：development 下仅对 `needs-improvement`/`poor` 告警（终端 + 页角小条，不阻断）；可选 `NEXT_PUBLIC_WEB_VITALS_VERBOSE=1` 打全量；`pnpm lighthouse:chat` 对 `/chat` 出性能报告。
 
 **Non-Goals:**
 
@@ -49,6 +50,11 @@
 ### D5: 延续 AI SDK + BFF
 
 - 不回到直连 `sse-client`；`lib/sse-client.ts` 保留作测试/备用。
+
+### D6: Web Vitals 本地优先（异常告警）
+
+- **选择**：`useReportWebVitals` 按 Google `rating` 过滤；异常时 `console.warn` + `POST /api/dev/vitals` 打到 **Next 终端** + 右下角 12s 角标；全量日志用 env 开关。
+- **理由**：开发时视线在终端/编辑器，不必盯 Console；角标作备用且不 modal；生产上报留 EP08。
 
 ## Risks / Trade-offs
 

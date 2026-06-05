@@ -54,3 +54,22 @@ Chat message and streaming UI state SHALL be managed with a Zustand store (`useC
 
 - **WHEN** AI SDK stream events update the active assistant message
 - **THEN** UI reflects tokens without full page reload and remains consistent with API after `onFinish` refetch
+
+### Requirement: Local web performance observability
+
+The web application SHALL expose Core Web Vitals in local development and provide a script to audit chat page performance.
+
+#### Scenario: Dev alert on poor vitals
+
+- **WHEN** a Core Web Vital reports `needs-improvement` or `poor` in development
+- **THEN** the Next dev server terminal logs `[WebVitals ⚠]` and the UI shows a dismissible corner hint without blocking interaction
+
+#### Scenario: Verbose vitals logging
+
+- **WHEN** `NEXT_PUBLIC_WEB_VITALS_VERBOSE=1` is set in development
+- **THEN** all reported metrics are logged to the browser console with `[WebVitals]`
+
+#### Scenario: Lighthouse chat audit
+
+- **WHEN** developer runs `pnpm lighthouse:chat` with web dev server on port 3000
+- **THEN** a performance HTML report is written under `apps/web/.lighthouse/`

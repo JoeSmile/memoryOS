@@ -306,6 +306,22 @@ pnpm db:up      # 仅 Docker（Postgres + Redis）
 
 更细的后端 FAQ 见 [python-getting-started.md](../tech/python-getting-started.md) §6。
 
+### 7.5 前端性能（本地）
+
+**默认「仅异常告警」**——指标正常时静默；`needs-improvement` / `poor` 时：
+
+| 渠道 | 你会看到什么 |
+|:-----|:-------------|
+| **终端**（推荐） | 跑 `pnpm dev:web` 的窗口出现 `[WebVitals ⚠] /chat LCP=3200ms (poor)` |
+| **页面角标** | 右下角小条 12s 后自动消失，可点 × 关掉，不挡操作 |
+| **浏览器 Console** | 同上，仅 `console.warn`，无弹窗 |
+
+需要看全部指标时，在 `apps/web/.env.local` 加 `NEXT_PUBLIC_WEB_VITALS_VERBOSE=1` 后重启 Web。
+
+| 方式 | 命令 / 操作 |
+|:-----|:------------|
+| Lighthouse `/chat` | 先起 Web，再 `pnpm lighthouse:chat` → 报告在 `apps/web/.lighthouse/chat.html` |
+
 ---
 
 ## 8. 相关链接

@@ -22,7 +22,8 @@
     "install:all": "pnpm install && pnpm setup:api",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
-    "format": "pnpm -r run format"
+    "format": "pnpm -r run format",
+    "lighthouse:chat": "pnpm --filter @memoryos/web lighthouse:chat"
   },
   "engines": {
     "node": ">=20"

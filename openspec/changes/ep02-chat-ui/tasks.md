@@ -39,5 +39,9 @@
 - [ ] 3.2 滚底、Loading、空态、错误态；更新 EP02 epic / docs
   - 预计文件：2 · components、docs
 
+- [ ] 3.3 Web Vitals 本地监控（`useReportWebVitals` dev 控制台 + `pnpm lighthouse:chat`）
+  - 预计文件：3 · `components/web-vitals-reporter.tsx`、`providers.tsx`、`package.json`
+  - **Non-Goal：** 生产埋点 / Sentry（EP08）
+
 **前置：** `ep02-program` Phase 6 完成。  
 **下一步史诗：** EP11 世界杯业务页复用本聊天壳（独立 change）。
