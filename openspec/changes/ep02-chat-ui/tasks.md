@@ -1,6 +1,6 @@
 ## 0. Human review（apply 前必过）
 
-- [ ] **Tasks reviewed by human**
+- [x] **Tasks reviewed by human**
 
 ### Review checklist
 
@@ -8,15 +8,16 @@
 - [x] 产品方向：世界杯向 **单会话**（无侧栏）；业务 UI 在 EP11
 - [ ] 消息管理 MVP 范围（regenerate stub / 编辑重发）可接受
 - [ ] 上下文提示仅 UI 展示、后端裁剪不在本 change
-- [ ] 依赖加入 `apps/web/package.json`
+- [x] 依赖加入 `apps/web/package.json`
 
-**Reviewer notes:** 用户确认按世界杯向产品调整 Phase 7：去掉侧栏，聚焦会话内消息管理与上下文可见性。
+**Reviewer notes:** 用户确认按世界杯向产品调整 Phase
+7：去掉侧栏，聚焦会话内消息管理与上下文可见性。
 
 ---
 
 ## 1. Dependencies & 单会话布局
 
-- [ ] 1.1 添加 zustand、react-markdown、remark-gfm、代码高亮库
+- [x] 1.1 添加 zustand、react-markdown、remark-gfm、代码高亮库
   - 预计文件：1 · `apps/web/package.json`
   - **已接入：** `@tanstack/react-query`、`ai`、`@ai-sdk/react`
 
@@ -25,7 +26,8 @@
 
 ## 2. 状态 & 消息管理
 
-- [ ] 2.1 `useChatStore`：整理 `useChat` + Query 同步（替代 minimal-chat 内联状态）
+- [ ] 2.1 `useChatStore`：整理 `useChat` +
+      Query 同步（替代 minimal-chat 内联状态）
   - 预计文件：2 · stores、hooks
 
 - [ ] 2.2 消息管理 MVP：`message.id` 稳定、助手「重新生成」、上下文条数提示
@@ -39,8 +41,10 @@
 - [ ] 3.2 滚底、Loading、空态、错误态；更新 EP02 epic / docs
   - 预计文件：2 · components、docs
 
-- [ ] 3.3 Web Vitals 本地监控（`useReportWebVitals` dev 控制台 + `pnpm lighthouse:chat`）
-  - 预计文件：3 · `components/web-vitals-reporter.tsx`、`providers.tsx`、`package.json`
+- [ ] 3.3 Web Vitals 本地监控（`useReportWebVitals` dev 控制台 +
+      `pnpm lighthouse:chat`）
+  - 预计文件：3 ·
+    `components/web-vitals-reporter.tsx`、`providers.tsx`、`package.json`
   - **Non-Goal：** 生产埋点 / Sentry（EP08）
 
 **前置：** `ep02-program` Phase 6 完成。  
