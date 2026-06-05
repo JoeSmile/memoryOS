@@ -21,7 +21,7 @@
   - 预计文件：1 · `apps/web/package.json`
   - **已接入：** `@tanstack/react-query`、`ai`、`@ai-sdk/react`
 
-- [ ] 1.2 单会话主区布局 `components/chat/*`（无侧栏）
+- [x] 1.2 单会话主区布局 `components/chat/*`（无侧栏）
   - 预计文件：3 · components、app/chat
 
 ## 2. 状态 & 消息管理
