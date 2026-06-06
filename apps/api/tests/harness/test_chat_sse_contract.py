@@ -84,6 +84,9 @@ async def test_chat_completions_sse_mock_stream():
                 payload = json.loads(line.removeprefix("data:").strip())
                 events.append(payload)
 
+        assert events[0]["event"] == "start"
+        assert events[0]["data"]["stream_id"]
+
         token_events = [e for e in events if e.get("event") == "token"]
         done_events = [e for e in events if e.get("event") == "done"]
         assert token_events
@@ -91,6 +94,7 @@ async def test_chat_completions_sse_mock_stream():
         assert done_events
         assert done_events[0]["data"]["message_id"]
         assert done_events[0]["data"]["stream_id"]
+        assert done_events[0]["data"]["stream_id"] == events[0]["data"]["stream_id"]
 
 
 @pytest.mark.asyncio

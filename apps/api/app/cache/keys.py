@@ -14,3 +14,11 @@ def completion_turn_inflight_key(
     client_message_id: uuid.UUID,
 ) -> str:
     return f"memoryos:completion_inflight:{conversation_id}:{client_message_id}"
+
+
+def stream_cancel_key(stream_id: str) -> str:
+    return f"memoryos:stream_cancel:{stream_id}"
+
+
+def stream_active_key(stream_id: str) -> str:
+    return f"memoryos:stream_active:{stream_id}"

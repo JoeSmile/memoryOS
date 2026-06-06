@@ -72,8 +72,9 @@ async def test_stream_persists_interrupted_assistant_on_disconnect(monkeypatch):
 
     await service.finalize_completion_stream(stream_state)
 
-    assert len(events) == 1
-    assert events[0]["event"] == "token"
+    assert len(events) == 2
+    assert events[0]["event"] == "start"
+    assert events[1]["event"] == "token"
     service.messages.create.assert_called_once()
     call_args, call_kwargs = service.messages.create.call_args
     assert call_args[1] == "assistant"

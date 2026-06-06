@@ -21,3 +21,7 @@ class ChatCompletionRequest(BaseModel):
     content: str = Field(min_length=1)
     client_message_id: UUID | None = None
     regenerate: bool = False
+
+
+class ChatCancelRequest(BaseModel):
+    stream_id: UUID

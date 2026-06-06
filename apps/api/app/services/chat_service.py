@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
 from app.cache.completion_turn_lock import CompletionTurnLock
+from app.cache.stream_cancel_cache import StreamCancelCache
 from app.cache.stream_cache import StreamCache
 from app.core.exceptions import AppException
 from app.graphs.chat_state import ChatState
@@ -49,6 +50,7 @@ class ChatService:
         self.conversations = ConversationService(db, redis=redis)
         self.messages = MessageRepository(db)
         self.stream_cache = StreamCache(redis)
+        self.cancel_cache = StreamCancelCache(redis)
         self.turn_lock = CompletionTurnLock(redis)
         self.runner = runner if runner is not None else ChatGraphRunner()
 
@@ -173,6 +175,34 @@ class ChatService:
             return
         await self.turn_lock.release(conversation_id, client_message_id)
 
+    async def cancel_stream(
+        self,
+        *,
+        stream_id: str,
+        user_id: uuid.UUID,
+    ) -> None:
+        owner = await self.cancel_cache.get_active_owner(stream_id)
+        if owner is None:
+            if await self.cancel_cache.is_cancelled(stream_id):
+                return
+            raise AppException(
+                code=40401,
+                message="stream_not_found",
+                status_code=404,
+            )
+
+        if owner[1] != user_id:
+            raise AppException(
+                code=40401,
+                message="stream_not_found",
+                status_code=404,
+            )
+
+        if await self.cancel_cache.is_cancelled(stream_id):
+            return
+
+        await self.cancel_cache.set_cancelled(stream_id)
+
     async def _iter_tokens_with_disconnect(
         self,
         state: ChatState,
@@ -230,6 +260,13 @@ class ChatService:
         )
         graph_state = self._to_graph_state(stream_state.user_id, history)
 
+        await self.cancel_cache.register_active(
+            stream_state.stream_id,
+            stream_state.conversation_id,
+            stream_state.user_id,
+        )
+        yield {"event": "start", "data": {"stream_id": stream_state.stream_id}}
+
         try:
             async for token in self._iter_tokens_with_disconnect(
                 graph_state,
@@ -263,6 +300,7 @@ class ChatService:
         stream_state: CompletionStreamState,
     ) -> uuid.UUID | None:
         """Always run from router finally — BFF may close before generator postamble."""
+        await self.cancel_cache.clear(stream_state.stream_id)
         await self.stream_cache.delete(
             stream_state.conversation_id,
             stream_state.stream_id,

@@ -9,7 +9,8 @@ from app.core.database import get_db
 from app.core.deps import get_current_user
 from app.core.redis import get_redis
 from app.models import User
-from app.schemas.message import ChatCompletionRequest
+from app.core.response import success
+from app.schemas.message import ChatCancelRequest, ChatCompletionRequest
 from app.services.chat_service import ChatService
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -67,4 +68,20 @@ async def chat_completions(
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
+        headers={"X-Stream-Id": stream_state.stream_id},
     )
+
+
+@router.post("/completions/cancel")
+async def chat_completions_cancel(
+    body: ChatCancelRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    redis: Redis | None = Depends(get_redis),
+):
+    service = ChatService(db, redis=redis)
+    await service.cancel_stream(
+        stream_id=str(body.stream_id),
+        user_id=user.id,
+    )
+    return success()
