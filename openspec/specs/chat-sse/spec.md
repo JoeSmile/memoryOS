@@ -15,6 +15,11 @@ The API SHALL expose `POST /api/v1/chat/completions` that returns `text/event-st
 - **WHEN** client sends valid Bearer token and body `{ conversation_id, content }` for a conversation owned by the user
 - **THEN** response has `Content-Type` text/event-stream and emits at least one `token` event followed by a `done` event
 
+#### Scenario: Stream with optional idempotency fields
+
+- **WHEN** client includes optional `client_message_id` and/or `regenerate` in the request body
+- **THEN** the server applies chat message deduplication and regenerate rules before streaming
+
 #### Scenario: Reject unauthenticated request
 
 - **WHEN** Authorization header is missing or invalid
@@ -41,12 +46,17 @@ Each SSE `data:` line SHALL be a JSON object with `event` and `data` fields.
 
 ### Requirement: User message persistence before stream
 
-The system SHALL persist the user message to PostgreSQL before emitting assistant tokens.
+The system SHALL persist the user message to PostgreSQL before emitting assistant tokens, except when `regenerate` is true.
 
 #### Scenario: User message saved
 
-- **WHEN** chat completions request is accepted
+- **WHEN** chat completions request is accepted with `regenerate` false or omitted
 - **THEN** a `messages` row with role `user` exists for the conversation before first `token` event
+
+#### Scenario: Regenerate skips new user row
+
+- **WHEN** chat completions request has `regenerate: true`
+- **THEN** no additional user message row is inserted for that request
 
 ### Requirement: Mock stream without API key
 
