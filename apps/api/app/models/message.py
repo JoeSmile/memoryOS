@@ -7,6 +7,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
 
+COMPLETION_COMPLETE = "complete"
+COMPLETION_INTERRUPTED = "interrupted"
+
 
 class Message(Base):
     __tablename__ = "messages"
@@ -24,6 +27,14 @@ class Message(Base):
     )
     role: Mapped[str] = mapped_column(String(32), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    client_message_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        nullable=True,
+    )
+    completion_status: Mapped[str | None] = mapped_column(
+        String(32),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
