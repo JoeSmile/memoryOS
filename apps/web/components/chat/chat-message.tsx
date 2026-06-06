@@ -1,5 +1,6 @@
 import type { UIMessage } from "ai";
 
+import { MessageContent } from "@/components/chat/message-content";
 import { getTextFromUIMessage } from "@/lib/chat-types";
 
 type ChatMessageProps = {
@@ -16,6 +17,7 @@ export function ChatMessage({
   onRegenerate,
 }: ChatMessageProps) {
   const isUser = message.role === "user";
+  const text = getTextFromUIMessage(message);
 
   return (
     <div
@@ -40,7 +42,10 @@ export function ChatMessage({
           </button>
         ) : null}
       </div>
-      <p className="whitespace-pre-wrap">{getTextFromUIMessage(message)}</p>
+      <MessageContent
+        content={text}
+        markdown={!isUser && !isStreaming}
+      />
     </div>
   );
 }
