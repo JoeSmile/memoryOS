@@ -88,6 +88,17 @@
 
 ---
 
+## Follow-up — 聊天加固（EP04 前可选，两个独立 change）
+
+**史诗：** [EP02 Follow-up backlog](../../../docs/tasks/epics/EP02-streaming-chat.md#follow-up-backlogphase-7-后ep04-前可选)
+
+- [x] D.0 propose `ep02-chat-dedup`（发送幂等 + `regenerate` 档 B，小）
+- [ ] C.0 propose `ep02-chat-cancel`（全链路停止 + Cancel API 兜底，**大、单独 PR**）
+
+建议顺序：先 `dedup` 或按优先级二选一；**禁止**与 Phase 7 代码混在同一 change。
+
+---
+
 ## 收尾 — archive 本 program
 
 - [ ] P.1 更新 EP02 史诗状态为完成；archive `ep02-program`

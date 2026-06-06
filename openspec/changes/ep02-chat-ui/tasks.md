@@ -6,8 +6,8 @@
 
 - [x] `ep02-chat-sse` 已 archive
 - [x] 产品方向：世界杯向 **单会话**（无侧栏）；业务 UI 在 EP11
-- [ ] 消息管理 MVP 范围（regenerate stub / 编辑重发）可接受
-- [ ] 上下文提示仅 UI 展示、后端裁剪不在本 change
+- [x] 消息管理 MVP 范围（regenerate stub / 编辑重发）可接受
+- [x] 上下文提示仅 UI 展示、后端裁剪不在本 change
 - [x] 依赖加入 `apps/web/package.json`
 
 **Reviewer notes:** 用户确认按世界杯向产品调整 Phase

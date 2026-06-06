@@ -62,7 +62,8 @@
 | 风险 | 缓解 |
 |:-----|:-----|
 | 无侧栏切换会话 | 深链 `conversation_id` + 新建会话 URL 跳转 |
-| regenerate 需后端支持 | MVP 仅重发最后 user 消息或 duplicate 最后 turn |
+| regenerate 需后端支持 | MVP 仅重发最后 user 消息或 duplicate 最后 turn；**Follow-up：** `ep02-chat-dedup` |
+| 停止生成未取消 LLM 上游 | MVP 仅 `is_disconnected` 停 SSE；**Follow-up（单独 change）：** `ep02-chat-cancel` |
 | 上下文提示仅为展示 | 文案标明「完整裁剪在后端」避免用户误解 |
 
 ## Migration Plan
