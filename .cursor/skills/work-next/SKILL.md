@@ -108,8 +108,8 @@ openspec instructions apply --change "<name>" --json
 | 多文件 / 新模块 / P0 Story 首做 | **writing-plans** 或 OpenSpec tasks 已够则省略 |
 | API / 业务行为变更 | **test-driven-development**（先 harness/unit 红灯） |
 | Bug / 测试失败 | **systematic-debugging** |
-| 声称完成 / commit / push 前 | **verification-before-completion** |
-| merge 前 | **requesting-code-review** 或 **code-reviewer** subagent |
+| 声称完成 / push 前 | **verification-before-completion** |
+| **commit 前（必做）** | **requesting-code-review** 或 **code-reviewer** subagent |
 | 分支收尾 | **finishing-a-development-branch** |
 
 **可跳过 Superpowers 整段**：单行 typo、纯文档索引、OpenSpec tasks 已极细且用户说「小改」— 仍须 **Verify + Harness（若动 API）**。
@@ -148,7 +148,7 @@ OpenSpec 的 design/tasks **不能替代** TDD 顺序与 verification 门禁。
 1. 声明：`Working on task X/Y: <描述>`（含当前分支名）
 2. 若本 task 触 API → 同步步骤 3 Harness
 3. **最小 diff**：≤3 文件 / ~150 行；一函数一事；复杂逻辑拆工具函数
-4. 勾选 task；输出 **Review 摘要** 后 **停止**（除非用户说「继续下一 task」）
+4. 勾选 task；**§5 Verify** → **§6 Code Review** → 输出结论后 **停止**（除非用户说「继续下一 task」或「commit」）
 
 ---
 
@@ -166,12 +166,16 @@ FE 变更：`pnpm lint` / 项目既有脚本。把 **命令 + 通过数** 写进
 
 ---
 
-## 6. Review（merge 前必做）
+## 6. Code Review（commit 前必做）
 
-1. **code-reviewer** subagent 或 **requesting-code-review**
-2. 对照：OpenSpec tasks、design、epic 勾选
-3. **Critical / Important** 必须修；Minor 可记 issue
-4. 修完 **重新跑步骤 5**
+**门禁**：无 code review 结论 → **禁止** `git commit`（见 [coding-constraints.md](coding-constraints.md) §Commit 前 Code Review Gate）。
+
+1. **Verify（§5）** 已通过。
+2. **code-reviewer** subagent 或 **requesting-code-review**。
+3. 对照：OpenSpec tasks、design、epic 勾选。
+4. 输出：**Strengths / Issues（Critical·Important·Minor）/ Spec 对齐 / Verdict**。
+5. **Critical / Important** 必须修；修完 **重新 §5 + §6**。
+6. 等待用户确认；用户说 **「commit」** 且 Verdict 为 merge-ready → 进入 §7。
 
 用户 `/babysit` → 读 babysit skill，盯 PR/CI/评论。
 
@@ -179,8 +183,10 @@ FE 变更：`pnpm lint` / 项目既有脚本。把 **命令 + 通过数** 写进
 
 ## 7. Finish（用户要求提交/合并时）
 
-1. **Checkpoint commit（推荐）** — 每完成一条 OpenSpec task 且 Verify 通过后：
-   - 用户未禁止 commit 时：`git add` 仅本 task 文件 → Conventional commit（如 `feat(api): ep03-jwt task 2.1 login endpoint`）
+**前置：** §6 Code Review 已完成，用户已明确要求 commit。
+
+1. **Checkpoint commit（推荐）** — 每完成一条 OpenSpec task：
+   - `git add` 仅本 task 文件 → Conventional commit（如 `feat(api): ep03-jwt task 2.1 login endpoint`）
    - 便于 review / bisect；多个 task 不要攒成一个巨型 commit
 2. **分支与 PR（推荐）** — `pnpm branch:task <change> <id>`；集成分支 `feat/<change>`，task 分支 `feat/<change>-tX-Y-slug`；单 PR ≤ **5 文件**
 3. push / merge（**finishing-a-development-branch**）；直推 `main` 仅在小改且用户明确要求时

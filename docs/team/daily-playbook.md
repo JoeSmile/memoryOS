@@ -323,6 +323,18 @@ pnpm db:up      # 仅 Docker（Postgres + Redis）
 
 ---
 
+### 7.6 Commit 前必做 Code Review
+
+实现 + Verify（lint/build/harness）通过后，**先 code review，再 commit**：
+
+1. Agent 输出 review 结论（Critical / Important 须修完）。
+2. 你确认或要求改动。
+3. 你说 **「commit」** 后才提交（每 task 一个 commit 仍推荐）。
+
+细则：`.cursor/skills/work-next/coding-constraints.md` §Commit 前 Code Review Gate。
+
+---
+
 ## 8. 相关链接
 
 - [onboarding.md](./onboarding.md) — 组队与新人
