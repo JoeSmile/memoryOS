@@ -20,6 +20,9 @@ export function MinimalChat() {
     errorMessage,
     handleSubmit,
     regenerateLatest,
+    startNewConversation,
+    retrySession,
+    canRetrySession,
     stop,
   } = useChatSession();
 
@@ -29,7 +32,13 @@ export function MinimalChat() {
 
   return (
     <ChatShell
-      header={<ChatHeader loadedMessageCount={loadedMessageCount} />}
+      header={
+        <ChatHeader
+          loadedMessageCount={loadedMessageCount}
+          onNewConversation={() => void startNewConversation()}
+          newConversationDisabled={isStreaming || loading}
+        />
+      }
       footer={
         <ChatComposer
           input={input}
@@ -39,6 +48,9 @@ export function MinimalChat() {
           onStop={() => stop()}
           disabled={!conversationId}
           errorMessage={errorMessage}
+          onRetry={
+            canRetrySession ? () => void retrySession() : undefined
+          }
         />
       }
     >

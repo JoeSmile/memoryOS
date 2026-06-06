@@ -4,7 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { TextStreamChatTransport } from "ai";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useMemo } from "react";
+import { FormEvent, useCallback, useEffect, useMemo } from "react";
 
 import { useConversationMessages } from "@/hooks/use-conversation-messages";
 import { useMe } from "@/hooks/use-me";
@@ -17,6 +17,7 @@ import {
   messagesFingerprint,
   toUIMessages,
   type ConversationRead,
+  type UserRead,
 } from "@/lib/chat-types";
 import { useChatStore } from "@/stores/chat-store";
 
@@ -44,7 +45,13 @@ export function useChatSession() {
   const prepareSend = useChatStore((state) => state.prepareSend);
 
   const token = getAccessToken();
-  const { data: me, isLoading: meLoading } = useMe(Boolean(token));
+  const {
+    data: me,
+    isLoading: meLoading,
+    isError: meError,
+    error: meQueryError,
+    refetch: refetchMe,
+  } = useMe(Boolean(token));
   const {
     data: persistedData,
     isLoading: messagesLoading,
@@ -97,6 +104,63 @@ export function useChatSession() {
     }
   }, [router, token]);
 
+  const createConversationRecord = useCallback(
+    async (title: string, user: UserRead): Promise<string | null> => {
+      const created = await apiFetch<ConversationRead>("/api/v1/conversations", {
+        method: "POST",
+        body: JSON.stringify({
+          user_id: user.id,
+          title,
+        }),
+      });
+
+      void queryClient.invalidateQueries({
+        queryKey: chatQueryKeys.myConversations,
+      });
+
+      return created.data?.id ?? null;
+    },
+    [queryClient],
+  );
+
+  const bootstrapConversation = useCallback(
+    async (user: UserRead) => {
+      setBootstrapping(true);
+      setError(null);
+      try {
+        const list = await apiFetch<ConversationRead[]>(
+          "/api/v1/conversations/me",
+        );
+        const latestId = list.data?.[0]?.id;
+        if (latestId) {
+          router.replace(`/chat?conversation_id=${latestId}`);
+          return;
+        }
+
+        const convId = await createConversationRecord("新对话", user);
+        if (convId) {
+          router.replace(`/chat?conversation_id=${convId}`);
+        } else {
+          setError("创建对话失败");
+          setBootstrapping(false);
+        }
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setError(err.message);
+        } else {
+          setError("加载失败");
+        }
+        setBootstrapping(false);
+      }
+    },
+    [
+      router,
+      setBootstrapping,
+      setError,
+      createConversationRecord,
+    ],
+  );
+
   useEffect(() => {
     if (conversationId) {
       setBootstrapping(false);
@@ -110,49 +174,27 @@ export function useChatSession() {
 
     if (!me) {
       setBootstrapping(false);
+      if (meError) {
+        const msg =
+          meQueryError instanceof Error
+            ? meQueryError.message
+            : "登录信息加载失败";
+        setError(msg);
+      }
       return;
     }
 
-    let cancelled = false;
-
-    async function createConversation() {
-      setBootstrapping(true);
-      setError(null);
-      try {
-        const created = await apiFetch<ConversationRead>(
-          "/api/v1/conversations",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              user_id: me!.id,
-              title: "新对话",
-            }),
-          },
-        );
-        const convId = created.data?.id;
-        if (!convId || cancelled) {
-          return;
-        }
-        router.replace(`/chat?conversation_id=${convId}`);
-      } catch (err) {
-        if (cancelled) {
-          return;
-        }
-        if (err instanceof ApiError) {
-          setError(err.message);
-        } else {
-          setError("加载失败");
-        }
-        setBootstrapping(false);
-      }
-    }
-
-    void createConversation();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [conversationId, me, meLoading, router, setBootstrapping, setError]);
+    void bootstrapConversation(me);
+  }, [
+    conversationId,
+    me,
+    meLoading,
+    meError,
+    meQueryError,
+    setBootstrapping,
+    setError,
+    bootstrapConversation,
+  ]);
 
   useEffect(() => {
     resetConversationSync();
@@ -181,6 +223,78 @@ export function useChatSession() {
   ]);
 
   const isStreaming = status === "submitted" || status === "streaming";
+
+  const startNewConversation = useCallback(async () => {
+    if (isStreaming) {
+      return;
+    }
+
+    let activeMe = me;
+    if (!activeMe) {
+      const result = await refetchMe();
+      activeMe = result.data;
+    }
+    if (!activeMe) {
+      setError("登录信息加载失败，请重试或重新登录");
+      return;
+    }
+
+    setBootstrapping(true);
+    setError(null);
+    setMessages([]);
+    resetConversationSync();
+
+    try {
+      const convId = await createConversationRecord("新分析", activeMe);
+      if (convId) {
+        router.replace(`/chat?conversation_id=${convId}`);
+      } else {
+        setError("新建分析失败");
+        setBootstrapping(false);
+      }
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("新建分析失败");
+      }
+      setBootstrapping(false);
+    }
+  }, [
+    me,
+    isStreaming,
+    refetchMe,
+    setBootstrapping,
+    setError,
+    setMessages,
+    resetConversationSync,
+    createConversationRecord,
+    router,
+  ]);
+
+  const retrySession = useCallback(async () => {
+    if (isStreaming || conversationId) {
+      return;
+    }
+
+    setError(null);
+    const result = await refetchMe();
+    const activeMe = result.data ?? me;
+    if (!activeMe) {
+      setError("登录信息加载失败，请重试或重新登录");
+      return;
+    }
+
+    await bootstrapConversation(activeMe);
+  }, [
+    isStreaming,
+    conversationId,
+    refetchMe,
+    me,
+    setError,
+    bootstrapConversation,
+  ]);
+
   const loading =
     bootstrapping ||
     (!conversationId && meLoading) ||
@@ -238,10 +352,13 @@ export function useChatSession() {
     isStreaming,
     loading,
     streamingMessageId,
-    loadedMessageCount: persistedMessages.length,
+    loadedMessageCount: messages.length,
     errorMessage: queryErrorMessage ?? error,
     handleSubmit,
     regenerateLatest,
+    startNewConversation,
+    retrySession,
+    canRetrySession: Boolean(error) && !conversationId && !isStreaming,
     stop,
   };
 }

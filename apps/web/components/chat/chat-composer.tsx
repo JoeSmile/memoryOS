@@ -8,6 +8,7 @@ type ChatComposerProps = {
   onStop: () => void;
   disabled?: boolean;
   errorMessage?: string | null;
+  onRetry?: () => void;
 };
 
 export function ChatComposer({
@@ -18,13 +19,26 @@ export function ChatComposer({
   onStop,
   disabled = false,
   errorMessage = null,
+  onRetry,
 }: ChatComposerProps) {
   return (
     <div className="shrink-0 border-t border-zinc-200 pt-4 dark:border-zinc-800">
       {errorMessage ? (
-        <p className="mb-2 text-sm text-red-600 dark:text-red-400" role="alert">
-          {errorMessage}
-        </p>
+        <div
+          className="mb-2 flex flex-wrap items-center gap-2 text-sm text-red-600 dark:text-red-400"
+          role="alert"
+        >
+          <span>{errorMessage}</span>
+          {onRetry ? (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="rounded border border-red-300 px-2 py-0.5 text-xs hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
+            >
+              重试
+            </button>
+          ) : null}
+        </div>
       ) : null}
 
       <form onSubmit={onSubmit} className="flex gap-2">
