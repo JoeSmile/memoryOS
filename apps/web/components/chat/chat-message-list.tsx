@@ -3,6 +3,8 @@ import { useEffect, useMemo, useRef } from "react";
 
 import { ChatMessage } from "@/components/chat/chat-message";
 
+const BOTTOM_THRESHOLD_PX = 80;
+
 type ChatMessageListProps = {
   messages: UIMessage[];
   streamingMessageId?: string | null;
@@ -18,7 +20,9 @@ export function ChatMessageList({
   onRegenerate,
   emptyLabel = "发送一条消息开始分析",
 }: ChatMessageListProps) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const isNearBottomRef = useRef(true);
 
   const latestAssistantId = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i -= 1) {
@@ -29,14 +33,38 @@ export function ChatMessageList({
     return null;
   }, [messages]);
 
+  function updateNearBottom() {
+    const el = scrollRef.current;
+    if (!el) {
+      return;
+    }
+    const distanceFromBottom =
+      el.scrollHeight - el.scrollTop - el.clientHeight;
+    isNearBottomRef.current = distanceFromBottom <= BOTTOM_THRESHOLD_PX;
+  }
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamingMessageId]);
+    if (!isNearBottomRef.current) {
+      return;
+    }
+    messagesEndRef.current?.scrollIntoView({
+      behavior: isStreaming ? "auto" : "smooth",
+    });
+  }, [messages, streamingMessageId, isStreaming]);
 
   return (
-    <div className="flex flex-1 flex-col gap-3 overflow-y-auto pb-4">
+    <div
+      ref={scrollRef}
+      onScroll={updateNearBottom}
+      className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-4"
+    >
       {messages.length === 0 ? (
-        <p className="text-center text-sm text-zinc-500">{emptyLabel}</p>
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 py-12 text-center">
+          <p className="text-sm text-zinc-500">{emptyLabel}</p>
+          <p className="text-xs text-zinc-400">
+            支持连续追问；完整上下文裁剪在后端（EP05）
+          </p>
+        </div>
       ) : null}
 
       {messages.map((message) => (

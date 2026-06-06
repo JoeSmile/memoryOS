@@ -23,7 +23,7 @@
 | **4** | 最小 LangGraph | [`ep02-langgraph`](../../../openspec/changes/archive/2026-06-03-ep02-langgraph/) | ✅ |
 | **5** | SSE + Graph 上游 | [`ep02-chat-sse`](../../../openspec/changes/archive/2026-06-03-ep02-chat-sse/) 后端 | ✅ |
 | **6** | 最小 `/chat` 冒烟 | [`ep02-chat-sse`](../../../openspec/changes/archive/2026-06-03-ep02-chat-sse/) 前端 + archive | ✅ |
-| **7** | 分析向聊天壳（单会话、无侧栏） | [`ep02-chat-ui`](../../../openspec/changes/ep02-chat-ui/) | ⬜ |
+| **7** | 分析向聊天壳（单会话、无侧栏） | [`ep02-chat-ui`](../../../openspec/changes/ep02-chat-ui/) | 🟡 实现完成，待 archive |
 
 执行：`/work-next ep02-program` 或按 Phase 对子 change 说「继续实现」。  
 人审：每个 change 的 `tasks.md` §0。
@@ -35,15 +35,15 @@
 ## Story 2.1 聊天 UI
 
 - [ ] ~~侧栏会话列表~~ → **移出 Phase 7**（世界杯向单会话；多会话侧栏见 EP10 backlog）
-- [ ] 单会话主区：消息气泡、输入、Loading、自动滚动 → **Phase 7**
-- [ ] 消息管理钩子（regenerate）+ 上下文条数提示 → **Phase 7**
-- [ ] 响应式基础适配 → **Phase 7**
+- [x] 单会话主区：消息气泡、输入、Loading、自动滚动 → **Phase 7**
+- [x] 消息管理钩子（regenerate）+ 上下文条数提示 → **Phase 7**
+- [x] 响应式基础适配 → **Phase 7**（`max-w-3xl` 单栏）
 
 ## Story 2.2 Markdown 渲染
 
-- [ ] `react-markdown` + 代码高亮 → **Phase 7**
-- [ ] GFM → **Phase 7**
-- [ ] 流式不完整 Markdown 边界处理 → **Phase 7**
+- [x] `react-markdown` + 代码高亮 → **Phase 7**
+- [x] GFM → **Phase 7**
+- [x] 流式不完整 Markdown 边界处理 → **Phase 7**
 
 ## Story 2.3 SSE 后端
 
@@ -61,7 +61,7 @@
 
 - [x] 会话 CRUD、历史消息加载 → **Phase 1 + 5–6**（列表仍 query `user_id`；消息列表已 JWT）
 - [ ] 会话标题自动生成 → **Phase 7 或 follow-up**
-- [ ] Zustand（`useChatStore`，无 session 列表 store）→ **Phase 7**
+- [x] Zustand（`useChatStore`，无 session 列表 store）→ **Phase 7**
 
 ## Story 2.6 LangGraph 对话编排（核心）
 
@@ -80,7 +80,7 @@
 ## 同步学习
 
 - [ ] React 高复用组件封装 → Phase 7 前
-- [ ] Zustand 实战 → Phase 7
+- [x] Zustand 实战 → Phase 7
 - [x] SSE 原理与前后端联动 → Phase 5–6
 - [ ] LangGraph：State、Node、Edge → **Phase 2–4**
 - [ ] LangSmith 配置与排错 → **Phase 3–4**

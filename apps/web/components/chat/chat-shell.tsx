@@ -8,9 +8,9 @@ type ChatShellProps = {
 
 export function ChatShell({ header, children, footer }: ChatShellProps) {
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 py-6">
+    <div className="mx-auto flex h-screen max-h-screen w-full max-w-3xl flex-col px-4 py-6">
       {header}
-      {children}
+      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
       {footer}
     </div>
   );
