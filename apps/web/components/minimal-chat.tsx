@@ -14,6 +14,7 @@ export function MinimalChat() {
     input,
     setInput,
     isStreaming,
+    isSending,
     loading,
     streamingMessageId,
     loadedMessageCount,
@@ -46,7 +47,7 @@ export function MinimalChat() {
           onSubmit={handleSubmit}
           isStreaming={isStreaming}
           onStop={() => stop()}
-          disabled={!conversationId}
+          disabled={!conversationId || isSending}
           errorMessage={errorMessage}
           onRetry={
             canRetrySession ? () => void retrySession() : undefined

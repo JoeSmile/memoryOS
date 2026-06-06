@@ -8,6 +8,8 @@ export type UpstreamChatParams = {
   content: string;
   authorization: string | null;
   signal?: AbortSignal;
+  clientMessageId?: string | null;
+  regenerate?: boolean;
 };
 
 export async function fetchMemoryosChatCompletion(
@@ -22,6 +24,8 @@ export async function fetchMemoryosChatCompletion(
     body: JSON.stringify({
       conversation_id: params.conversationId,
       content: params.content,
+      client_message_id: params.clientMessageId ?? undefined,
+      regenerate: params.regenerate ?? false,
     }),
     signal: params.signal,
   });
@@ -40,6 +44,19 @@ export function memoryosSseResponseToTextStream(
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let buffer = "";
+
+  async function drainUpstream(): Promise<void> {
+    try {
+      while (true) {
+        const { done } = await reader.read();
+        if (done) {
+          return;
+        }
+      }
+    } catch {
+      // Client closed; draining is best-effort so API can persist assistant.
+    }
+  }
 
   return new ReadableStream<Uint8Array>({
     async pull(controller) {
@@ -78,7 +95,10 @@ export function memoryosSseResponseToTextStream(
       }
     },
     cancel() {
-      void reader.cancel();
+      void (async () => {
+        await drainUpstream();
+        await reader.cancel();
+      })();
     },
   });
 }

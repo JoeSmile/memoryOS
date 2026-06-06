@@ -4,9 +4,20 @@ import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { TextStreamChatTransport } from "ai";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useCallback, useEffect, useMemo } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { flushSync } from "react-dom";
 
-import { useConversationMessages } from "@/hooks/use-conversation-messages";
+import {
+  fetchConversationMessages,
+  useConversationMessages,
+} from "@/hooks/use-conversation-messages";
 import { useMe } from "@/hooks/use-me";
 import { ApiError, apiFetch } from "@/lib/api-client";
 import { getAccessToken } from "@/lib/auth-token";
@@ -17,6 +28,7 @@ import {
   messagesFingerprint,
   toUIMessages,
   type ConversationRead,
+  type MessageRead,
   type UserRead,
 } from "@/lib/chat-types";
 import { useChatStore } from "@/stores/chat-store";
@@ -60,6 +72,11 @@ export function useChatSession() {
     error: messagesQueryError,
   } = useConversationMessages(conversationId);
   const persistedMessages = persistedData ?? EMPTY_MESSAGES;
+  const [isSending, setIsSending] = useState(false);
+  const sendMetaRef = useRef<{
+    clientMessageId: string | null;
+    regenerate: boolean;
+  }>({ clientMessageId: null, regenerate: false });
 
   const transport = useMemo(
     () =>
@@ -77,24 +94,70 @@ export function useChatSession() {
             id,
             conversation_id: id,
             messages,
+            client_message_id: sendMetaRef.current.clientMessageId ?? undefined,
+            regenerate: sendMetaRef.current.regenerate,
           },
         }),
       }),
     [],
   );
 
+  const clearSendMeta = useCallback(() => {
+    sendMetaRef.current = { clientMessageId: null, regenerate: false };
+    setIsSending(false);
+  }, []);
+
+  const syncPersistedMessages = useCallback(
+    async (options?: { retryUntilAssistant?: boolean }) => {
+      if (!conversationId) {
+        return;
+      }
+
+      resetConversationSync();
+      const queryKey = chatQueryKeys.messages(conversationId);
+      const maxAttempts = options?.retryUntilAssistant ? 5 : 1;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        await queryClient.fetchQuery({
+          queryKey,
+          queryFn: () => fetchConversationMessages(conversationId),
+          staleTime: 0,
+        });
+        if (!options?.retryUntilAssistant) {
+          break;
+        }
+        const rows = queryClient.getQueryData<MessageRead[]>(queryKey) ?? [];
+        const last = rows.at(-1);
+        if (last?.role === "assistant" || attempt === maxAttempts - 1) {
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+    },
+    [conversationId, queryClient, resetConversationSync],
+  );
+
   const { messages, sendMessage, status, stop, setMessages } = useChat({
     id: conversationId ?? "pending",
     transport,
     onFinish: () => {
-      if (conversationId) {
-        void queryClient.invalidateQueries({
-          queryKey: chatQueryKeys.messages(conversationId),
-        });
-      }
+      clearSendMeta();
+      void syncPersistedMessages({ retryUntilAssistant: true });
     },
     onError: (err) => {
-      setError(err.message);
+      clearSendMeta();
+      if (conversationId) {
+        if (err.name === "AbortError") {
+          void syncPersistedMessages({ retryUntilAssistant: true });
+        } else {
+          void queryClient.invalidateQueries({
+            queryKey: chatQueryKeys.messages(conversationId),
+          });
+        }
+      }
+      if (err.name !== "AbortError") {
+        setError(err.message);
+      }
     },
   });
 
@@ -210,9 +273,20 @@ export function useChatSession() {
       return;
     }
 
+    const lastLocal = messages.at(-1);
+    const lastPersisted = persistedMessages.at(-1);
+    if (
+      lastLocal?.role === "assistant" &&
+      lastPersisted?.role !== "assistant" &&
+      getTextFromUIMessage(lastLocal).length > 0
+    ) {
+      return;
+    }
+
     markPersistedMessagesSynced(fingerprint);
     setMessages(toUIMessages(persistedMessages));
   }, [
+    messages,
     persistedMessages,
     status,
     messagesLoading,
@@ -315,16 +389,26 @@ export function useChatSession() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const text = input.trim();
-    if (!text || !conversationId || isStreaming) {
+    if (!text || !conversationId || isStreaming || isSending) {
       return;
     }
 
+    sendMetaRef.current = {
+      clientMessageId: crypto.randomUUID(),
+      regenerate: false,
+    };
+    setIsSending(true);
+    setError(null);
     prepareSend();
-    await sendMessage({ text });
+    try {
+      await sendMessage({ text });
+    } catch {
+      clearSendMeta();
+    }
   }
 
   async function regenerateLatest() {
-    if (!conversationId || isStreaming) {
+    if (!conversationId || isStreaming || isSending) {
       return;
     }
 
@@ -340,8 +424,41 @@ export function useChatSession() {
       return;
     }
 
+    sendMetaRef.current = { clientMessageId: null, regenerate: true };
+    setIsSending(true);
     setError(null);
-    await sendMessage({ text });
+    flushSync(() => {
+      setMessages((current) => {
+        const last = current.at(-1);
+        if (last?.role === "assistant") {
+          return current.slice(0, -1);
+        }
+        return current;
+      });
+    });
+    try {
+      const pending = sendMessage({ text });
+      flushSync(() => {
+        setMessages((current) => {
+          if (current.length < 2) {
+            return current;
+          }
+          const last = current.at(-1);
+          const prev = current.at(-2);
+          if (
+            last?.role === "user" &&
+            prev?.role === "user" &&
+            getTextFromUIMessage(last) === getTextFromUIMessage(prev)
+          ) {
+            return current.slice(0, -1);
+          }
+          return current;
+        });
+      });
+      await pending;
+    } catch {
+      clearSendMeta();
+    }
   }
 
   return {
@@ -350,6 +467,7 @@ export function useChatSession() {
     input,
     setInput,
     isStreaming,
+    isSending,
     loading,
     streamingMessageId,
     loadedMessageCount: messages.length,
@@ -359,6 +477,8 @@ export function useChatSession() {
     startNewConversation,
     retrySession,
     canRetrySession: Boolean(error) && !conversationId && !isStreaming,
-    stop,
+    stop: () => {
+      stop();
+    },
   };
 }
