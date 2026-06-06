@@ -43,6 +43,19 @@ async def create_conversation(
     return success(data=ConversationRead.model_validate(conversation).model_dump())
 
 
+@router.get("/me")
+async def list_my_conversations(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    redis: Redis | None = Depends(get_redis),
+):
+    """当前用户的会话列表（updated_at 降序），供 /chat 恢复最近一场分析。"""
+    service = ConversationService(db, redis=redis)
+    items = await service.list_for_user(user.id)
+    await db.commit()
+    return success(data=[item.model_dump() for item in items])
+
+
 @router.get("/{conversation_id}/messages")
 async def list_conversation_messages(
     conversation_id: UUID,

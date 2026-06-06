@@ -35,6 +35,7 @@ async def chat_completions(
         ):
             yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
         await db.commit()
+        await service.conversations.invalidate_list_cache(user.id)
 
     return StreamingResponse(
         event_generator(),

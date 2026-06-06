@@ -48,7 +48,9 @@ class ChatService:
         await self.conversations.get_owned_conversation(conversation_id, user_id)
 
         await self.messages.create(conversation_id, "user", content)
+        await self.conversations.touch_activity(conversation_id)
         await self.db.commit()
+        await self.conversations.invalidate_list_cache(user_id)
 
         history = await self.messages.list_by_conversation_id(conversation_id)
         state = self._to_graph_state(user_id, history)
@@ -74,6 +76,7 @@ class ChatService:
 
         full = "".join(assistant_parts)
         assistant = await self.messages.create(conversation_id, "assistant", full)
+        await self.conversations.touch_activity(conversation_id)
         await self.stream_cache.delete(conversation_id, stream_id)
         yield {
             "event": "done",
