@@ -33,15 +33,19 @@
 - [x] 2.2 消息管理 MVP：`message.id` 稳定、助手「重新生成」、上下文条数提示
   - 预计文件：2 · components/chat
 
+- [x] 2.3 恢复最近会话 +「新建分析」（无侧栏）
+  - 预计文件：4 · `GET /conversations/me`、hooks、chat-header
+  - `/chat` 无 id → 拉最近 `updated_at` 会话；Header 显式新建
+
 ## 3. Markdown & polish
 
-- [ ] 3.1 `MessageContent` Markdown + 流式边界（done 后 GFM）
+- [x] 3.1 `MessageContent` Markdown + 流式边界（done 后 GFM）
   - 预计文件：2 · components
 
-- [ ] 3.2 滚底、Loading、空态、错误态；更新 EP02 epic / docs
+- [x] 3.2 滚底、Loading、空态、错误态；更新 EP02 epic / docs
   - 预计文件：2 · components、docs
 
-- [ ] 3.3 Web Vitals 本地监控（`useReportWebVitals` dev 控制台 +
+- [x] 3.3 Web Vitals 本地监控（`useReportWebVitals` dev 控制台 +
       `pnpm lighthouse:chat`）
   - 预计文件：3 ·
     `components/web-vitals-reporter.tsx`、`providers.tsx`、`package.json`

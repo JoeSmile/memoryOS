@@ -34,7 +34,8 @@
 ### D2: Zustand 只保留 `useChatStore`
 
 - messages、streaming、error、与 `useChat` / Query invalidate 协同。
-- **不**引入 `useSessionStore`。
+- **不**引入 `useSessionStore`（无侧栏列表 UI）。
+- **恢复最近一场**：`GET /conversations/me` + `/chat` 无 id 时 redirect；「新建分析」显式 `POST` 新会话。
 
 ### D3: 消息管理与上下文分工
 
