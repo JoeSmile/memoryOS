@@ -86,8 +86,9 @@
 - [x] 📖 SSE 格式：`data: {...}\n\n`、`event:`、`id:`；与 WebSocket 对比
 - [x] 📖 FastAPI `StreamingResponse`、`text/event-stream`、心跳注释 `: ping\n\n`
 - [x] 📖 前端 `fetch` + `response.body.getReader()` 解码 UTF-8 分片
-- [ ] 📖 `AbortController` 停止生成；断开时后端取消上游 LLM  
-  **落地（单独 change，改动大）：** OpenSpec `ep02-chat-cancel` — HTTP abort + `POST .../cancel` 兜底 + Runner `aclose`（见 [EP02 Follow-up § ep02-chat-cancel](../epics/EP02-streaming-chat.md#ep02-chat-cancel--全链路停止--兜底-cancel-api大单独-change)）。
+- [x] 📖 `AbortController` 停止生成；断开时后端取消上游 LLM  
+  **已落地（`ep02-chat-cancel`）：** 详见 [`docs/tech/chat-stream-cancel.md`](../../tech/chat-stream-cancel.md)。  
+  要点：`stop()` = UI 冻结 + cancel（`visible_content`）+ Abort；SSE `start` / `X-Stream-Id`；Runner 双检 disconnect/cancel（**250ms 轮询**）+ `aclose`；BFF drain 上游但停转发；`interrupted` partial 落库。**计费：** best-effort。
 - [ ] 📖 Nginx：`proxy_buffering off`、`proxy_read_timeout`
 - [x] 🔧 `POST /api/v1/chat/completions` + 前端 `lib/sse-client.ts`
 
@@ -105,6 +106,17 @@
 | Nginx 缓冲                  | 「假流式」一次性出 | 关 buffering               |
 | 未鉴权 SSE                  | 被人刷接口         | 同 REST 鉴权中间件         |
 | 错误走 200 + SSE error 事件 | 前端难区分         | 约定 error 事件或 HTTP 4xx |
+
+**Stop / Cancel 专项（`ep02-chat-cancel` 亲历，展开见 [`chat-stream-cancel.md`](../../tech/chat-stream-cancel.md) §6）：**
+
+| 坑 | 现象 | 规避 |
+| :-- | :-- | :-- |
+| BFF 立刻 abort 上游 | Stop 后刷新 assistant 丢失 | `drainThenAbort`：先读上游 SSE 再 abort；`finalize` 放 router `finally` |
+| cancel 退出标 `stream_exhausted` | 误落库 `complete` 或竞态丢消息 | cancel/disconnect 标 `disconnected`，仅自然结束标 `stream_exhausted` |
+| 仅 abort、无 `visible_content` | DB 字数多于停住所见 | cancel 带 UI 快照；`finalize` 截断 |
+| cancel 幂等先于归属校验 | 安全漏洞 | 先 `get_active_owner`，再幂等 return |
+| Harness 单连接测流中 cancel | 测不了真并发 | mid-stream 用 Service/Runner 单测 |
+| BFF pull 与 drain 共 reader | Stop 后仍多几个字 | `clientStopped` 停 enqueue；UI `flushSync` 乐观冻结 |
 
 ---
 

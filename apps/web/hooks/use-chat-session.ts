@@ -77,11 +77,21 @@ export function useChatSession() {
     clientMessageId: string | null;
     regenerate: boolean;
   }>({ clientMessageId: null, regenerate: false });
+  const streamIdRef = useRef<string | null>(null);
 
   const transport = useMemo(
     () =>
       new TextStreamChatTransport({
         api: "/api/chat",
+        fetch: async (input, init) => {
+          streamIdRef.current = null;
+          const response = await fetch(input, init);
+          const headerStreamId = response.headers.get("X-Stream-Id");
+          if (headerStreamId) {
+            streamIdRef.current = headerStreamId;
+          }
+          return response;
+        },
         headers: () => {
           const accessToken = getAccessToken();
           if (!accessToken) {
@@ -115,7 +125,7 @@ export function useChatSession() {
 
       resetConversationSync();
       const queryKey = chatQueryKeys.messages(conversationId);
-      const maxAttempts = options?.retryUntilAssistant ? 5 : 1;
+      const maxAttempts = options?.retryUntilAssistant ? 15 : 1;
 
       for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
         await queryClient.fetchQuery({
@@ -160,6 +170,9 @@ export function useChatSession() {
       }
     },
   });
+
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   useEffect(() => {
     if (!token) {
@@ -478,7 +491,50 @@ export function useChatSession() {
     retrySession,
     canRetrySession: Boolean(error) && !conversationId && !isStreaming,
     stop: () => {
+      const activeStreamId = streamIdRef.current;
+      const lastMessage = messagesRef.current.at(-1);
+      const visibleContent =
+        lastMessage?.role === "assistant"
+          ? getTextFromUIMessage(lastMessage)
+          : "";
+
+      if (lastMessage?.role === "assistant") {
+        flushSync(() => {
+          setMessages((current) => {
+            const tail = current.at(-1);
+            if (tail?.role !== "assistant") {
+              return current;
+            }
+            return [
+              ...current.slice(0, -1),
+              {
+                ...tail,
+                parts: [{ type: "text" as const, text: visibleContent }],
+              },
+            ];
+          });
+        });
+      }
+
+      const accessToken = getAccessToken();
+      if (activeStreamId && accessToken) {
+        void fetch("/api/chat/cancel", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            stream_id: activeStreamId,
+            visible_content: visibleContent || undefined,
+          }),
+        }).catch(() => {
+          // Best-effort cancel when AbortController alone is insufficient.
+        });
+      }
+
       stop();
+      streamIdRef.current = null;
     },
   };
 }

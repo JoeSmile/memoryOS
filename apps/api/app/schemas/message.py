@@ -25,3 +25,4 @@ class ChatCompletionRequest(BaseModel):
 
 class ChatCancelRequest(BaseModel):
     stream_id: UUID
+    visible_content: str | None = Field(default=None, max_length=100_000)

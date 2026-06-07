@@ -171,3 +171,51 @@ async def test_chat_cancel_owned_stream_is_idempotent():
             _envelope(resp.json())
 
         await cache.clear(stream_id)
+
+
+@pytest.mark.asyncio
+async def test_chat_cancel_returns_404_when_active_cleared_but_cancel_remains():
+    """stream_active TTL may expire before stream_cancel; must not skip owner check."""
+    from app.cache.keys import stream_active_key
+    from app.cache.stream_cancel_cache import StreamCancelCache
+    from app.core.redis import ensure_redis
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        token_a, user_a = await _register_and_login(client)
+        token_b, _user_b = await _register_and_login(client)
+
+        conv = await client.post(
+            "/api/v1/conversations",
+            json={"user_id": user_a, "title": "Active cleared cancel remains"},
+        )
+        conversation_id = conv.json()["data"]["id"]
+        stream_id = str(uuid.uuid4())
+        redis = await ensure_redis()
+        cache = StreamCancelCache(redis)
+        await cache.register_active(
+            stream_id,
+            uuid.UUID(conversation_id),
+            uuid.UUID(user_a),
+        )
+        await cache.set_cancelled(stream_id)
+        await redis.delete(stream_active_key(stream_id))
+
+        foreign = await client.post(
+            "/api/v1/chat/completions/cancel",
+            headers={"Authorization": f"Bearer {token_b}"},
+            json={"stream_id": stream_id},
+        )
+        assert foreign.status_code == 404
+        assert foreign.json()["message"] == "stream_not_found"
+
+        owner_retry = await client.post(
+            "/api/v1/chat/completions/cancel",
+            headers={"Authorization": f"Bearer {token_a}"},
+            json={"stream_id": stream_id},
+        )
+        assert owner_retry.status_code == 404
+
+        await cache.clear(stream_id)
+
+

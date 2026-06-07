@@ -9,7 +9,7 @@
 | **OpenSpec 总控** | [`ep02-program`](../../../openspec/changes/ep02-program/) — **7 Phase 全部完成前不启动 EP04+** |
 | **子 change**     | 见下表                                                                                         |
 | **学习路线**      | [L02-streaming-langgraph.md](../learning/L02-streaming-langgraph.md)                           |
-| **目标文档**      | `docs/tech/langgraph-chat.md`                                                                  |
+| **目标文档**      | `docs/tech/langgraph-chat.md` · Stop/Cancel：[`chat-stream-cancel.md`](../../tech/chat-stream-cancel.md) |
 
 ---
 
@@ -117,17 +117,20 @@ abort 失效时仍有兜底。
 
 |  #   | Task                                                        | 层            | 说明                                                        |
 | :--: | :---------------------------------------------------------- | :------------ | :---------------------------------------------------------- |
-| C.1  | SSE `start` 事件或响应头下发 `stream_id`                    | API · BFF     | 流式一开始就可知 cancel 目标（现仅 `done` 带出）            |
-| C.2  | Redis `stream_cancel:{stream_id}` + 活跃流注册              | API · cache   | 多 worker 可协调；循环双检 `is_disconnected` OR cancel flag |
-| C.3  | `POST /api/v1/chat/completions/cancel`                      | API · Harness | JWT + 会话归属；幂等；仅设 cancel 标记                      |
-| C.4  | Runner `astream` + `finally: aclose()`；`call_model` 改流式 | API · graphs  | 主路径硬断开 LangChain/OpenAI HTTP                          |
-| C.5  | `ChatService`：`Task.cancel` / 断开时清理                   | API           | 不再只 `return` 不关闭生成器                                |
-| C.6  | 前端 `stop()`：Abort + fire-and-forget cancel API           | Web · BFF     | 混合：连接 abort（快）+ cancel API（稳）                    |
-| C.7  | BFF `ReadableStream.cancel` 联动 abort 上游 fetch           | Web           | 补 `req.signal` 链路死角                                    |
-| C.8  | UI「已停止」态；可选不落库 partial 策略文档化               | Web · docs    | 避免刷新后 UI/DB 不一致困惑                                 |
-| C.9  | Harness：mid-stream disconnect + cancel-only                | tests         | 断言无新 token / mock 计数不增                              |
-| C.10 | L02 §4 勾选 + 供应商计费边界说明                            | Docs          | AbortController + 上游取消                                  |
+| C.1  | SSE `start` 事件或响应头下发 `stream_id`                    | API · BFF     | 流式一开始就可知 cancel 目标（现仅 `done` 带出）            | [x]  |
+| C.2  | Redis `stream_cancel:{stream_id}` + 活跃流注册              | API · cache   | 多 worker 可协调；循环双检 `is_disconnected` OR cancel flag | [x]  |
+| C.3  | `POST /api/v1/chat/completions/cancel`                      | API · Harness | JWT + 会话归属；幂等；仅设 cancel 标记                      | [x]  |
+| C.4  | Runner `astream` + `finally: aclose()`；`call_model` 改流式 | API · graphs  | 主路径硬断开 LangChain/OpenAI HTTP                          | [x]  |
+| C.5  | `ChatService`：`Task.cancel` / 断开时清理                   | API           | 不再只 `return` 不关闭生成器                                | [x]  |
+| C.6  | 前端 `stop()`：Abort + fire-and-forget cancel API           | Web · BFF     | 混合：连接 abort（快）+ cancel API（稳）                    | [x]  |
+| C.7  | BFF `ReadableStream.cancel` 联动 abort 上游 fetch           | Web           | 补 `req.signal` 链路死角                                    | [x]  |
+| C.8  | UI「已停止」态；可选不落库 partial 策略文档化               | Web · docs    | 沿用 dedup「已中断」+ interrupted 落库（非删 partial）      | [x]  |
+| C.9  | Harness：mid-stream disconnect + cancel-only                | tests         | cancel 停 token：单元测；API cancel 契约 Harness            | [x]  |
+| C.10 | L02 §4 勾选 + 供应商计费边界说明                            | Docs          | AbortController + 上游取消（best-effort）                   | [x]  |
+| C.11 | BFF drain 上游 + 停转发；`finalize` 竞态修复                | Web · API     | 见 [`chat-stream-cancel.md`](../../tech/chat-stream-cancel.md) §6.1–6.2 | [x]  |
+| C.12 | cancel 带 `visible_content`；UI 乐观冻结                    | Web · API     | 停住所见 = 落盘内容                                       | [x]  |
+| C.13 | 技术方案 + 踩坑文档                                         | Docs          | `docs/tech/chat-stream-cancel.md`                         | [x]  |
 
-**现状（MVP）：** `is_disconnected()` 停 SSE、不写 assistant；**未** `aclose`
-LLM；无 cancel API。  
-**执行：** `/opsx:propose ep02-chat-cancel`（**勿**与 dedup 合并）
+**现状：** change `ep02-chat-cancel` 已实现（含 C.11–C.12 follow-up）；`pnpm test:api:harness` 全绿。  
+**计费：** Stop 后尽最大努力停上游 HTTP + Redis cancel 标记；供应商侧停费非 100% 保证。  
+**详案：** [`docs/tech/chat-stream-cancel.md`](../../tech/chat-stream-cancel.md)

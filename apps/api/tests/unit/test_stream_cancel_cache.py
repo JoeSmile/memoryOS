@@ -26,3 +26,16 @@ async def test_register_owner_and_cancel_idempotent():
     await cache.clear(stream_id)
     assert await cache.get_active_owner(stream_id) is None
     assert await cache.is_cancelled(stream_id) is False
+
+
+@pytest.mark.asyncio
+async def test_cancel_stores_visible_content_until_clear():
+    stream_id = str(uuid.uuid4())
+    cache = StreamCancelCache(redis=None)
+
+    await cache.set_cancelled(stream_id, visible_content="你")
+    assert await cache.is_cancelled(stream_id) is True
+    assert await cache.get_visible_content(stream_id) == "你"
+
+    await cache.clear(stream_id)
+    assert await cache.get_visible_content(stream_id) is None

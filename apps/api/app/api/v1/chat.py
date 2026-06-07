@@ -83,5 +83,6 @@ async def chat_completions_cancel(
     await service.cancel_stream(
         stream_id=str(body.stream_id),
         user_id=user.id,
+        visible_content=body.visible_content,
     )
     return success()

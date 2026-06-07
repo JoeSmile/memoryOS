@@ -22,3 +22,7 @@ def stream_cancel_key(stream_id: str) -> str:
 
 def stream_active_key(stream_id: str) -> str:
     return f"memoryos:stream_active:{stream_id}"
+
+
+def stream_cancel_visible_key(stream_id: str) -> str:
+    return f"memoryos:stream_cancel_visible:{stream_id}"

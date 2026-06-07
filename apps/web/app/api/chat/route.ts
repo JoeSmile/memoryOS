@@ -55,11 +55,21 @@ export async function POST(req: Request) {
     );
   }
 
+  const upstreamAbort = new AbortController();
+  let drainUpstreamOnClientAbort: (() => Promise<void>) | null = null;
+  req.signal.addEventListener(
+    "abort",
+    () => {
+      void drainUpstreamOnClientAbort?.();
+    },
+    { once: true },
+  );
+
   const upstream = await fetchMemoryosChatCompletion({
     conversationId,
     content,
     authorization,
-    signal: req.signal,
+    signal: upstreamAbort.signal,
     clientMessageId: body.client_message_id,
     regenerate: body.regenerate ?? false,
   });
@@ -91,13 +101,25 @@ export async function POST(req: Request) {
     });
   }
 
-  const textStream = memoryosSseResponseToTextStream(upstream);
-
-  return new Response(textStream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+  let streamId = upstream.headers.get("X-Stream-Id");
+  const textStream = memoryosSseResponseToTextStream(upstream, {
+    onStreamId: (id) => {
+      streamId = id;
     },
+    onClientAbort: (drain) => {
+      drainUpstreamOnClientAbort = drain;
+    },
+    abortUpstream: () => upstreamAbort.abort(),
   });
+
+  const responseHeaders: Record<string, string> = {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+  };
+  if (streamId) {
+    responseHeaders["X-Stream-Id"] = streamId;
+  }
+
+  return new Response(textStream, { headers: responseHeaders });
 }

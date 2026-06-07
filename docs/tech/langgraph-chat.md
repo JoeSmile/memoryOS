@@ -152,12 +152,16 @@ async def stream_tokens(self, state: ChatState) -> AsyncIterator[str]:
 
 HTTP 层在 SSE 开始前失败 → 统一 `{ code, message, data }` JSON（非 SSE）。
 
-### 6.4 取消
+### 6.4 取消（`ep02-chat-cancel`）
 
-- 客户端 `AbortController` 断开 → FastAPI 取消 task → runner 收到
-  `CancelledError` → 停止读 `astream_events`。
-- **半条 assistant**：仅 `done`
-  后 insert；断开则不落库 assistant（`ep02-chat-sse` D4）。
+> 完整方案与踩坑：**[`chat-stream-cancel.md`](./chat-stream-cancel.md)**
+
+- **混合 Stop**：浏览器 `AbortController` + `POST .../cancel`（Redis 标记，多 worker 兜底）。
+- **Runner**：循环内双检 `is_disconnected()` OR `is_cancelled(stream_id)`，间隔 **250ms**；停止时 `aclose()` 上游。
+- **落库**：`finalize_completion_stream` 在 router `finally` 必跑；`interrupted` 保留 partial。
+- **用户快照**：cancel 可带 `visible_content`，finalize 截断为「停住时所见」；BFF abort 后只 drain、不继续转发给浏览器。
+
+**与旧稿差异**（`ep02-chat-sse` D4）：断开 / Stop **会**落库 `interrupted`，不再「断开则不落库」。
 
 ---
 

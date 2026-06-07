@@ -36,38 +36,38 @@
 
 ## 3. Runner 上游断开
 
-- [ ] 3.1 `call_model` 真流式（`astream`）；mock 保持可测
+- [x] 3.1 `call_model` 真流式（`astream`）；mock 保持可测
   - 预计文件：2 · `graphs/nodes/call_model.py`、`graphs/nodes/mock_model.py`
   - 层：graphs
 
-- [ ] 3.2 `ChatGraphRunner`：`aclose` / `finally`；循环双检 disconnect **或** cancel
+- [x] 3.2 `ChatGraphRunner`：`aclose` / `finally`；循环双检 disconnect **或** cancel
   - 预计文件：1 · `graphs/runner.py`
   - 层：graphs
 
-- [ ] 3.3 `ChatService` token 循环接入 cancel 检查；断开时 `Task.cancel` 清理
+- [x] 3.3 `ChatService` token 循环接入 cancel 检查；断开时 `Task.cancel` 清理
   - 预计文件：1 · `services/chat_service.py`
   - Harness：mid-stream disconnect 无新 token（mock slow stream）
 
 ## 4. 前端 & BFF
 
-- [ ] 4.1 BFF `POST /api/chat/cancel` 代理 + `memoryos-upstream` 解析 `start` 存 `streamId`
+- [x] 4.1 BFF `POST /api/chat/cancel` 代理 + `memoryos-upstream` 解析 `start` 存 `streamId`
   - 预计文件：2 · `apps/web/app/api/chat/cancel/route.ts`、`lib/memoryos-upstream.ts`
   - 层：BFF
 
-- [ ] 4.2 `useChatSession.stop()`：Abort + fire-and-forget cancel；保留 dedup sync
+- [x] 4.2 `useChatSession.stop()`：Abort + fire-and-forget cancel；保留 dedup sync
   - 预计文件：1 · `hooks/use-chat-session.ts`
   - 层：Web
 
-- [ ] 4.3 BFF `ReadableStream.cancel` 联动上游 abort（与 dedup drain 兼容）
+- [x] 4.3 BFF `ReadableStream.cancel` 联动上游 abort（与 dedup drain 兼容）
   - 预计文件：1 · `lib/memoryos-upstream.ts`
   - 层：BFF
 
 ## 5. Verify & docs
 
-- [ ] 5.1 `pnpm test:api:harness` 全绿；`pnpm --filter @memoryos/web lint`
+- [x] 5.1 `pnpm test:api:harness` 全绿；`pnpm --filter @memoryos/web lint`
   - 预计文件：0 · 验证命令
 
-- [ ] 5.2 L02 §4 + EP02 `ep02-chat-cancel` 勾选；供应商计费边界说明
+- [x] 5.2 L02 §4 + EP02 `ep02-chat-cancel` 勾选；供应商计费边界说明
   - 预计文件：2 · `docs/tasks/learning/L02-streaming-langgraph.md`、`docs/tasks/epics/EP02-streaming-chat.md`
 
 **前置：** `ep02-chat-dedup` 已 archive / 合并。  

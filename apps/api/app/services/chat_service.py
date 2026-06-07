@@ -1,5 +1,4 @@
 import asyncio
-import contextlib
 import uuid
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
@@ -19,9 +18,6 @@ from app.models import Message
 from app.models.message import COMPLETION_COMPLETE, COMPLETION_INTERRUPTED
 from app.repositories import MessageRepository
 from app.services.conversation_service import ConversationService
-
-_DISCONNECT_POLL_SECONDS = 0.25
-
 
 class _ClientDisconnected(Exception):
     """Consumer closed the SSE connection (stop / tab close / proxy abort)."""
@@ -175,16 +171,27 @@ class ChatService:
             return
         await self.turn_lock.release(conversation_id, client_message_id)
 
+    @staticmethod
+    def _interrupted_content(full: str, visible: str | None) -> str:
+        if not visible:
+            return full
+        if not full:
+            return visible
+        if full.startswith(visible):
+            return visible
+        if visible.startswith(full):
+            return full
+        return visible if len(visible) <= len(full) else full
+
     async def cancel_stream(
         self,
         *,
         stream_id: str,
         user_id: uuid.UUID,
+        visible_content: str | None = None,
     ) -> None:
         owner = await self.cancel_cache.get_active_owner(stream_id)
         if owner is None:
-            if await self.cancel_cache.is_cancelled(stream_id):
-                return
             raise AppException(
                 code=40401,
                 message="stream_not_found",
@@ -201,42 +208,31 @@ class ChatService:
         if await self.cancel_cache.is_cancelled(stream_id):
             return
 
-        await self.cancel_cache.set_cancelled(stream_id)
+        await self.cancel_cache.set_cancelled(
+            stream_id,
+            visible_content=visible_content,
+        )
 
     async def _iter_tokens_with_disconnect(
         self,
         state: ChatState,
         *,
         conversation_id: uuid.UUID,
+        stream_id: str,
         request: Request | None,
     ) -> AsyncIterator[str]:
-        """Poll disconnect without cancelling the upstream token task on timeout."""
-        agen = self.runner.stream_tokens(
+        """Delegate to runner; raise when HTTP client disconnects mid-stream."""
+        async for token in self.runner.stream_tokens(
             state,
             thread_id=str(conversation_id),
-        ).__aiter__()
-        pending: asyncio.Task[str] | None = asyncio.create_task(agen.__anext__())
+            request=request,
+            stream_id=stream_id,
+            cancel_cache=self.cancel_cache,
+        ):
+            yield token
 
-        try:
-            while pending is not None:
-                if request is not None and await request.is_disconnected():
-                    raise _ClientDisconnected
-
-                done, _ = await asyncio.wait(
-                    {pending},
-                    timeout=_DISCONNECT_POLL_SECONDS,
-                )
-                if pending in done:
-                    try:
-                        yield pending.result()
-                    except StopAsyncIteration:
-                        return
-                    pending = asyncio.create_task(agen.__anext__())
-        finally:
-            if pending is not None and not pending.done():
-                pending.cancel()
-                with contextlib.suppress(asyncio.CancelledError):
-                    await pending
+        if request is not None and await request.is_disconnected():
+            raise _ClientDisconnected
 
     def new_completion_stream_state(
         self,
@@ -271,6 +267,7 @@ class ChatService:
             async for token in self._iter_tokens_with_disconnect(
                 graph_state,
                 conversation_id=stream_state.conversation_id,
+                stream_id=stream_state.stream_id,
                 request=request,
             ):
                 stream_state.assistant_parts.append(token)
@@ -281,7 +278,10 @@ class ChatService:
                 )
                 yield {"event": "token", "data": {"content": token}}
 
-            stream_state.stream_exhausted = True
+            if await self.cancel_cache.is_cancelled(stream_state.stream_id):
+                stream_state.disconnected = True
+            else:
+                stream_state.stream_exhausted = True
         except _ClientDisconnected:
             stream_state.disconnected = True
         except asyncio.CancelledError:
@@ -300,6 +300,9 @@ class ChatService:
         stream_state: CompletionStreamState,
     ) -> uuid.UUID | None:
         """Always run from router finally — BFF may close before generator postamble."""
+        visible_content = await self.cancel_cache.get_visible_content(
+            stream_state.stream_id,
+        )
         await self.cancel_cache.clear(stream_state.stream_id)
         await self.stream_cache.delete(
             stream_state.conversation_id,
@@ -317,10 +320,12 @@ class ChatService:
             if stream_state.stream_exhausted and not stream_state.disconnected
             else COMPLETION_INTERRUPTED
         )
+        full_content = "".join(stream_state.assistant_parts)
+        content = self._interrupted_content(full_content, visible_content)
         assistant = await self.messages.create(
             stream_state.conversation_id,
             "assistant",
-            "".join(stream_state.assistant_parts),
+            content,
             completion_status=completion_status,
         )
         await self.conversations.touch_activity(stream_state.conversation_id)
