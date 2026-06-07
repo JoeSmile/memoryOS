@@ -27,6 +27,14 @@ class Settings(BaseSettings):
         default="postgresql+asyncpg://memoryos:memoryos@localhost:5432/memoryos",
         description="postgresql+asyncpg://user:pass@host:5432/dbname",
     )
+    db_pool_size: int = Field(
+        default=5,
+        description="SQLAlchemy async engine pool_size (DB_POOL_SIZE)",
+    )
+    db_max_overflow: int = Field(
+        default=10,
+        description="SQLAlchemy async engine max_overflow (DB_MAX_OVERFLOW)",
+    )
 
     redis_url: str | None = Field(
         default=None,

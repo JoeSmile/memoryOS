@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 class ConversationCreate(BaseModel):
     user_id: UUID
     title: str = Field(default="", max_length=500)
+    initial_message: str | None = Field(default=None, min_length=1)
 
 
 class ConversationRead(BaseModel):

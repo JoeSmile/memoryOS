@@ -10,6 +10,7 @@ from app.core.redis import get_redis
 from app.core.response import success
 from app.models import User
 from app.schemas.conversation import ConversationCreate, ConversationRead
+from app.schemas.message import MessageRead
 from app.services.conversation_service import ConversationService
 
 router = APIRouter(prefix="/conversations", tags=["conversations"])
@@ -34,13 +35,23 @@ async def create_conversation(
     redis: Redis | None = Depends(get_redis),
 ):
     service = ConversationService(db, redis=redis)
-    conversation = await service.create(
-        user_id=body.user_id,
-        title=body.title,
-    )
+    if body.initial_message is not None:
+        conversation, message = await service.create_with_first_message(
+            user_id=body.user_id,
+            title=body.title,
+            content=body.initial_message,
+        )
+        data = ConversationRead.model_validate(conversation).model_dump()
+        data["initial_message"] = MessageRead.model_validate(message).model_dump()
+    else:
+        conversation = await service.create(
+            user_id=body.user_id,
+            title=body.title,
+        )
+        data = ConversationRead.model_validate(conversation).model_dump()
     await db.commit()
     await service.invalidate_list_cache(body.user_id)
-    return success(data=ConversationRead.model_validate(conversation).model_dump())
+    return success(data=data)
 
 
 @router.get("/me")

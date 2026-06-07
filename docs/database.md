@@ -69,8 +69,7 @@ erDiagram
 | `created_at` | `TIMESTAMPTZ`  | NOT NULL, default `now()`                   |              |
 | `updated_at` | `TIMESTAMPTZ`  | NOT NULL, default `now()`                   | 最后活动时间 |
 
-**索引（Story 3.5 优化）**：`(user_id, updated_at DESC)`
-— 会话列表；本 Story 可在迁移中加基础索引。
+**索引（Story 3.5）**：`ix_conversations_user_updated (user_id, updated_at DESC)` — 会话列表（迁移 `010`）。
 
 ---
 
@@ -84,7 +83,7 @@ erDiagram
 | `content`         | `TEXT`        | NOT NULL                                            | 正文                                                       |
 | `created_at`      | `TIMESTAMPTZ` | NOT NULL, default `now()`                           | 排序依据                                                   |
 
-**索引（Story 3.5）**：`(conversation_id, created_at)` — 拉取历史。
+**索引（Story 3.5）**：`ix_messages_conv_created (conversation_id, created_at)` — 拉取历史（迁移 `010`）。
 
 ---
 
@@ -107,6 +106,7 @@ design 一致；后续可改为 PostgreSQL `ENUM` 类型。
 | :----------- | :--------------------------------------------------------------- |
 | Compose 文件 | `infra/docker/docker-compose.yml`                                |
 | 连接串       | `postgresql+asyncpg://memoryos:memoryos@localhost:5432/memoryos` |
+| 连接池       | `DB_POOL_SIZE=5`、`DB_MAX_OVERFLOW=10`（见 `apps/api/.env.example`） |
 | 启动         | `pnpm db:up`（Postgres + Redis）                                 |
 | Redis        | `redis://localhost:6379/0`                                       |
 
