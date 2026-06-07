@@ -43,8 +43,8 @@ class Settings(BaseSettings):
         description="pgvector column width; must match Alembic 011 vector(N)",
     )
     embedding_model: str = Field(
-        default="text-embedding-3-small",
-        description="OpenAI-compatible embedding model when API key is set",
+        default="text-embedding-v4",
+        description="DashScope/OpenAI-compatible embedding model when API key is set",
     )
 
     redis_url: str | None = Field(
@@ -110,6 +110,11 @@ class Settings(BaseSettings):
     def use_mock_llm(self) -> bool:
         return not (self.openai_api_key and self.openai_api_key.strip())
 
+    @property
+    def use_mock_embedding(self) -> bool:
+        """Same gate as LLM: no OPENAI_API_KEY → deterministic mock vectors."""
+        return self.use_mock_llm
+
 
 def _sync_llm_observability_env(s: Settings) -> None:
     """Expose .env values to LangChain / LangSmith SDKs (read os.environ)."""
@@ -147,7 +152,7 @@ def get_settings() -> Settings:
         )
     if s.use_mock_llm:
         logger.info(
-            "OPENAI_API_KEY is not set; chat graph will use mock LLM (CI/harness)."
+            "OPENAI_API_KEY is not set; chat graph and embeddings use mock (CI/harness)."
         )
     return s
 

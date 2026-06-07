@@ -55,7 +55,7 @@ erDiagram
         uuid document_id FK
         int chunk_index
         text content
-        vector embedding "384-dim"
+        vector embedding "1024-dim"
         int token_count "nullable"
         timestamptz created_at
     }
@@ -117,7 +117,7 @@ erDiagram
 | 项 | 值 |
 | :--- | :--- |
 | 扩展 | `CREATE EXTENSION vector`（Compose 镜像 `pgvector/pgvector:pg16`） |
-| 向量维度 | **384**（`app/core/rag_constants.py` · mock / `text-embedding-3-small` 对齐） |
+| 向量维度 | **1024**（`app/core/rag_constants.py` · 百炼 `text-embedding-v4` 默认） |
 | 幂等键 | `(collection, external_id)` |
 | V1 ANN 索引 | **无**（~2.2 万行暴力 scan + `LIMIT`） |
 
@@ -152,7 +152,7 @@ ORM：`app/models/knowledge.py` · Repository：`document_repository` / `documen
 | `document_id` | `UUID` | FK → `documents.id` ON DELETE CASCADE, NOT NULL | 所属文档 |
 | `chunk_index` | `INTEGER` | NOT NULL, default `0` | 同文档内序号（Gold 事实卡 V1 恒为 `0`） |
 | `content` | `TEXT` | NOT NULL | 检索与展示正文 |
-| `embedding` | `vector(384)` | NOT NULL | pgvector 语义向量 |
+| `embedding` | `vector(1024)` | NOT NULL | pgvector 语义向量 |
 | `token_count` | `INTEGER` | NULL | 可选 token 统计 |
 | `created_at` | `TIMESTAMPTZ` | NOT NULL, default `now()` | |
 

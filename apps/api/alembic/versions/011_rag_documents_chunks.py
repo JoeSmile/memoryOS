@@ -19,7 +19,7 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 # Keep in sync with app.core.rag_constants.EMBEDDING_DIMENSIONS
-EMBEDDING_DIMENSIONS = 384
+EMBEDDING_DIMENSIONS = 1024
 
 
 def upgrade() -> None:

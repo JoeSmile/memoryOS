@@ -104,7 +104,7 @@ docker compose exec redis redis-cli ping
 docker compose exec postgres psql -U memoryos -d memoryos -c "CREATE EXTENSION IF NOT EXISTS vector; SELECT extname FROM pg_extension WHERE extname = 'vector';"
 ```
 
-期望输出一行 `vector`。Alembic `011` 迁移也会执行 `CREATE EXTENSION`；首次换镜像后请先 `down -v` 再 `up`。
+期望输出一行 `vector`。Alembic `011`/`012` 迁移也会执行 `CREATE EXTENSION`；首次换镜像或 **embedding 维度变更** 后请先 `down -v` 再 `up`，或 `alembic upgrade head`（`012` 会清空 `document_chunks`，需 re-ingest）。
 
 换镜像或拉代码后若 `alembic upgrade` 报缺 `pgvector` 包，在仓库根目录执行 `pnpm setup:api`（或 `bash scripts/api.sh exec pip install -r requirements.txt`）。
 

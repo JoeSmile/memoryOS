@@ -74,14 +74,15 @@
 
 - **换模型 ≈ 必须全量 re-embed**（维度、空间分布都不同）。  
 - **单一真相源**：`Settings.embedding_model` + `embedding_dimensions` + Alembic `vector(N)` **必须一致**。  
-- OpenAI `text-embedding-3-small` 支持 `dimensions=384` 降维，便于与 mock 维度对齐。
+- 百炼 **`text-embedding-v4`** 支持 `dimensions=1024`（默认）、512、256 等；**V1 用 1024**（性能/成本平衡，见官方推荐）。  
+- Mock 与 live **同维度**（1024）；CI 不测语义，只测管线。
 
 ### 3.3 Mock vs Live（MemoryOS 双模式）
 
 | 模式 | 条件 | 用途 |
 |:-----|:-----|:-----|
-| **Mock** | 无 `OPENAI_API_KEY`（Harness/CI） | 契约测试；**确定性** hash → 384 维 + L2 归一化 |
-| **Live** | 有 Key（DashScope OpenAI 兼容） | **本地默认**：全量 ingest、调 TopK/召回准确率 |
+| **Mock** | 无 `OPENAI_API_KEY`（Harness/CI） | 契约测试；**确定性** hash → 1024 维 + L2 归一化 |
+| **Live** | 有 Key（DashScope OpenAI 兼容） | **`text-embedding-v4`**，`dimensions=1024` |
 
 **人审决策（2026-06-03）**：本地开发对接 **真实 embedding API**；不用 mock 做语义验证。Mock 仅服务 CI。
 
@@ -141,7 +142,7 @@
 ### 4.1 表设计（V1）
 
 - `documents`：逻辑文档 + `(collection, external_id)` 唯一。  
-- `document_chunks`：`content` + `embedding vector(384)` + `chunk_index`。
+- `document_chunks`：`content` + `embedding vector(1024)` + `chunk_index`。
 
 ### 4.2 何时建 ANN 索引
 
@@ -181,7 +182,8 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 
 | 项 | 决策 | 日期 | 备注 |
 |:---|:-----|:-----|:-----|
-| embedding 维度 | `384`（`text-embedding-3-small` dimensions 参数） | 2026-06-03 | 实施时确认 migration |
+| embedding 维度 | **`1024`**（百炼 `text-embedding-v4` 默认） | 2026-06-07 | migration `011`/`012`；384 方案废弃 |
+| embedding 模型 | **`text-embedding-v4`**（DashScope 兼容 API） | 2026-06-07 | `Settings.embedding_model` |
 | mock vs live | **本地 live API**；CI/Harness mock | 2026-06-03 | 人审 A |
 | 摄入范围 | **全量 5 jsonl**（含 players + player_careers） | 2026-06-03 | 人审 B |
 | 聊天集成 | **本 change 不做** | 2026-06-03 | 人审 C |

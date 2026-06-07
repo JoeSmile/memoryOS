@@ -35,10 +35,10 @@
 
 ## 2. Embedding
 
-- [ ] 2.1 `Settings` 嵌入配置 + `EmbeddingService`（mock 384 维 + OpenAI 兼容 live）
+- [x] 2.1 `Settings` 嵌入配置 + `EmbeddingService`（mock 1024 维 + 百炼 v4 live）
   - 预计文件：2 · 层：core、services
 
-- [ ] 2.2 unit：`tests/unit/test_embedding_service.py` mock 确定性
+- [x] 2.2 unit：`tests/unit/test_embedding_service.py` mock 确定性
   - 预计文件：1 · 层：tests
 
 - [ ] 2.3 **与人讨论** embedding 决策（mock/live、batch、重试）并更新 `docs/tech/rag-embedding-chunking.md` §3 + §6
