@@ -106,6 +106,8 @@ docker compose exec postgres psql -U memoryos -d memoryos -c "CREATE EXTENSION I
 
 期望输出一行 `vector`。Alembic `011` 迁移也会执行 `CREATE EXTENSION`；首次换镜像后请先 `down -v` 再 `up`。
 
+换镜像或拉代码后若 `alembic upgrade` 报缺 `pgvector` 包，在仓库根目录执行 `pnpm setup:api`（或 `bash scripts/api.sh exec pip install -r requirements.txt`）。
+
 ## Redis 缓存约定（Story 3.3）
 
 | Key                                             | TTL   | 用途                  |

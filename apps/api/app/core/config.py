@@ -5,6 +5,8 @@ from functools import lru_cache
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.core.rag_constants import EMBEDDING_DIMENSIONS
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,6 +36,15 @@ class Settings(BaseSettings):
     db_max_overflow: int = Field(
         default=10,
         description="SQLAlchemy async engine max_overflow (DB_MAX_OVERFLOW)",
+    )
+
+    embedding_dimensions: int = Field(
+        default=EMBEDDING_DIMENSIONS,
+        description="pgvector column width; must match Alembic 011 vector(N)",
+    )
+    embedding_model: str = Field(
+        default="text-embedding-3-small",
+        description="OpenAI-compatible embedding model when API key is set",
     )
 
     redis_url: str | None = Field(

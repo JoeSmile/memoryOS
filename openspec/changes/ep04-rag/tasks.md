@@ -27,7 +27,7 @@
 - [x] 1.1 Docker Postgres → `pgvector/pgvector:pg16` + `infra/docker/README.md`
   - 预计文件：2 · 层：infra
 
-- [ ] 1.2 Alembic `011`：`vector` 扩展 + `documents` / `document_chunks` + SQLAlchemy models
+- [x] 1.2 Alembic `011`：`vector` 扩展 + `documents` / `document_chunks` + SQLAlchemy models
   - 预计文件：3 · 层：alembic、models
 
 - [ ] 1.3 更新 `docs/database.md` RAG 表说明

@@ -186,10 +186,12 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 | 摄入范围 | **全量 5 jsonl**（含 players + player_careers） | 2026-06-03 | 人审 B |
 | 聊天集成 | **本 change 不做** | 2026-06-03 | 人审 C |
 | Ollama | **V1 不接入**；V2 可选本地后端 | 2026-06-03 | 见 §3.8 |
+| re-ingest `updated_at` | `DocumentRepository.upsert` + `touch_updated_at` | 2026-06-07 | code review P1 |
+| 维度单一来源 | `app/core/rag_constants.py` + `Settings.embedding_dimensions` | 2026-06-07 | code review P2 |
 | 批量 embed batch size | — | — | 待 task 2.1 填 |
 | 失败重试策略 | — | — | 待 task 2.1 填 |
 | search 默认 collection | `null`（不限，全库搜） | 2026-06-03 | 人审 B；可按需传 collection |
-| V1 是否 HNSW | — | — | 待 task 1.2 填 |
+| V1 是否 HNSW | **否**（~2.2 万行先暴力 scan + LIMIT） | 2026-06-07 | task 1.2 |
 | 全量 ingest 行数验收 | 预期 ~22090 | — | 待 task 3.3 跑完填实际数 |
 
 ### 6.1 实施后复盘（可选）
