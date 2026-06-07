@@ -1,0 +1,4290 @@
+{
+  "generated_at": "2026-06-07T07:00:54.954684+00:00",
+  "bronze_dir": "/Users/guowei/Desktop/github/memoryOS/data/bronze/worldcup",
+  "file_count": 31,
+  "files": [
+    {
+      "name": "award_winners.csv",
+      "sha256": "84deded971dabc8bc30dab6dbcdabc7f08c646f6e5db22b85d2a71cdad437955",
+      "row_count": 200,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "award_id",
+        "award_name",
+        "shared",
+        "player_id",
+        "family_name",
+        "given_name",
+        "team_id",
+        "team_name",
+        "team_code"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 200,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "award_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": false
+        },
+        "award_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": false
+        },
+        "shared": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "player_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 147,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 146,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 124,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 35,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 35,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 34,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "awards.csv",
+      "sha256": "80ff600291b87c519eacf79aecfa7a16ca7222a693b67ba604843ce3b719ca21",
+      "row_count": 8,
+      "columns": [
+        "key_id",
+        "award_id",
+        "award_name",
+        "award_description",
+        "year_introduced"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": true
+        },
+        "award_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": true
+        },
+        "award_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": true
+        },
+        "award_description": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": true
+        },
+        "year_introduced": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "bookings.csv",
+      "sha256": "e1c010ce790fc7729392dc51ceafcb75775b4cc2e3ba39b186efbe6ab19f8969",
+      "row_count": 3178,
+      "columns": [
+        "key_id",
+        "booking_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "match_date",
+        "stage_name",
+        "group_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "home_team",
+        "away_team",
+        "player_id",
+        "family_name",
+        "given_name",
+        "shirt_number",
+        "minute_label",
+        "minute_regulation",
+        "minute_stoppage",
+        "match_period",
+        "yellow_card",
+        "red_card",
+        "second_yellow_card",
+        "sending_off"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3178,
+          "is_unique_key_candidate": true
+        },
+        "booking_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3178,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 918,
+          "is_unique_key_candidate": false
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 736,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 395,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 9,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 85,
+          "is_unique_key_candidate": false
+        },
+        "home_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "away_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "player_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2268,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2035,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1443,
+          "is_unique_key_candidate": false
+        },
+        "shirt_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 26,
+          "is_unique_key_candidate": false
+        },
+        "minute_label": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 141,
+          "is_unique_key_candidate": false
+        },
+        "minute_regulation": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 117,
+          "is_unique_key_candidate": false
+        },
+        "minute_stoppage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 12,
+          "is_unique_key_candidate": false
+        },
+        "match_period": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": false
+        },
+        "yellow_card": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "red_card": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "second_yellow_card": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "sending_off": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "confederations.csv",
+      "sha256": "1560c8d8d25c257ae53ba146a06f1fee25b23b07c3cfcff15c5aaabaa40baf30",
+      "row_count": 6,
+      "columns": [
+        "key_id",
+        "confederation_id",
+        "confederation_name",
+        "confederation_code",
+        "confederation_wikipedia_link"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": true
+        },
+        "confederation_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": true
+        },
+        "confederation_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": true
+        },
+        "confederation_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": true
+        },
+        "confederation_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": true
+        }
+      }
+    },
+    {
+      "name": "goals-by-minute-summary.csv",
+      "sha256": "0a057fecf5b71f1c5806c2e42f1e860af7cb35a9b68057f79fa3aab4c50e779b",
+      "row_count": 90,
+      "columns": [
+        "minute_start",
+        "minute_end",
+        "goal_count"
+      ],
+      "column_stats": {
+        "minute_start": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 90,
+          "is_unique_key_candidate": true
+        },
+        "minute_end": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 90,
+          "is_unique_key_candidate": true
+        },
+        "goal_count": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 32,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "goals.csv",
+      "sha256": "4fbe990b7f42bb8af00d1587af09359ecfdb4ee4101bb44fda0eb336fc1e5be3",
+      "row_count": 3637,
+      "columns": [
+        "key_id",
+        "goal_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "match_date",
+        "stage_name",
+        "group_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "home_team",
+        "away_team",
+        "player_id",
+        "family_name",
+        "given_name",
+        "shirt_number",
+        "player_team_id",
+        "player_team_name",
+        "player_team_code",
+        "minute_label",
+        "minute_regulation",
+        "minute_stoppage",
+        "match_period",
+        "own_goal",
+        "penalty"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3637,
+          "is_unique_key_candidate": true
+        },
+        "goal_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3637,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1162,
+          "is_unique_key_candidate": false
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 857,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 483,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 85,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 85,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 84,
+          "is_unique_key_candidate": false
+        },
+        "home_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "away_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "player_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1831,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1704,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1199,
+          "is_unique_key_candidate": false
+        },
+        "shirt_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 27,
+          "is_unique_key_candidate": false
+        },
+        "player_team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "player_team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "player_team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 85,
+          "is_unique_key_candidate": false
+        },
+        "minute_label": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 141,
+          "is_unique_key_candidate": false
+        },
+        "minute_regulation": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 118,
+          "is_unique_key_candidate": false
+        },
+        "minute_stoppage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 12,
+          "is_unique_key_candidate": false
+        },
+        "match_period": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": false
+        },
+        "own_goal": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "penalty": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "group_standings.csv",
+      "sha256": "3de1d95f81ff47e42517c1c19ba780267f872a9ff73e0ddf3600542e5962d68e",
+      "row_count": 626,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "stage_number",
+        "stage_name",
+        "group_name",
+        "position",
+        "team_id",
+        "team_name",
+        "team_code",
+        "played",
+        "wins",
+        "draws",
+        "losses",
+        "goals_for",
+        "goals_against",
+        "goal_difference",
+        "points",
+        "advanced"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 626,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 28,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 28,
+          "is_unique_key_candidate": false
+        },
+        "stage_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 5,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 14,
+          "is_unique_key_candidate": false
+        },
+        "position": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 85,
+          "is_unique_key_candidate": false
+        },
+        "played": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3,
+          "is_unique_key_candidate": false
+        },
+        "wins": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4,
+          "is_unique_key_candidate": false
+        },
+        "draws": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4,
+          "is_unique_key_candidate": false
+        },
+        "losses": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4,
+          "is_unique_key_candidate": false
+        },
+        "goals_for": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 18,
+          "is_unique_key_candidate": false
+        },
+        "goals_against": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 20,
+          "is_unique_key_candidate": false
+        },
+        "goal_difference": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 34,
+          "is_unique_key_candidate": false
+        },
+        "points": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 9,
+          "is_unique_key_candidate": false
+        },
+        "advanced": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "groups.csv",
+      "sha256": "9c5b27464ff20591cde826922c8687df83ed6a653d10999f9238052a1d746ff8",
+      "row_count": 159,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "stage_number",
+        "stage_name",
+        "group_name",
+        "count_teams"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 159,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 28,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 28,
+          "is_unique_key_candidate": false
+        },
+        "stage_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 5,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 14,
+          "is_unique_key_candidate": false
+        },
+        "count_teams": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "host_countries.csv",
+      "sha256": "bac4e724d1e8352208ba59ed91dc314c27f98666ab80366bd954908b59f0a027",
+      "row_count": 31,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "performance"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 31,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 20,
+          "is_unique_key_candidate": false
+        },
+        "performance": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "manager_appearances.csv",
+      "sha256": "33f39d48fd60479138da38d3d90d82dc0d86795830cfc54a053a4d831063193a",
+      "row_count": 2538,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "match_date",
+        "stage_name",
+        "group_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "home_team",
+        "away_team",
+        "manager_id",
+        "family_name",
+        "given_name",
+        "country_name"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2538,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1248,
+          "is_unique_key_candidate": false
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 909,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 490,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "home_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "away_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "manager_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 475,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 461,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 381,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 77,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "manager_appointments.csv",
+      "sha256": "7ba0a3db430da1372219c83f5dab372250ad55951d0f052f93e9e7216eed6e9c",
+      "row_count": 637,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "manager_id",
+        "family_name",
+        "given_name",
+        "country_name"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 637,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "manager_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 475,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 461,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 381,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 77,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "managers.csv",
+      "sha256": "94e4db4acc0570e821e7180ed11adf002d65b56b63e3edd041e210d94753a985",
+      "row_count": 475,
+      "columns": [
+        "key_id",
+        "manager_id",
+        "family_name",
+        "given_name",
+        "female",
+        "country_name",
+        "manager_wikipedia_link"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 475,
+          "is_unique_key_candidate": true
+        },
+        "manager_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 475,
+          "is_unique_key_candidate": true
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 461,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 381,
+          "is_unique_key_candidate": false
+        },
+        "female": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 77,
+          "is_unique_key_candidate": false
+        },
+        "manager_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 475,
+          "is_unique_key_candidate": true
+        }
+      }
+    },
+    {
+      "name": "matches.csv",
+      "sha256": "037f718764758e7dda3a2918276f85fa8389af1d50999d2a480c8a6a49408875",
+      "row_count": 1248,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "stage_name",
+        "group_name",
+        "group_stage",
+        "knockout_stage",
+        "replayed",
+        "replay",
+        "match_date",
+        "match_time",
+        "stadium_id",
+        "stadium_name",
+        "city_name",
+        "country_name",
+        "home_team_id",
+        "home_team_name",
+        "home_team_code",
+        "away_team_id",
+        "away_team_name",
+        "away_team_code",
+        "score",
+        "home_team_score",
+        "away_team_score",
+        "home_team_score_margin",
+        "away_team_score_margin",
+        "extra_time",
+        "penalty_shootout",
+        "score_penalties",
+        "home_team_score_penalties",
+        "away_team_score_penalties",
+        "result",
+        "home_team_win",
+        "away_team_win",
+        "draw"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1248,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1248,
+          "is_unique_key_candidate": true
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 909,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "group_stage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "knockout_stage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "replayed": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "replay": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 490,
+          "is_unique_key_candidate": false
+        },
+        "match_time": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 46,
+          "is_unique_key_candidate": false
+        },
+        "stadium_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 240,
+          "is_unique_key_candidate": false
+        },
+        "stadium_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 235,
+          "is_unique_key_candidate": false
+        },
+        "city_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 202,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 20,
+          "is_unique_key_candidate": false
+        },
+        "home_team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 84,
+          "is_unique_key_candidate": false
+        },
+        "home_team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 84,
+          "is_unique_key_candidate": false
+        },
+        "home_team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 83,
+          "is_unique_key_candidate": false
+        },
+        "away_team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "away_team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "away_team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "score": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 54,
+          "is_unique_key_candidate": false
+        },
+        "home_team_score": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 13,
+          "is_unique_key_candidate": false
+        },
+        "away_team_score": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 9,
+          "is_unique_key_candidate": false
+        },
+        "home_team_score_margin": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "away_team_score_margin": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "extra_time": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "penalty_shootout": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "score_penalties": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 15,
+          "is_unique_key_candidate": false
+        },
+        "home_team_score_penalties": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "away_team_score_penalties": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "result": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3,
+          "is_unique_key_candidate": false
+        },
+        "home_team_win": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "away_team_win": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "draw": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "penalty_kicks.csv",
+      "sha256": "cbc58511b92b84b30baf674b20ede84f2bae3813b5d367e5c049e8108f222d9a",
+      "row_count": 396,
+      "columns": [
+        "key_id",
+        "penalty_kick_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "match_date",
+        "stage_name",
+        "group_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "home_team",
+        "away_team",
+        "player_id",
+        "family_name",
+        "given_name",
+        "shirt_number",
+        "converted"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 396,
+          "is_unique_key_candidate": true
+        },
+        "penalty_kick_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 396,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 43,
+          "is_unique_key_candidate": false
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 41,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 39,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 36,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 36,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 35,
+          "is_unique_key_candidate": false
+        },
+        "home_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "away_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "player_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 350,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 343,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 270,
+          "is_unique_key_candidate": false
+        },
+        "shirt_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 24,
+          "is_unique_key_candidate": false
+        },
+        "converted": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "player_appearances.csv",
+      "sha256": "edab41b99556cf7494387a5c7d74824c4c69a4474c32d1d4fbf8bab4e61ad483",
+      "row_count": 27432,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "match_date",
+        "stage_name",
+        "group_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "home_team",
+        "away_team",
+        "player_id",
+        "family_name",
+        "given_name",
+        "shirt_number",
+        "position_name",
+        "position_code",
+        "starter",
+        "substitute"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 27432,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1015,
+          "is_unique_key_candidate": false
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 792,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 403,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 9,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 85,
+          "is_unique_key_candidate": false
+        },
+        "home_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "away_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "player_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6559,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 5396,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3306,
+          "is_unique_key_candidate": false
+        },
+        "shirt_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 26,
+          "is_unique_key_candidate": false
+        },
+        "position_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "position_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "starter": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "substitute": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "players.csv",
+      "sha256": "97d61d04b522c9b6471753e92eb3100978d8159ca8c7a7bfd1b2f1921e92e884",
+      "row_count": 10401,
+      "columns": [
+        "key_id",
+        "player_id",
+        "family_name",
+        "given_name",
+        "birth_date",
+        "female",
+        "goal_keeper",
+        "defender",
+        "midfielder",
+        "forward",
+        "count_tournaments",
+        "list_tournaments",
+        "player_wikipedia_link"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10401,
+          "is_unique_key_candidate": true
+        },
+        "player_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10401,
+          "is_unique_key_candidate": true
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8145,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4331,
+          "is_unique_key_candidate": false
+        },
+        "birth_date": {
+          "null_count": 1,
+          "null_pct": 0.01,
+          "nunique": 8564,
+          "is_unique_key_candidate": false
+        },
+        "female": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "goal_keeper": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "defender": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "midfielder": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "forward": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "count_tournaments": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 7,
+          "is_unique_key_candidate": false
+        },
+        "list_tournaments": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 191,
+          "is_unique_key_candidate": false
+        },
+        "player_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10388,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "qualified_teams.csv",
+      "sha256": "7774c395295e4cca9a55b5d4d947b3c6f90b0abe2a984c6b1ba108145b0cad9e",
+      "row_count": 625,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "count_matches",
+        "performance"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 625,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "count_matches": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 7,
+          "is_unique_key_candidate": false
+        },
+        "performance": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 9,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "referee_appearances.csv",
+      "sha256": "c3f213a6d8a1db38b93f22bc98f7b04fcde694670c544a6117ca35e13cc8c206",
+      "row_count": 1248,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "match_date",
+        "stage_name",
+        "group_name",
+        "referee_id",
+        "family_name",
+        "given_name",
+        "country_name",
+        "confederation_id",
+        "confederation_name",
+        "confederation_code"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1248,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1248,
+          "is_unique_key_candidate": true
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 909,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 490,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "referee_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 493,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 484,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 418,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 100,
+          "is_unique_key_candidate": false
+        },
+        "confederation_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "confederation_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "confederation_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "referee_appointments.csv",
+      "sha256": "9fbb2841b37d4a6aac4b4c1c0bc6905ac270cfd2e6563dbfb8d5ef35e60c0f9d",
+      "row_count": 668,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "referee_id",
+        "family_name",
+        "given_name",
+        "country_name",
+        "confederation_id",
+        "confederation_name",
+        "confederation_code"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 668,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "referee_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 493,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 484,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 418,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 100,
+          "is_unique_key_candidate": false
+        },
+        "confederation_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "confederation_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "confederation_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "referees.csv",
+      "sha256": "f9884485637116ed734852f0c1b4fd858398bbb6485c6e1f3f3187111b26948d",
+      "row_count": 493,
+      "columns": [
+        "key_id",
+        "referee_id",
+        "family_name",
+        "given_name",
+        "female",
+        "country_name",
+        "confederation_id",
+        "confederation_name",
+        "confederation_code",
+        "referee_wikipedia_link"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 493,
+          "is_unique_key_candidate": true
+        },
+        "referee_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 493,
+          "is_unique_key_candidate": true
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 484,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 418,
+          "is_unique_key_candidate": false
+        },
+        "female": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 100,
+          "is_unique_key_candidate": false
+        },
+        "confederation_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "confederation_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "confederation_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "referee_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 369,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "squads.csv",
+      "sha256": "dafd483504fe26a63ae211e2539462fbbd86c53d5e079fc0a8cf48e8273659bb",
+      "row_count": 13843,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "player_id",
+        "family_name",
+        "given_name",
+        "shirt_number",
+        "position_name",
+        "position_code"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 13843,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "player_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10401,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8145,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4331,
+          "is_unique_key_candidate": false
+        },
+        "shirt_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 27,
+          "is_unique_key_candidate": false
+        },
+        "position_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4,
+          "is_unique_key_candidate": false
+        },
+        "position_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "stadiums.csv",
+      "sha256": "88b1bddb12cdf5abfe640937959dff41877f096f8b32b09c2f3a2614ec22e91c",
+      "row_count": 240,
+      "columns": [
+        "key_id",
+        "stadium_id",
+        "stadium_name",
+        "city_name",
+        "country_name",
+        "stadium_capacity",
+        "stadium_wikipedia_link",
+        "city_wikipedia_link"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 240,
+          "is_unique_key_candidate": true
+        },
+        "stadium_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 240,
+          "is_unique_key_candidate": true
+        },
+        "stadium_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 235,
+          "is_unique_key_candidate": false
+        },
+        "city_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 202,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 20,
+          "is_unique_key_candidate": false
+        },
+        "stadium_capacity": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 75,
+          "is_unique_key_candidate": false
+        },
+        "stadium_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 234,
+          "is_unique_key_candidate": false
+        },
+        "city_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 203,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "substitutions.csv",
+      "sha256": "dd98a991dceaeb966771db3e6f7b28413a76f16be3a1f0c2a99b8c258a3a8e56",
+      "row_count": 10222,
+      "columns": [
+        "key_id",
+        "substitution_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "match_date",
+        "stage_name",
+        "group_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "home_team",
+        "away_team",
+        "player_id",
+        "family_name",
+        "given_name",
+        "shirt_number",
+        "minute_label",
+        "minute_regulation",
+        "minute_stoppage",
+        "match_period",
+        "going_off",
+        "coming_on"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10222,
+          "is_unique_key_candidate": true
+        },
+        "substitution_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10222,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 21,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1012,
+          "is_unique_key_candidate": false
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 790,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 402,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 9,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 85,
+          "is_unique_key_candidate": false
+        },
+        "home_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "away_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "player_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4502,
+          "is_unique_key_candidate": false
+        },
+        "family_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3826,
+          "is_unique_key_candidate": false
+        },
+        "given_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2523,
+          "is_unique_key_candidate": false
+        },
+        "shirt_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 26,
+          "is_unique_key_candidate": false
+        },
+        "minute_label": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 132,
+          "is_unique_key_candidate": false
+        },
+        "minute_regulation": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 114,
+          "is_unique_key_candidate": false
+        },
+        "minute_stoppage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10,
+          "is_unique_key_candidate": false
+        },
+        "match_period": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": false
+        },
+        "going_off": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "coming_on": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "team_appearances.csv",
+      "sha256": "10daa069291136fb42e2f93cffbb1f45bfca722f29cf3d24cce4648182b4e013",
+      "row_count": 2496,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "match_id",
+        "match_name",
+        "stage_name",
+        "group_name",
+        "group_stage",
+        "knockout_stage",
+        "replayed",
+        "replay",
+        "match_date",
+        "match_time",
+        "stadium_id",
+        "stadium_name",
+        "city_name",
+        "country_name",
+        "team_id",
+        "team_name",
+        "team_code",
+        "opponent_id",
+        "opponent_name",
+        "opponent_code",
+        "home_team",
+        "away_team",
+        "goals_for",
+        "goals_against",
+        "goal_differential",
+        "extra_time",
+        "penalty_shootout",
+        "penalties_for",
+        "penalties_against",
+        "result",
+        "win",
+        "lose",
+        "draw"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2496,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "match_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 1248,
+          "is_unique_key_candidate": false
+        },
+        "match_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 909,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 10,
+          "is_unique_key_candidate": false
+        },
+        "group_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 16,
+          "is_unique_key_candidate": false
+        },
+        "group_stage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "knockout_stage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "replayed": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "replay": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "match_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 490,
+          "is_unique_key_candidate": false
+        },
+        "match_time": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 46,
+          "is_unique_key_candidate": false
+        },
+        "stadium_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 240,
+          "is_unique_key_candidate": false
+        },
+        "stadium_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 235,
+          "is_unique_key_candidate": false
+        },
+        "city_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 202,
+          "is_unique_key_candidate": false
+        },
+        "country_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 20,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "opponent_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "opponent_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": false
+        },
+        "opponent_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "home_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "away_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "goals_for": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 13,
+          "is_unique_key_candidate": false
+        },
+        "goals_against": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 13,
+          "is_unique_key_candidate": false
+        },
+        "goal_differential": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 25,
+          "is_unique_key_candidate": false
+        },
+        "extra_time": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "penalty_shootout": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "penalties_for": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "penalties_against": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "result": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3,
+          "is_unique_key_candidate": false
+        },
+        "win": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "lose": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "draw": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "teams.csv",
+      "sha256": "a2d5ef96fade3bee9ffd22a28cda6378c6b9fb67f8e99514aa58ec0854d26a66",
+      "row_count": 88,
+      "columns": [
+        "key_id",
+        "team_id",
+        "team_name",
+        "team_code",
+        "mens_team",
+        "womens_team",
+        "federation_name",
+        "region_name",
+        "confederation_id",
+        "confederation_name",
+        "confederation_code",
+        "mens_team_wikipedia_link",
+        "womens_team_wikipedia_link",
+        "federation_wikipedia_link"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": true
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": true
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 88,
+          "is_unique_key_candidate": true
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "mens_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "womens_team": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "federation_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 87,
+          "is_unique_key_candidate": false
+        },
+        "region_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 11,
+          "is_unique_key_candidate": false
+        },
+        "confederation_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "confederation_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "confederation_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "mens_team_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 85,
+          "is_unique_key_candidate": false
+        },
+        "womens_team_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 37,
+          "is_unique_key_candidate": false
+        },
+        "federation_wikipedia_link": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 86,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "top-scorers-summary.csv",
+      "sha256": "be757eda1f7ef67e142d26b3740f160969a3ef7d9a0963e51c67a6f0749d7322",
+      "row_count": 15,
+      "columns": [
+        "player",
+        "team_name",
+        "goals"
+      ],
+      "column_stats": {
+        "player": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 15,
+          "is_unique_key_candidate": true
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 9,
+          "is_unique_key_candidate": false
+        },
+        "goals": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 7,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "tournament-appearances.csv",
+      "sha256": "ef0773cc4ca1e2b6ee4f5a066cce4b1aa312b7d72c88ac7e9e06677c82b46ce0",
+      "row_count": 20,
+      "columns": [
+        "team_name",
+        "appearances"
+      ],
+      "column_stats": {
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 20,
+          "is_unique_key_candidate": true
+        },
+        "appearances": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 9,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "tournament-goals-summary.csv",
+      "sha256": "e3053e730df6f9b932cbb6206b3f2e625468af7167b2e8b64e8dff7b9216724a",
+      "row_count": 22,
+      "columns": [
+        "year",
+        "tournament_name",
+        "avg_goals_per_game"
+      ],
+      "column_stats": {
+        "year": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 22,
+          "is_unique_key_candidate": true
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 22,
+          "is_unique_key_candidate": true
+        },
+        "avg_goals_per_game": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 20,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "tournament_stages.csv",
+      "sha256": "e4a6606907cf7c797dc0d9c7c26f29d8cbe05f02a089b828b6933f3ca10f3024",
+      "row_count": 155,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "stage_number",
+        "stage_name",
+        "group_stage",
+        "knockout_stage",
+        "unbalanced_groups",
+        "start_date",
+        "end_date",
+        "count_matches",
+        "count_teams",
+        "count_scheduled",
+        "count_replays",
+        "count_playoffs",
+        "count_walkovers"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 155,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "stage_number": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "stage_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": false
+        },
+        "group_stage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "knockout_stage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "unbalanced_groups": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "start_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 152,
+          "is_unique_key_candidate": false
+        },
+        "end_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 152,
+          "is_unique_key_candidate": false
+        },
+        "count_matches": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 15,
+          "is_unique_key_candidate": false
+        },
+        "count_teams": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 8,
+          "is_unique_key_candidate": false
+        },
+        "count_scheduled": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 12,
+          "is_unique_key_candidate": false
+        },
+        "count_replays": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3,
+          "is_unique_key_candidate": false
+        },
+        "count_playoffs": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 3,
+          "is_unique_key_candidate": false
+        },
+        "count_walkovers": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "tournament_standings.csv",
+      "sha256": "a1649d448bb769ee1e808e567e5fdc2c3256267aaf14ff5902e26a5b2a7344ea",
+      "row_count": 120,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "position",
+        "team_id",
+        "team_name",
+        "team_code"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 120,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "position": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 4,
+          "is_unique_key_candidate": false
+        },
+        "team_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "team_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": false
+        },
+        "team_code": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 29,
+          "is_unique_key_candidate": false
+        }
+      }
+    },
+    {
+      "name": "tournaments.csv",
+      "sha256": "906b122d80aae5302486bafa9dfd925378503a2a11de6f5db39d6c4879040ce0",
+      "row_count": 30,
+      "columns": [
+        "key_id",
+        "tournament_id",
+        "tournament_name",
+        "year",
+        "start_date",
+        "end_date",
+        "host_country",
+        "winner",
+        "host_won",
+        "count_teams",
+        "group_stage",
+        "second_group_stage",
+        "final_round",
+        "round_of_16",
+        "quarter_finals",
+        "semi_finals",
+        "third_place_match",
+        "final"
+      ],
+      "column_stats": {
+        "key_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": true
+        },
+        "tournament_id": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": true
+        },
+        "tournament_name": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": true
+        },
+        "year": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": true
+        },
+        "start_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": true
+        },
+        "end_date": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 30,
+          "is_unique_key_candidate": true
+        },
+        "host_country": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 20,
+          "is_unique_key_candidate": false
+        },
+        "winner": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 12,
+          "is_unique_key_candidate": false
+        },
+        "host_won": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "count_teams": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 6,
+          "is_unique_key_candidate": false
+        },
+        "group_stage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "second_group_stage": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "final_round": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "round_of_16": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "quarter_finals": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "semi_finals": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "third_place_match": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        },
+        "final": {
+          "null_count": 0,
+          "null_pct": 0.0,
+          "nunique": 2,
+          "is_unique_key_candidate": false
+        }
+      }
+    }
+  ],
+  "column_index": {
+    "advanced": [
+      "group_standings.csv"
+    ],
+    "appearances": [
+      "tournament-appearances.csv"
+    ],
+    "avg_goals_per_game": [
+      "tournament-goals-summary.csv"
+    ],
+    "award_description": [
+      "awards.csv"
+    ],
+    "award_id": [
+      "award_winners.csv",
+      "awards.csv"
+    ],
+    "award_name": [
+      "award_winners.csv",
+      "awards.csv"
+    ],
+    "away_team": [
+      "bookings.csv",
+      "goals.csv",
+      "manager_appearances.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "substitutions.csv",
+      "team_appearances.csv"
+    ],
+    "away_team_code": [
+      "matches.csv"
+    ],
+    "away_team_id": [
+      "matches.csv"
+    ],
+    "away_team_name": [
+      "matches.csv"
+    ],
+    "away_team_score": [
+      "matches.csv"
+    ],
+    "away_team_score_margin": [
+      "matches.csv"
+    ],
+    "away_team_score_penalties": [
+      "matches.csv"
+    ],
+    "away_team_win": [
+      "matches.csv"
+    ],
+    "birth_date": [
+      "players.csv"
+    ],
+    "booking_id": [
+      "bookings.csv"
+    ],
+    "city_name": [
+      "matches.csv",
+      "stadiums.csv",
+      "team_appearances.csv"
+    ],
+    "city_wikipedia_link": [
+      "stadiums.csv"
+    ],
+    "coming_on": [
+      "substitutions.csv"
+    ],
+    "confederation_code": [
+      "confederations.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "referees.csv",
+      "teams.csv"
+    ],
+    "confederation_id": [
+      "confederations.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "referees.csv",
+      "teams.csv"
+    ],
+    "confederation_name": [
+      "confederations.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "referees.csv",
+      "teams.csv"
+    ],
+    "confederation_wikipedia_link": [
+      "confederations.csv"
+    ],
+    "converted": [
+      "penalty_kicks.csv"
+    ],
+    "count_matches": [
+      "qualified_teams.csv",
+      "tournament_stages.csv"
+    ],
+    "count_playoffs": [
+      "tournament_stages.csv"
+    ],
+    "count_replays": [
+      "tournament_stages.csv"
+    ],
+    "count_scheduled": [
+      "tournament_stages.csv"
+    ],
+    "count_teams": [
+      "groups.csv",
+      "tournament_stages.csv",
+      "tournaments.csv"
+    ],
+    "count_tournaments": [
+      "players.csv"
+    ],
+    "count_walkovers": [
+      "tournament_stages.csv"
+    ],
+    "country_name": [
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "managers.csv",
+      "matches.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "referees.csv",
+      "stadiums.csv",
+      "team_appearances.csv"
+    ],
+    "defender": [
+      "players.csv"
+    ],
+    "draw": [
+      "matches.csv",
+      "team_appearances.csv"
+    ],
+    "draws": [
+      "group_standings.csv"
+    ],
+    "end_date": [
+      "tournament_stages.csv",
+      "tournaments.csv"
+    ],
+    "extra_time": [
+      "matches.csv",
+      "team_appearances.csv"
+    ],
+    "family_name": [
+      "award_winners.csv",
+      "bookings.csv",
+      "goals.csv",
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "managers.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "players.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "referees.csv",
+      "squads.csv",
+      "substitutions.csv"
+    ],
+    "federation_name": [
+      "teams.csv"
+    ],
+    "federation_wikipedia_link": [
+      "teams.csv"
+    ],
+    "female": [
+      "managers.csv",
+      "players.csv",
+      "referees.csv"
+    ],
+    "final": [
+      "tournaments.csv"
+    ],
+    "final_round": [
+      "tournaments.csv"
+    ],
+    "forward": [
+      "players.csv"
+    ],
+    "given_name": [
+      "award_winners.csv",
+      "bookings.csv",
+      "goals.csv",
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "managers.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "players.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "referees.csv",
+      "squads.csv",
+      "substitutions.csv"
+    ],
+    "goal_count": [
+      "goals-by-minute-summary.csv"
+    ],
+    "goal_difference": [
+      "group_standings.csv"
+    ],
+    "goal_differential": [
+      "team_appearances.csv"
+    ],
+    "goal_id": [
+      "goals.csv"
+    ],
+    "goal_keeper": [
+      "players.csv"
+    ],
+    "goals": [
+      "top-scorers-summary.csv"
+    ],
+    "goals_against": [
+      "group_standings.csv",
+      "team_appearances.csv"
+    ],
+    "goals_for": [
+      "group_standings.csv",
+      "team_appearances.csv"
+    ],
+    "going_off": [
+      "substitutions.csv"
+    ],
+    "group_name": [
+      "bookings.csv",
+      "goals.csv",
+      "group_standings.csv",
+      "groups.csv",
+      "manager_appearances.csv",
+      "matches.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "referee_appearances.csv",
+      "substitutions.csv",
+      "team_appearances.csv"
+    ],
+    "group_stage": [
+      "matches.csv",
+      "team_appearances.csv",
+      "tournament_stages.csv",
+      "tournaments.csv"
+    ],
+    "home_team": [
+      "bookings.csv",
+      "goals.csv",
+      "manager_appearances.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "substitutions.csv",
+      "team_appearances.csv"
+    ],
+    "home_team_code": [
+      "matches.csv"
+    ],
+    "home_team_id": [
+      "matches.csv"
+    ],
+    "home_team_name": [
+      "matches.csv"
+    ],
+    "home_team_score": [
+      "matches.csv"
+    ],
+    "home_team_score_margin": [
+      "matches.csv"
+    ],
+    "home_team_score_penalties": [
+      "matches.csv"
+    ],
+    "home_team_win": [
+      "matches.csv"
+    ],
+    "host_country": [
+      "tournaments.csv"
+    ],
+    "host_won": [
+      "tournaments.csv"
+    ],
+    "key_id": [
+      "award_winners.csv",
+      "awards.csv",
+      "bookings.csv",
+      "confederations.csv",
+      "goals.csv",
+      "group_standings.csv",
+      "groups.csv",
+      "host_countries.csv",
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "managers.csv",
+      "matches.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "players.csv",
+      "qualified_teams.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "referees.csv",
+      "squads.csv",
+      "stadiums.csv",
+      "substitutions.csv",
+      "team_appearances.csv",
+      "teams.csv",
+      "tournament_stages.csv",
+      "tournament_standings.csv",
+      "tournaments.csv"
+    ],
+    "knockout_stage": [
+      "matches.csv",
+      "team_appearances.csv",
+      "tournament_stages.csv"
+    ],
+    "list_tournaments": [
+      "players.csv"
+    ],
+    "lose": [
+      "team_appearances.csv"
+    ],
+    "losses": [
+      "group_standings.csv"
+    ],
+    "manager_id": [
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "managers.csv"
+    ],
+    "manager_wikipedia_link": [
+      "managers.csv"
+    ],
+    "match_date": [
+      "bookings.csv",
+      "goals.csv",
+      "manager_appearances.csv",
+      "matches.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "referee_appearances.csv",
+      "substitutions.csv",
+      "team_appearances.csv"
+    ],
+    "match_id": [
+      "bookings.csv",
+      "goals.csv",
+      "manager_appearances.csv",
+      "matches.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "referee_appearances.csv",
+      "substitutions.csv",
+      "team_appearances.csv"
+    ],
+    "match_name": [
+      "bookings.csv",
+      "goals.csv",
+      "manager_appearances.csv",
+      "matches.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "referee_appearances.csv",
+      "substitutions.csv",
+      "team_appearances.csv"
+    ],
+    "match_period": [
+      "bookings.csv",
+      "goals.csv",
+      "substitutions.csv"
+    ],
+    "match_time": [
+      "matches.csv",
+      "team_appearances.csv"
+    ],
+    "mens_team": [
+      "teams.csv"
+    ],
+    "mens_team_wikipedia_link": [
+      "teams.csv"
+    ],
+    "midfielder": [
+      "players.csv"
+    ],
+    "minute_end": [
+      "goals-by-minute-summary.csv"
+    ],
+    "minute_label": [
+      "bookings.csv",
+      "goals.csv",
+      "substitutions.csv"
+    ],
+    "minute_regulation": [
+      "bookings.csv",
+      "goals.csv",
+      "substitutions.csv"
+    ],
+    "minute_start": [
+      "goals-by-minute-summary.csv"
+    ],
+    "minute_stoppage": [
+      "bookings.csv",
+      "goals.csv",
+      "substitutions.csv"
+    ],
+    "opponent_code": [
+      "team_appearances.csv"
+    ],
+    "opponent_id": [
+      "team_appearances.csv"
+    ],
+    "opponent_name": [
+      "team_appearances.csv"
+    ],
+    "own_goal": [
+      "goals.csv"
+    ],
+    "penalties_against": [
+      "team_appearances.csv"
+    ],
+    "penalties_for": [
+      "team_appearances.csv"
+    ],
+    "penalty": [
+      "goals.csv"
+    ],
+    "penalty_kick_id": [
+      "penalty_kicks.csv"
+    ],
+    "penalty_shootout": [
+      "matches.csv",
+      "team_appearances.csv"
+    ],
+    "performance": [
+      "host_countries.csv",
+      "qualified_teams.csv"
+    ],
+    "played": [
+      "group_standings.csv"
+    ],
+    "player": [
+      "top-scorers-summary.csv"
+    ],
+    "player_id": [
+      "award_winners.csv",
+      "bookings.csv",
+      "goals.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "players.csv",
+      "squads.csv",
+      "substitutions.csv"
+    ],
+    "player_team_code": [
+      "goals.csv"
+    ],
+    "player_team_id": [
+      "goals.csv"
+    ],
+    "player_team_name": [
+      "goals.csv"
+    ],
+    "player_wikipedia_link": [
+      "players.csv"
+    ],
+    "points": [
+      "group_standings.csv"
+    ],
+    "position": [
+      "group_standings.csv",
+      "tournament_standings.csv"
+    ],
+    "position_code": [
+      "player_appearances.csv",
+      "squads.csv"
+    ],
+    "position_name": [
+      "player_appearances.csv",
+      "squads.csv"
+    ],
+    "quarter_finals": [
+      "tournaments.csv"
+    ],
+    "red_card": [
+      "bookings.csv"
+    ],
+    "referee_id": [
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "referees.csv"
+    ],
+    "referee_wikipedia_link": [
+      "referees.csv"
+    ],
+    "region_name": [
+      "teams.csv"
+    ],
+    "replay": [
+      "matches.csv",
+      "team_appearances.csv"
+    ],
+    "replayed": [
+      "matches.csv",
+      "team_appearances.csv"
+    ],
+    "result": [
+      "matches.csv",
+      "team_appearances.csv"
+    ],
+    "round_of_16": [
+      "tournaments.csv"
+    ],
+    "score": [
+      "matches.csv"
+    ],
+    "score_penalties": [
+      "matches.csv"
+    ],
+    "second_group_stage": [
+      "tournaments.csv"
+    ],
+    "second_yellow_card": [
+      "bookings.csv"
+    ],
+    "semi_finals": [
+      "tournaments.csv"
+    ],
+    "sending_off": [
+      "bookings.csv"
+    ],
+    "shared": [
+      "award_winners.csv"
+    ],
+    "shirt_number": [
+      "bookings.csv",
+      "goals.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "squads.csv",
+      "substitutions.csv"
+    ],
+    "stadium_capacity": [
+      "stadiums.csv"
+    ],
+    "stadium_id": [
+      "matches.csv",
+      "stadiums.csv",
+      "team_appearances.csv"
+    ],
+    "stadium_name": [
+      "matches.csv",
+      "stadiums.csv",
+      "team_appearances.csv"
+    ],
+    "stadium_wikipedia_link": [
+      "stadiums.csv"
+    ],
+    "stage_name": [
+      "bookings.csv",
+      "goals.csv",
+      "group_standings.csv",
+      "groups.csv",
+      "manager_appearances.csv",
+      "matches.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "referee_appearances.csv",
+      "substitutions.csv",
+      "team_appearances.csv",
+      "tournament_stages.csv"
+    ],
+    "stage_number": [
+      "group_standings.csv",
+      "groups.csv",
+      "tournament_stages.csv"
+    ],
+    "start_date": [
+      "tournament_stages.csv",
+      "tournaments.csv"
+    ],
+    "starter": [
+      "player_appearances.csv"
+    ],
+    "substitute": [
+      "player_appearances.csv"
+    ],
+    "substitution_id": [
+      "substitutions.csv"
+    ],
+    "team_code": [
+      "award_winners.csv",
+      "bookings.csv",
+      "goals.csv",
+      "group_standings.csv",
+      "host_countries.csv",
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "qualified_teams.csv",
+      "squads.csv",
+      "substitutions.csv",
+      "team_appearances.csv",
+      "teams.csv",
+      "tournament_standings.csv"
+    ],
+    "team_id": [
+      "award_winners.csv",
+      "bookings.csv",
+      "goals.csv",
+      "group_standings.csv",
+      "host_countries.csv",
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "qualified_teams.csv",
+      "squads.csv",
+      "substitutions.csv",
+      "team_appearances.csv",
+      "teams.csv",
+      "tournament_standings.csv"
+    ],
+    "team_name": [
+      "award_winners.csv",
+      "bookings.csv",
+      "goals.csv",
+      "group_standings.csv",
+      "host_countries.csv",
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "qualified_teams.csv",
+      "squads.csv",
+      "substitutions.csv",
+      "team_appearances.csv",
+      "teams.csv",
+      "top-scorers-summary.csv",
+      "tournament-appearances.csv",
+      "tournament_standings.csv"
+    ],
+    "third_place_match": [
+      "tournaments.csv"
+    ],
+    "tournament_id": [
+      "award_winners.csv",
+      "bookings.csv",
+      "goals.csv",
+      "group_standings.csv",
+      "groups.csv",
+      "host_countries.csv",
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "matches.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "qualified_teams.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "squads.csv",
+      "substitutions.csv",
+      "team_appearances.csv",
+      "tournament_stages.csv",
+      "tournament_standings.csv",
+      "tournaments.csv"
+    ],
+    "tournament_name": [
+      "award_winners.csv",
+      "bookings.csv",
+      "goals.csv",
+      "group_standings.csv",
+      "groups.csv",
+      "host_countries.csv",
+      "manager_appearances.csv",
+      "manager_appointments.csv",
+      "matches.csv",
+      "penalty_kicks.csv",
+      "player_appearances.csv",
+      "qualified_teams.csv",
+      "referee_appearances.csv",
+      "referee_appointments.csv",
+      "squads.csv",
+      "substitutions.csv",
+      "team_appearances.csv",
+      "tournament-goals-summary.csv",
+      "tournament_stages.csv",
+      "tournament_standings.csv",
+      "tournaments.csv"
+    ],
+    "unbalanced_groups": [
+      "tournament_stages.csv"
+    ],
+    "win": [
+      "team_appearances.csv"
+    ],
+    "winner": [
+      "tournaments.csv"
+    ],
+    "wins": [
+      "group_standings.csv"
+    ],
+    "womens_team": [
+      "teams.csv"
+    ],
+    "womens_team_wikipedia_link": [
+      "teams.csv"
+    ],
+    "year": [
+      "tournament-goals-summary.csv",
+      "tournaments.csv"
+    ],
+    "year_introduced": [
+      "awards.csv"
+    ],
+    "yellow_card": [
+      "bookings.csv"
+    ]
+  },
+  "semantic_groups": [
+    {
+      "id": "tournament",
+      "notes": "赛会标识；多文件重复贴标",
+      "columns": [
+        "tournament_id",
+        "tournament_name"
+      ],
+      "files_by_column": {
+        "tournament_id": [
+          "award_winners.csv",
+          "bookings.csv",
+          "goals.csv",
+          "group_standings.csv",
+          "groups.csv",
+          "host_countries.csv",
+          "manager_appearances.csv",
+          "manager_appointments.csv",
+          "matches.csv",
+          "penalty_kicks.csv",
+          "player_appearances.csv",
+          "qualified_teams.csv",
+          "referee_appearances.csv",
+          "referee_appointments.csv",
+          "squads.csv",
+          "substitutions.csv",
+          "team_appearances.csv",
+          "tournament_stages.csv",
+          "tournament_standings.csv",
+          "tournaments.csv"
+        ],
+        "tournament_name": [
+          "award_winners.csv",
+          "bookings.csv",
+          "goals.csv",
+          "group_standings.csv",
+          "groups.csv",
+          "host_countries.csv",
+          "manager_appearances.csv",
+          "manager_appointments.csv",
+          "matches.csv",
+          "penalty_kicks.csv",
+          "player_appearances.csv",
+          "qualified_teams.csv",
+          "referee_appearances.csv",
+          "referee_appointments.csv",
+          "squads.csv",
+          "substitutions.csv",
+          "team_appearances.csv",
+          "tournament-goals-summary.csv",
+          "tournament_stages.csv",
+          "tournament_standings.csv",
+          "tournaments.csv"
+        ]
+      }
+    },
+    {
+      "id": "team_identifiers",
+      "notes": "球队 ID；视角不同（主客/对手/球员所属队）",
+      "columns": [
+        "team_id",
+        "home_team_id",
+        "away_team_id",
+        "opponent_id",
+        "player_team_id"
+      ],
+      "files_by_column": {
+        "team_id": [
+          "award_winners.csv",
+          "bookings.csv",
+          "goals.csv",
+          "group_standings.csv",
+          "host_countries.csv",
+          "manager_appearances.csv",
+          "manager_appointments.csv",
+          "penalty_kicks.csv",
+          "player_appearances.csv",
+          "qualified_teams.csv",
+          "squads.csv",
+          "substitutions.csv",
+          "team_appearances.csv",
+          "teams.csv",
+          "tournament_standings.csv"
+        ],
+        "home_team_id": [
+          "matches.csv"
+        ],
+        "away_team_id": [
+          "matches.csv"
+        ],
+        "opponent_id": [
+          "team_appearances.csv"
+        ],
+        "player_team_id": [
+          "goals.csv"
+        ]
+      }
+    },
+    {
+      "id": "team_labels",
+      "notes": "球队名称冗余列",
+      "columns": [
+        "team_name",
+        "home_team_name",
+        "away_team_name",
+        "opponent_name",
+        "player_team_name"
+      ],
+      "files_by_column": {
+        "team_name": [
+          "award_winners.csv",
+          "bookings.csv",
+          "goals.csv",
+          "group_standings.csv",
+          "host_countries.csv",
+          "manager_appearances.csv",
+          "manager_appointments.csv",
+          "penalty_kicks.csv",
+          "player_appearances.csv",
+          "qualified_teams.csv",
+          "squads.csv",
+          "substitutions.csv",
+          "team_appearances.csv",
+          "teams.csv",
+          "top-scorers-summary.csv",
+          "tournament-appearances.csv",
+          "tournament_standings.csv"
+        ],
+        "home_team_name": [
+          "matches.csv"
+        ],
+        "away_team_name": [
+          "matches.csv"
+        ],
+        "opponent_name": [
+          "team_appearances.csv"
+        ],
+        "player_team_name": [
+          "goals.csv"
+        ]
+      }
+    },
+    {
+      "id": "match_ref",
+      "notes": "比赛引用",
+      "columns": [
+        "match_id",
+        "match_name",
+        "match_date"
+      ],
+      "files_by_column": {
+        "match_id": [
+          "bookings.csv",
+          "goals.csv",
+          "manager_appearances.csv",
+          "matches.csv",
+          "penalty_kicks.csv",
+          "player_appearances.csv",
+          "referee_appearances.csv",
+          "substitutions.csv",
+          "team_appearances.csv"
+        ],
+        "match_name": [
+          "bookings.csv",
+          "goals.csv",
+          "manager_appearances.csv",
+          "matches.csv",
+          "penalty_kicks.csv",
+          "player_appearances.csv",
+          "referee_appearances.csv",
+          "substitutions.csv",
+          "team_appearances.csv"
+        ],
+        "match_date": [
+          "bookings.csv",
+          "goals.csv",
+          "manager_appearances.csv",
+          "matches.csv",
+          "penalty_kicks.csv",
+          "player_appearances.csv",
+          "referee_appearances.csv",
+          "substitutions.csv",
+          "team_appearances.csv"
+        ]
+      }
+    },
+    {
+      "id": "score_team_perspective",
+      "notes": "球队相对视角进球",
+      "columns": [
+        "goals_for",
+        "goals_against",
+        "goal_differential"
+      ],
+      "files_by_column": {
+        "goals_for": [
+          "group_standings.csv",
+          "team_appearances.csv"
+        ],
+        "goals_against": [
+          "group_standings.csv",
+          "team_appearances.csv"
+        ],
+        "goal_differential": [
+          "team_appearances.csv"
+        ]
+      }
+    },
+    {
+      "id": "score_match_perspective",
+      "notes": "比赛主客绝对比分",
+      "columns": [
+        "home_team_score",
+        "away_team_score",
+        "home_team_score_margin",
+        "away_team_score_margin"
+      ],
+      "files_by_column": {
+        "home_team_score": [
+          "matches.csv"
+        ],
+        "away_team_score": [
+          "matches.csv"
+        ],
+        "home_team_score_margin": [
+          "matches.csv"
+        ],
+        "away_team_score_margin": [
+          "matches.csv"
+        ]
+      }
+    },
+    {
+      "id": "win_flags",
+      "notes": "胜负标志；matches 主客 vs team_appearances 当前队",
+      "columns": [
+        "home_team_win",
+        "away_team_win",
+        "win",
+        "lose",
+        "draw"
+      ],
+      "files_by_column": {
+        "home_team_win": [
+          "matches.csv"
+        ],
+        "away_team_win": [
+          "matches.csv"
+        ],
+        "win": [
+          "team_appearances.csv"
+        ],
+        "lose": [
+          "team_appearances.csv"
+        ],
+        "draw": [
+          "matches.csv",
+          "team_appearances.csv"
+        ]
+      }
+    },
+    {
+      "id": "penalty_shootout",
+      "notes": "点球大战比分",
+      "columns": [
+        "penalties_for",
+        "penalties_against",
+        "home_team_score_penalties",
+        "away_team_score_penalties"
+      ],
+      "files_by_column": {
+        "penalties_for": [
+          "team_appearances.csv"
+        ],
+        "penalties_against": [
+          "team_appearances.csv"
+        ],
+        "home_team_score_penalties": [
+          "matches.csv"
+        ],
+        "away_team_score_penalties": [
+          "matches.csv"
+        ]
+      }
+    }
+  ],
+  "fk_checks": [
+    {
+      "child_file": "goals.csv",
+      "child_col": "match_id",
+      "parent_file": "matches.csv",
+      "parent_col": "match_id",
+      "orphan_count": 0,
+      "sample_orphans": []
+    },
+    {
+      "child_file": "goals.csv",
+      "child_col": "player_id",
+      "parent_file": "players.csv",
+      "parent_col": "player_id",
+      "orphan_count": 0,
+      "sample_orphans": []
+    },
+    {
+      "child_file": "squads.csv",
+      "child_col": "player_id",
+      "parent_file": "players.csv",
+      "parent_col": "player_id",
+      "orphan_count": 0,
+      "sample_orphans": []
+    },
+    {
+      "child_file": "squads.csv",
+      "child_col": "team_id",
+      "parent_file": "teams.csv",
+      "parent_col": "team_id",
+      "orphan_count": 0,
+      "sample_orphans": []
+    },
+    {
+      "child_file": "matches.csv",
+      "child_col": "home_team_id",
+      "parent_file": "teams.csv",
+      "parent_col": "team_id",
+      "orphan_count": 0,
+      "sample_orphans": []
+    },
+    {
+      "child_file": "team_appearances.csv",
+      "child_col": "match_id",
+      "parent_file": "matches.csv",
+      "parent_col": "match_id",
+      "orphan_count": 0,
+      "sample_orphans": []
+    }
+  ]
+}

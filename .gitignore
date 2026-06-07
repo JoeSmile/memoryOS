@@ -68,6 +68,9 @@ docker-data/
 postgres-data/
 redis-data/
 
+# World Cup bronze CSVs (local only; see data/bronze/worldcup/README.md)
+data/bronze/worldcup/*.csv
+
 # Misc
 .turbo/
 .vercel/

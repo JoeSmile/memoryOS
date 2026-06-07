@@ -1,0 +1,3 @@
+key_id,team_id,team_name,team_code,mens_team,womens_team,federation_name,region_name,confederation_id,confederation_name,confederation_code,mens_team_wikipedia_link,womens_team_wikipedia_link,federation_wikipedia_link
+1,T-01,Argentina,ARG,1,0,Fed,SA,C-01,CONMEBOL,CONMEBOL,http://example.com,not applicable,http://example.com
+2,T-02,Brazil,BRA,1,0,Fed,SA,C-01,CONMEBOL,CONMEBOL,http://example.com,not applicable,http://example.com
