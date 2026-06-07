@@ -9,26 +9,31 @@
 
 ### 学什么
 
-- [ ] 📖 布局：侧栏（会话列表）+ 主区（消息流）+ 底部输入
-- [ ] 📖 受控输入、Enter 发送、Shift+Enter 换行、发送中禁用
-- [ ] 📖 列表虚拟滚动概念（消息 500+ 条时再上 `@tanstack/react-virtual`）
-- [ ] 📖 自动滚底：`scrollIntoView` vs 判断用户是否在底部再滚
-- [ ] 📖 空态 / Loading / Error 统一组件
-- [ ] 🔧 `apps/web/components/chat/*`、`app/chat/page.tsx`
+- [x] 📖 布局：侧栏（会话列表）+ 主区（消息流）+ 底部输入
+- [x] 📖 受控输入、Enter 发送、Shift+Enter 换行、发送中禁用
+- [x] 📖 列表虚拟滚动概念（消息 500+ 条时再上 `@tanstack/react-virtual`）
+- [x] 📖 自动滚底：`scrollIntoView` vs 判断用户是否在底部再滚
+- [x] 📖 空态 / Loading / Error 统一组件
+- [x] 🔧 `apps/web/components/chat/*`、`app/chat/page.tsx`
 
 ### 面试常问
 
 - 流式输出时如何保持滚动体验？用户上滑看历史时要不要强制滚底？
-- 如何防止重复提交同一条消息？
+- 如何防止重复提交同一条消息？  
+  **已落地：** OpenSpec [`ep02-chat-dedup`](../../../openspec/changes/ep02-chat-dedup/) —
+  前端 `isSending` + 每发 `client_message_id`（UUID）；后端
+  `UNIQUE(conversation_id, client_message_id)` + 409 `duplicate_message`；
+  中断 assistant 落库 `completion_status=interrupted`（UI「已中断」+ `…`，无「继续生成」）。
 
 ### 实战易踩坑
 
-| 坑 | 现象 | 规避 |
-|:---|:-----|:-----|
-| 在 Server Component 里做聊天 | 无法流式、无法输入 | 整页聊天区 `'use client'` |
-| 每条消息一个 Context | 重渲染卡顿 | 列表项 memo + 稳定 key |
-| `key={index}` | 流式更新乱序/闪烁 | 用 message `id` |
-| 未处理竞态：慢请求覆盖新回复 | 显示错乱 | `AbortController` / 请求序号 |
+| 坑                           | 现象                     | 规避                                                   |
+| :--------------------------- | :----------------------- | :----------------------------------------------------- |
+| 在 Server Component 里做聊天 | 无法流式、无法输入       | 整页聊天区 `'use client'`                              |
+| 每条消息一个 Context         | 重渲染卡顿               | 列表项 memo + 稳定 key                                 |
+| `key={index}`                | 流式更新乱序/闪烁        | 用 message `id`                                        |
+| 未处理竞态：慢请求覆盖新回复 | 显示错乱                 | `AbortController` / 请求序号                           |
+| 仅前端 disable、无服务端幂等 | 双点/重试 duplicate 入库 | `client_message_id` + DB 唯一约束（已实现 · `ep02-chat-dedup`） |
 
 ---
 
@@ -36,17 +41,17 @@
 
 ### 学什么
 
-- [ ] 📖 `react-markdown` + `remark-gfm` + 代码高亮（shiki / rehype-highlight）
-- [ ] 📖 流式未完成时的 Markdown 边界（可先纯文本后升级渲染）
-- [ ] 📖 XSS：勿对助手内容 `dangerouslySetInnerHTML`；链接 `rel="noopener"`
-- [ ] 🔧 `components/chat/MessageContent.tsx`
+- [x] 📖 `react-markdown` + `remark-gfm` + 代码高亮（shiki / rehype-highlight）
+- [x] 📖 流式未完成时的 Markdown 边界（可先纯文本后升级渲染）
+- [x] 📖 XSS：勿对助手内容 `dangerouslySetInnerHTML`；链接 `rel="noopener"`
+- [x] 🔧 `components/chat/MessageContent.tsx`
 
 ### 实战易踩坑
 
-| 坑 | 现象 | 规避 |
-|:---|:-----|:-----|
+| 坑                 | 现象     | 规避                         |
+| :----------------- | :------- | :--------------------------- |
 | 代码块在流式中断开 | 渲染炸裂 | 流式结束后再高亮，或节流渲染 |
-| 复制代码按钮绑错层 | 点到整页 | 事件委托到 pre 级 |
+| 复制代码按钮绑错层 | 点到整页 | 事件委托到 pre 级            |
 
 ---
 
@@ -54,11 +59,11 @@
 
 ### 学什么
 
-- [ ] 📖 拆分 store：`useSessionStore` / `useChatStore` / `useUIStore`
-- [ ] 📖 派生状态：当前会话 messages 用 selector 避免全量订阅
-- [ ] 📖 异步 action：`sendMessage` 内聚 loading、error、abort
-- [ ] 📖 与 URL 同步：当前 `sessionId` 可放 query（可选）
-- [ ] 🔧 `apps/web/stores/useChatStore.ts`
+- [x] 📖 拆分 store：`useSessionStore` / `useChatStore` / `useUIStore`
+- [x] 📖 派生状态：当前会话 messages 用 selector 避免全量订阅
+- [x] 📖 异步 action：`sendMessage` 内聚 loading、error、abort
+- [x] 📖 与 URL 同步：当前 `sessionId` 可放 query（可选）
+- [x] 🔧 `apps/web/stores/useChatStore.ts`
 
 ### 面试常问
 
@@ -67,10 +72,10 @@
 
 ### 实战易踩坑
 
-| 坑 | 现象 | 规避 |
-|:---|:-----|:-----|
-| 整个 store 一次 set | 每条 token 全树重渲染 | 只更新当前 message 字段 |
-| store 与 server 数据双源不一致 | 刷新丢消息 | 发送成功以 API 持久化为准再对齐 |
+| 坑                             | 现象                  | 规避                            |
+| :----------------------------- | :-------------------- | :------------------------------ |
+| 整个 store 一次 set            | 每条 token 全树重渲染 | 只更新当前 message 字段         |
+| store 与 server 数据双源不一致 | 刷新丢消息            | 发送成功以 API 持久化为准再对齐 |
 
 ---
 
@@ -78,12 +83,14 @@
 
 ### 学什么
 
-- [ ] 📖 SSE 格式：`data: {...}\n\n`、`event:`、`id:`；与 WebSocket 对比
-- [ ] 📖 FastAPI `StreamingResponse`、`text/event-stream`、心跳注释 `: ping\n\n`
-- [ ] 📖 前端 `fetch` + `response.body.getReader()` 解码 UTF-8 分片
-- [ ] 📖 `AbortController` 停止生成；断开时后端取消上游 LLM
+- [x] 📖 SSE 格式：`data: {...}\n\n`、`event:`、`id:`；与 WebSocket 对比
+- [x] 📖 FastAPI `StreamingResponse`、`text/event-stream`、心跳注释 `: ping\n\n`
+- [x] 📖 前端 `fetch` + `response.body.getReader()` 解码 UTF-8 分片
+- [x] 📖 `AbortController` 停止生成；断开时后端取消上游 LLM  
+  **已落地（`ep02-chat-cancel`）：** 详见 [`docs/tech/chat-stream-cancel.md`](../../tech/chat-stream-cancel.md)。  
+  要点：`stop()` = UI 冻结 + cancel（`visible_content`）+ Abort；SSE `start` / `X-Stream-Id`；Runner 双检 disconnect/cancel（**250ms 轮询**）+ `aclose`；BFF drain 上游但停转发；`interrupted` partial 落库。**计费：** best-effort。
 - [ ] 📖 Nginx：`proxy_buffering off`、`proxy_read_timeout`
-- [ ] 🔧 `POST /api/v1/chat/completions` + 前端 `lib/sse-client.ts`
+- [x] 🔧 `POST /api/v1/chat/completions` + 前端 `lib/sse-client.ts`
 
 ### 面试常问
 
@@ -92,13 +99,24 @@
 
 ### 实战易踩坑
 
+| 坑                          | 现象               | 规避                       |
+| :-------------------------- | :----------------- | :------------------------- |
+| 按 chunk 当完整 JSON 解析   | 随机 JSON 错       | 行缓冲拼 `data:` 行        |
+| 忘记 `\n\n` 分隔            | 前端收不到事件     | 严格 SSE 格式              |
+| Nginx 缓冲                  | 「假流式」一次性出 | 关 buffering               |
+| 未鉴权 SSE                  | 被人刷接口         | 同 REST 鉴权中间件         |
+| 错误走 200 + SSE error 事件 | 前端难区分         | 约定 error 事件或 HTTP 4xx |
+
+**Stop / Cancel 专项（`ep02-chat-cancel` 亲历，展开见 [`chat-stream-cancel.md`](../../tech/chat-stream-cancel.md) §6）：**
+
 | 坑 | 现象 | 规避 |
-|:---|:-----|:-----|
-| 按 chunk 当完整 JSON 解析 | 随机 JSON 错 | 行缓冲拼 `data:` 行 |
-| 忘记 `\n\n` 分隔 | 前端收不到事件 | 严格 SSE 格式 |
-| Nginx 缓冲 | 「假流式」一次性出 | 关 buffering |
-| 未鉴权 SSE | 被人刷接口 | 同 REST 鉴权中间件 |
-| 错误走 200 + SSE error 事件 | 前端难区分 | 约定 error 事件或 HTTP 4xx |
+| :-- | :-- | :-- |
+| BFF 立刻 abort 上游 | Stop 后刷新 assistant 丢失 | `drainThenAbort`：先读上游 SSE 再 abort；`finalize` 放 router `finally` |
+| cancel 退出标 `stream_exhausted` | 误落库 `complete` 或竞态丢消息 | cancel/disconnect 标 `disconnected`，仅自然结束标 `stream_exhausted` |
+| 仅 abort、无 `visible_content` | DB 字数多于停住所见 | cancel 带 UI 快照；`finalize` 截断 |
+| cancel 幂等先于归属校验 | 安全漏洞 | 先 `get_active_owner`，再幂等 return |
+| Harness 单连接测流中 cancel | 测不了真并发 | mid-stream 用 Service/Runner 单测 |
+| BFF pull 与 drain 共 reader | Stop 后仍多几个字 | `clientStopped` 停 enqueue；UI `flushSync` 乐观冻结 |
 
 ---
 
@@ -107,7 +125,8 @@
 ### 学什么
 
 - [ ] 📖 **为何不用裸 while 调 OpenAI**：分支、重试、状态、可观测性失控
-- [ ] 📖 `StateGraph`、`State`（TypedDict / Pydantic）、`Annotated` 累加 messages
+- [ ] 📖 `StateGraph`、`State`（TypedDict / Pydantic）、`Annotated`
+      累加 messages
 - [ ] 📖 节点：入参 state → 返回 partial state；纯函数便于单测
 - [ ] 📖 边：固定边 vs 条件边（`should_continue`）
 - [ ] 📖 流式：`astream_events` / `stream_mode` 把 token 推到 SSE
@@ -122,12 +141,12 @@
 
 ### 实战易踩坑
 
-| 坑 | 现象 | 规避 |
-|:---|:-----|:-----|
-| 在节点里 mutating 全局 state | 并发请求串台 | 每请求独立 config / thread_id |
-| 无最大步数 | 死循环烧 token | `recursion_limit` / 条件边 END |
-| 流式与图节点阻塞混写 | 首 token 慢 | IO 放 async 节点 |
-| 本地 graph 与生产 env 不一致 | 线上行为不同 | 配置化 model endpoint |
+| 坑                           | 现象           | 规避                           |
+| :--------------------------- | :------------- | :----------------------------- |
+| 在节点里 mutating 全局 state | 并发请求串台   | 每请求独立 config / thread_id  |
+| 无最大步数                   | 死循环烧 token | `recursion_limit` / 条件边 END |
+| 流式与图节点阻塞混写         | 首 token 慢    | IO 放 async 节点               |
+| 本地 graph 与生产 env 不一致 | 线上行为不同   | 配置化 model endpoint          |
 
 ---
 
@@ -149,11 +168,11 @@
 
 ### 实战易踩坑
 
-| 坑 | 现象 | 规避 |
-|:---|:-----|:-----|
-| 生产全量 trace | 额度爆 | 采样率 / 仅错误全量 |
-| trace 含用户隐私 | 合规风险 | 脱敏后上报 |
-| 未关 tracing 跑压测 | 费用惊人 | 压测环境单独 key |
+| 坑                  | 现象     | 规避                |
+| :------------------ | :------- | :------------------ |
+| 生产全量 trace      | 额度爆   | 采样率 / 仅错误全量 |
+| trace 含用户隐私    | 合规风险 | 脱敏后上报          |
+| 未关 tracing 跑压测 | 费用惊人 | 压测环境单独 key    |
 
 ---
 
@@ -207,11 +226,11 @@
 
 ### 实战易踩坑
 
-| 坑 | 现象 | 规避 |
-|:---|:-----|:-----|
-| 把检索原文无上限拼进 prompt | 超 context、贵 | TopK + 字符上限 |
-| system 可被用户消息覆盖 | 注入 | system 固定 + 输入过滤 |
-| 多轮未持久化就依赖内存 | 刷新丢上下文 | 以 DB messages 为准 |
+| 坑                          | 现象           | 规避                   |
+| :-------------------------- | :------------- | :--------------------- |
+| 把检索原文无上限拼进 prompt | 超 context、贵 | TopK + 字符上限        |
+| system 可被用户消息覆盖     | 注入           | system 固定 + 输入过滤 |
+| 多轮未持久化就依赖内存      | 刷新丢上下文   | 以 DB messages 为准    |
 
 ---
 

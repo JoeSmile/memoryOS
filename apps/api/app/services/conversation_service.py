@@ -59,6 +59,10 @@ class ConversationService:
             raise AppException(code=40401, message="user_not_found", status_code=404)
         return await self.conversations.create(user_id=user_id, title=title)
 
+    async def touch_activity(self, conversation_id: uuid.UUID) -> None:
+        """Bump updated_at when messages are persisted (resume /me ordering)."""
+        await self.conversations.touch_updated_at(conversation_id)
+
     async def invalidate_list_cache(self, user_id: uuid.UUID) -> None:
         """在 DB commit 之后调用，避免并发下用未提交数据回填缓存。"""
         await self.cache.invalidate(user_id)

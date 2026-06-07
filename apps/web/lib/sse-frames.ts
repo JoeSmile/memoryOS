@@ -22,3 +22,11 @@ export function extractTokenContent(frame: MemoryosSseFrame): string | null {
   const content = frame.data.content;
   return typeof content === "string" && content.length > 0 ? content : null;
 }
+
+export function extractStartStreamId(frame: MemoryosSseFrame): string | null {
+  if (frame.event !== "start") {
+    return null;
+  }
+  const streamId = frame.data.stream_id;
+  return typeof streamId === "string" && streamId.length > 0 ? streamId : null;
+}

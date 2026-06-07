@@ -35,7 +35,8 @@
 |:-----|:----:|:---------|
 | [FE-engineering.md](../tech/FE-engineering.md) | ✅ 已有 | EP01 |
 | `docs/tech/BE-engineering.md` | 📋 待写 | EP01 / EP03 |
-| `docs/tech/langgraph-chat.md` | 📋 待写 | EP02 |
+| [langgraph-chat.md](../tech/langgraph-chat.md) | ✅ 已有 | EP02 |
+| [chat-stream-cancel.md](../tech/chat-stream-cancel.md) | ✅ 已有 | EP02 · Stop/Cancel |
 | `docs/tech/rag-langchain-vs-llamaindex.md` | 📋 待写 | EP04 |
 | `docs/tech/agent-langgraph.md` | 📋 待写 | EP05 |
 | `docs/tech/memory-system.md` | 📋 待写 | EP06 |

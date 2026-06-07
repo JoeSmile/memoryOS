@@ -25,6 +25,16 @@
 
 输出 **Review 摘要**（层、文件列表、测试结果）→ **停止**（除非用户说「继续」）。
 
-用户允许提交时：**checkpoint commit**（仅本 task；message 含 change/task id）。
+## Commit 前 Code Review Gate（HARD）
 
-合并前：`pnpm test:api:harness`（及 unit）。
+**任何 `git commit` 之前**必须先做 code review，**禁止**实现完直接提交。
+
+1. **Verify** 通过（`pnpm lint` / `pnpm build` / `pnpm test:api:harness` 等，按改动范围）。
+2. **Code review** — `requesting-code-review` skill 或 **code-reviewer** subagent；对照 OpenSpec task / design。
+3. 输出结构化结论：**Strengths / Critical / Important / Minor / Verdict**。
+4. **Critical / Important** 必须修完并 re-verify、re-review。
+5. **仅当用户明确说「commit」**（或「提交」）且 Verdict 为 merge-ready → 再 `git commit`（本 task 范围；message 含 change/task id）。
+
+用户未要求 commit 时：review 后停止，等待确认。
+
+合并前：再次 `pnpm test:api:harness`（及 unit）。

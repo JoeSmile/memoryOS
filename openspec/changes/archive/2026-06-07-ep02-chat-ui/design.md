@@ -34,7 +34,8 @@
 ### D2: Zustand 只保留 `useChatStore`
 
 - messages、streaming、error、与 `useChat` / Query invalidate 协同。
-- **不**引入 `useSessionStore`。
+- **不**引入 `useSessionStore`（无侧栏列表 UI）。
+- **恢复最近一场**：`GET /conversations/me` + `/chat` 无 id 时 redirect；「新建分析」显式 `POST` 新会话。
 
 ### D3: 消息管理与上下文分工
 
@@ -53,7 +54,7 @@
 
 ### D6: Web Vitals 本地优先（异常告警）
 
-- **选择**：`useReportWebVitals` 按 Google `rating` 过滤；异常时 `console.warn` + `POST /api/dev/vitals` 打到 **Next 终端** + 右下角 12s 角标；全量日志用 env 开关。
+- **选择**：`useReportWebVitals` 按 Google `rating` 过滤；异常时仅 `console.warn` + 右下角 12s 角标（**不发 HTTP**；`/api/dev/vitals` 仅保留 204 stub 兼容旧 bundle）；全量日志用 env 开关。
 - **理由**：开发时视线在终端/编辑器，不必盯 Console；角标作备用且不 modal；生产上报留 EP08。
 
 ## Risks / Trade-offs
@@ -61,7 +62,8 @@
 | 风险 | 缓解 |
 |:-----|:-----|
 | 无侧栏切换会话 | 深链 `conversation_id` + 新建会话 URL 跳转 |
-| regenerate 需后端支持 | MVP 仅重发最后 user 消息或 duplicate 最后 turn |
+| regenerate 需后端支持 | MVP 仅重发最后 user 消息或 duplicate 最后 turn；**Follow-up：** `ep02-chat-dedup` |
+| 停止生成未取消 LLM 上游 | MVP 仅 `is_disconnected` 停 SSE；**Follow-up（单独 change）：** `ep02-chat-cancel` |
 | 上下文提示仅为展示 | 文案标明「完整裁剪在后端」避免用户误解 |
 
 ## Migration Plan

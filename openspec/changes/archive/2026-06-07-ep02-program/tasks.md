@@ -84,14 +84,25 @@
 **产品向：** 世界杯分析 Web 复用；**无侧栏**；消息管理 + 上下文提示  
 **Done：** archive；EP02 Story 2.1–2.2、2.5 勾选（侧栏项移出或标 N/A）
 
-- [ ] 7.1 完成并 archive `ep02-chat-ui`
+- [x] 7.1 完成并 archive `ep02-chat-ui`
+
+---
+
+## Follow-up — 聊天加固（EP04 前可选，两个独立 change）
+
+**史诗：** [EP02 Follow-up backlog](../../../docs/tasks/epics/EP02-streaming-chat.md#follow-up-backlogphase-7-后ep04-前可选)
+
+- [x] D.0 propose `ep02-chat-dedup`（发送幂等 + `regenerate` 档 B，小）
+- [x] C.0 propose `ep02-chat-cancel`（全链路停止 + Cancel API 兜底，**大、单独 PR**）
+
+建议顺序：先 `dedup` 或按优先级二选一；**禁止**与 Phase 7 代码混在同一 change。
 
 ---
 
 ## 收尾 — archive 本 program
 
-- [ ] P.1 更新 EP02 史诗状态为完成；archive `ep02-program`
-- [ ] P.2 团队声明可启动 EP04 propose
+- [x] P.1 更新 EP02 史诗状态为完成；archive `ep02-program`
+- [x] P.2 团队声明可启动 EP04 propose
 
 **验证（Phase 1–7 后）：**
 

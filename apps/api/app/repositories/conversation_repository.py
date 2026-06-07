@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Conversation
@@ -14,7 +14,10 @@ class ConversationRepository:
         result = await self.db.execute(
             select(Conversation)
             .where(Conversation.user_id == user_id)
-            .order_by(Conversation.updated_at.desc())
+            .order_by(
+                Conversation.updated_at.desc(),
+                Conversation.created_at.desc(),
+            )
         )
         return list(result.scalars().all())
 
@@ -30,3 +33,10 @@ class ConversationRepository:
         await self.db.flush()
         await self.db.refresh(conversation)
         return conversation
+
+    async def touch_updated_at(self, conversation_id: uuid.UUID) -> None:
+        await self.db.execute(
+            update(Conversation)
+            .where(Conversation.id == conversation_id)
+            .values(updated_at=func.now())
+        )

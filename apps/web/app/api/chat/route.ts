@@ -12,6 +12,8 @@ type ChatRouteBody = {
   id?: string;
   conversation_id?: string;
   messages?: UIMessage[];
+  client_message_id?: string;
+  regenerate?: boolean;
 };
 
 export async function POST(req: Request) {
@@ -53,28 +55,71 @@ export async function POST(req: Request) {
     );
   }
 
+  const upstreamAbort = new AbortController();
+  let drainUpstreamOnClientAbort: (() => Promise<void>) | null = null;
+  req.signal.addEventListener(
+    "abort",
+    () => {
+      void drainUpstreamOnClientAbort?.();
+    },
+    { once: true },
+  );
+
   const upstream = await fetchMemoryosChatCompletion({
     conversationId,
     content,
     authorization,
-    signal: req.signal,
+    signal: upstreamAbort.signal,
+    clientMessageId: body.client_message_id,
+    regenerate: body.regenerate ?? false,
   });
 
   if (!upstream.ok) {
     const errorText = await upstream.text();
+    if (upstream.status === 409) {
+      try {
+        const payload = JSON.parse(errorText) as {
+          code?: number;
+          message?: string;
+        };
+        if (payload.code === 40902 && payload.message === "duplicate_message") {
+          return new Response(new ReadableStream({ start(c) { c.close(); } }), {
+            status: 200,
+            headers: {
+              "Content-Type": "text/plain; charset=utf-8",
+              "X-Chat-Duplicate": "1",
+            },
+          });
+        }
+      } catch {
+        // fall through to forward upstream error
+      }
+    }
     return new Response(errorText, {
       status: upstream.status,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  const textStream = memoryosSseResponseToTextStream(upstream);
-
-  return new Response(textStream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+  let streamId = upstream.headers.get("X-Stream-Id");
+  const textStream = memoryosSseResponseToTextStream(upstream, {
+    onStreamId: (id) => {
+      streamId = id;
     },
+    onClientAbort: (drain) => {
+      drainUpstreamOnClientAbort = drain;
+    },
+    abortUpstream: () => upstreamAbort.abort(),
   });
+
+  const responseHeaders: Record<string, string> = {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+  };
+  if (streamId) {
+    responseHeaders["X-Stream-Id"] = streamId;
+  }
+
+  return new Response(textStream, { headers: responseHeaders });
 }
