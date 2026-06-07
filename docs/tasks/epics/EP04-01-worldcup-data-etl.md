@@ -2,6 +2,7 @@
 
 | 属性         | 值                                                                                                                                                          |
 | :----------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **状态**     | ✅ **已完成**（2026-06-07）— 7 个子 change 已 archive                                                                                                       |
 | **周期**     | EP04 第 1 周（约 1–1.5 周）                                                                                                                                 |
 | **优先级**   | P0（阻塞 EP04 RAG / Neo4j / EP11 赛会数据）                                                                                                                 |
 | **父史诗**   | [EP04 — RAG](./EP04-rag.md)                                                                                                                                 |
@@ -160,35 +161,42 @@ Gold     document_chunks / 图节点       交给 EP04 RAG、Neo4j change
 
 ---
 
-## OpenSpec 建议（每条独立 PR）
+## OpenSpec（已 archive）
 
-| Change                  | 范围                            | 约行数 |
-| :---------------------- | :------------------------------ | :----- |
-| `ep04-01-wc-profile`    | Story 01.1 盘点 + profile 脚本  | 小     |
-| `ep04-01-wc-dim-teams`  | Story 01.2 维度表               | 中     |
-| `ep04-01-wc-players`    | Story 01.3 球员                 | 中     |
-| `ep04-01-wc-matches`    | Story 01.4 比赛主表             | 中     |
-| `ep04-01-wc-events`     | Story 01.4b 进球/名单/红黄牌 P1 | 中     |
-| `ep04-01-wc-validate`   | Story 01.5 校验 + 文档          | 小     |
-| `ep04-01-wc-fact-cards` | Story 01.6 Gold 文本            | 小     |
+| Change | Story | Archive |
+| :----- | :---- | :------ |
+| `ep04-01-wc-profile` | 01.1 盘点 | [`2026-06-07-ep04-01-wc-profile`](../../../openspec/changes/archive/2026-06-07-ep04-01-wc-profile/) |
+| `ep04-01-wc-dim-teams` | 01.2 维度 | [`2026-06-07-ep04-01-wc-dim-teams`](../../../openspec/changes/archive/2026-06-07-ep04-01-wc-dim-teams/) |
+| `ep04-01-wc-players` | 01.3 球员 | [`2026-06-07-ep04-01-wc-players`](../../../openspec/changes/archive/2026-06-07-ep04-01-wc-players/) |
+| `ep04-01-wc-matches` | 01.4 比赛 | [`2026-06-07-ep04-01-wc-matches`](../../../openspec/changes/archive/2026-06-07-ep04-01-wc-matches/) |
+| `ep04-01-wc-events` | 01.4b 事件 | [`2026-06-07-ep04-01-wc-events`](../../../openspec/changes/archive/2026-06-07-ep04-01-wc-events/) |
+| `ep04-01-wc-validate` | 01.5 校验 | [`2026-06-07-ep04-01-wc-validate`](../../../openspec/changes/archive/2026-06-07-ep04-01-wc-validate/) |
+| `ep04-01-wc-fact-cards` | 01.6 事实卡 | [`2026-06-07-ep04-01-wc-fact-cards`](../../../openspec/changes/archive/2026-06-07-ep04-01-wc-fact-cards/) |
+
+**Git commits**：`171446f`（Silver ETL + validate）· `5ceded2`（Gold fact-cards）
 
 ---
 
-## 验收
+## 验收（复现命令）
 
 ```bash
-# 盘点
-python scripts/etl/worldcup/profile.py data/bronze/worldcup/
+pnpm db:migrate
 
-# ETL（示例，待实现）
-python scripts/etl/worldcup/run.py --edition 2022
+# 盘点
+python scripts/etl/worldcup/profile.py
+
+# Silver ETL（顺序）
+bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py dimensions
+bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py players
+bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py matches
+bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py events
 
 # 校验
 bash scripts/api.sh exec python ../../scripts/etl/worldcup/validate.py
 bash scripts/api.sh exec python ../../scripts/etl/worldcup/validate.py --tournament WC-2022
 
-# 迁移
-pnpm db:migrate
+# Gold 事实卡
+bash scripts/api.sh exec python ../../scripts/etl/worldcup/fact_cards.py
 ```
 
 - [x] 2022（或选定届次）**0 校验错误**
@@ -205,6 +213,28 @@ pnpm db:migrate
 | matches 双行边界 case（弃权、replay）      | `replayed`/`replay` 列单独规则              |
 | 球员跨届 `list_tournaments` 与比赛表对不上 | 先维度入库，交叉校验放 Story 01.5           |
 | 工作量吞掉 EP04 进度                       | **强制** 本史诗单独排期，EP04 只做 RAG 管线 |
+
+---
+
+## 交付摘要
+
+| 层 | 路径 / 表 | 规模 |
+| :--- | :--- | ---: |
+| Bronze | `data/bronze/worldcup/*.csv`（gitignore）+ `_profile/` | 31 CSV |
+| Silver | Alembic `003`–`006`，11 张 `wc_*` 表 | 见 [`worldcup-data-model.md`](../../tech/worldcup-data-model.md) |
+| Gold | `data/gold/worldcup/fact_cards/*.jsonl` | 1248 / 10401 / 30 + 10 samples |
+| 工具 | `scripts/etl/worldcup/{profile,run,validate,fact_cards}.py` | |
+
+**WC-2022 黄金集**：64 场 · 172 球 · 831 名单 · 决赛 3–3（validate 24+4 项全绿）。
+
+**未做（P2，另开 change）**：substitutions、penalty_kicks、player_appearances、referees 等 ~20 张剩余 CSV。
+
+---
+
+## 下一步（EP04）
+
+1. **EP04 RAG** — document loader 读 `fact_cards/*.jsonl` → chunk → pgvector（见 [EP04-rag](./EP04-rag.md)）
+2. 可选并行：`ep04-worldcup-kg`（Neo4j）或 EP11 赛会 API
 
 ---
 

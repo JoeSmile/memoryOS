@@ -4,7 +4,7 @@
 |:-----|:---|
 | **周期** | 第 4-5 周 |
 | **优先级** | P0 |
-| **依赖** | EP02、EP03、**[EP04-01 世界杯 CSV ETL](./EP04-01-worldcup-data-etl.md)**（结构化数据 Silver 层） |
+| **依赖** | EP02、EP03、**[EP04-01 世界杯 CSV ETL](./EP04-01-worldcup-data-etl.md)** ✅（Silver + Gold 事实卡已就绪） |
 | **学习路线** | [L03-rag-dual-stack.md](../learning/L03-rag-dual-stack.md) |
 | **目标文档** | `docs/tech/rag-langchain-vs-llamaindex.md` 📋 |
 
