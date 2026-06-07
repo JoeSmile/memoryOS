@@ -15,6 +15,34 @@ DEFAULT_BRONZE_DIR = REPO_ROOT / "data" / "bronze" / "worldcup"
 sys.path.insert(0, str(API_DIR))
 
 
+async def _run_appearances(bronze_dir: Path) -> int:
+    from app.core.database import AsyncSessionLocal
+    from app.etl.worldcup.loaders.player_appearances import load_player_appearances
+
+    async with AsyncSessionLocal() as session:
+        async with session.begin():
+            result = await load_player_appearances(session, bronze_dir)
+
+    print(f"loaded player_appearances: {result.player_appearances}")
+    return 0
+
+
+async def _run_subpen(bronze_dir: Path) -> int:
+    from app.core.database import AsyncSessionLocal
+    from app.etl.worldcup.loaders.sub_pen import load_sub_pen
+
+    async with AsyncSessionLocal() as session:
+        async with session.begin():
+            result = await load_sub_pen(session, bronze_dir)
+
+    print(
+        "loaded sub/pen:",
+        f"substitutions={result.substitutions}",
+        f"penalty_kicks={result.penalty_kicks}",
+    )
+    return 0
+
+
 async def _run_events(bronze_dir: Path) -> int:
     from app.core.database import AsyncSessionLocal
     from app.etl.worldcup.loaders.events import load_events
@@ -91,6 +119,8 @@ def main(argv: list[str] | None = None) -> int:
         ("players", "Load players and tournament year bridge rows"),
         ("matches", "Load matches and team appearance stats"),
         ("events", "Load goals, squads, and bookings"),
+        ("subpen", "Load substitutions and penalty kicks (P2)"),
+        ("appearances", "Load player match appearances (P2)"),
     ):
         sub = subparsers.add_parser(name, help=help_text)
         sub.add_argument(
@@ -115,6 +145,10 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(_run_matches(bronze_dir))
     if args.command == "events":
         return asyncio.run(_run_events(bronze_dir))
+    if args.command == "subpen":
+        return asyncio.run(_run_subpen(bronze_dir))
+    if args.command == "appearances":
+        return asyncio.run(_run_appearances(bronze_dir))
 
     print(f"error: unknown command {args.command}", file=sys.stderr)
     return 1

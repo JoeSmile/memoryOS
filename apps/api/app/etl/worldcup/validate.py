@@ -19,6 +19,9 @@ EXPECTED_COUNTS: dict[str, int] = {
     "wc_goals": 3637,
     "wc_squads": 13843,
     "wc_bookings": 3178,
+    "wc_substitutions": 10222,
+    "wc_penalty_kicks": 396,
+    "wc_player_appearances": 27432,
 }
 
 TOURNAMENT_GOLDEN: dict[str, dict[str, int | str]] = {
@@ -26,6 +29,7 @@ TOURNAMENT_GOLDEN: dict[str, dict[str, int | str]] = {
         "wc_matches": 64,
         "wc_goals": 172,
         "wc_squads": 831,
+        "wc_player_appearances": 1995,
         "final_match_id": "M-2022-64",
         "final_home_score": 3,
         "final_away_score": 3,
@@ -42,6 +46,24 @@ FK_CHECKS: list[tuple[str, str]] = [
     ("wc_goals.player_id", "wc_goals", "player_id", "wc_players", "id"),
     ("wc_squads.player_id", "wc_squads", "player_id", "wc_players", "id"),
     ("wc_bookings.match_id", "wc_bookings", "match_id", "wc_matches", "id"),
+    ("wc_substitutions.match_id", "wc_substitutions", "match_id", "wc_matches", "id"),
+    ("wc_substitutions.player_id", "wc_substitutions", "player_id", "wc_players", "id"),
+    ("wc_penalty_kicks.match_id", "wc_penalty_kicks", "match_id", "wc_matches", "id"),
+    ("wc_penalty_kicks.player_id", "wc_penalty_kicks", "player_id", "wc_players", "id"),
+    (
+        "wc_player_appearances.match_id",
+        "wc_player_appearances",
+        "match_id",
+        "wc_matches",
+        "id",
+    ),
+    (
+        "wc_player_appearances.player_id",
+        "wc_player_appearances",
+        "player_id",
+        "wc_players",
+        "id",
+    ),
 ]
 
 
@@ -72,26 +94,21 @@ async def _check_table_counts(
                     message=f"no golden spec for tournament {tournament_id}",
                 )
             ]
-        for table in ("wc_matches", "wc_goals", "wc_squads"):
+        tournament_tables = (
+            "wc_matches",
+            "wc_goals",
+            "wc_squads",
+            "wc_player_appearances",
+        )
+        for table in tournament_tables:
+            if table not in spec:
+                continue
             expected = int(spec[table])
-            if table == "wc_matches":
-                actual = await _scalar(
-                    session,
-                    "SELECT COUNT(*) FROM wc_matches WHERE tournament_id = :tid",
-                    {"tid": tournament_id},
-                )
-            elif table == "wc_goals":
-                actual = await _scalar(
-                    session,
-                    "SELECT COUNT(*) FROM wc_goals WHERE tournament_id = :tid",
-                    {"tid": tournament_id},
-                )
-            else:
-                actual = await _scalar(
-                    session,
-                    "SELECT COUNT(*) FROM wc_squads WHERE tournament_id = :tid",
-                    {"tid": tournament_id},
-                )
+            actual = await _scalar(
+                session,
+                f"SELECT COUNT(*) FROM {table} WHERE tournament_id = :tid",
+                {"tid": tournament_id},
+            )
             results.append(
                 CheckResult(
                     name=f"count.{table}.{tournament_id}",

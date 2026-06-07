@@ -39,6 +39,8 @@ bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py dimensions
 bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py players
 bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py matches
 bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py events
+bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py subpen
+bash scripts/api.sh exec python ../../scripts/etl/worldcup/run.py appearances
 ```
 
 校验 Silver 数据：

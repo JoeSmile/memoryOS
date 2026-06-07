@@ -53,6 +53,9 @@ erDiagram
 | `wc_goals` | 006 | 3,637 | `id` (G-*) |
 | `wc_squads` | 006 | 13,843 | `(tournament_id, team_id, player_id)` |
 | `wc_bookings` | 006 | 3,178 | `id` (B-*) |
+| `wc_substitutions` | 007 | 10,222 | `id` (S-*) |
+| `wc_penalty_kicks` | 007 | 396 | `id` (PK-*) |
+| `wc_player_appearances` | 008 | 27,432 | `(match_id, team_id, player_id)` |
 
 ---
 
@@ -179,6 +182,14 @@ erDiagram
 ### `wc_bookings`
 
 红黄牌；`yellow_card` / `red_card` / `second_yellow_card` / `sending_off` 为 BOOL。
+
+### `wc_substitutions` / `wc_penalty_kicks`（P2）
+
+换人 `S-*`；点球逐球 `PK-*`（`converted` BOOL）。
+
+### `wc_player_appearances`（P2）
+
+每场每球员出场；PK `(match_id, team_id, player_id)`。`starter` / `substitute` 互斥。
 
 ---
 

@@ -74,6 +74,74 @@ class WcSquad(Base):
     )
 
 
+class WcSubstitution(Base):
+    __tablename__ = "wc_substitutions"
+
+    id: Mapped[str] = mapped_column(String(16), primary_key=True)
+    tournament_id: Mapped[str] = mapped_column(
+        String(16),
+        ForeignKey("wc_tournaments.id"),
+        nullable=False,
+    )
+    match_id: Mapped[str] = mapped_column(
+        String(24),
+        ForeignKey("wc_matches.id"),
+        nullable=False,
+    )
+    team_id: Mapped[str] = mapped_column(
+        String(16),
+        ForeignKey("wc_teams.id"),
+        nullable=False,
+    )
+    player_id: Mapped[str] = mapped_column(
+        String(16),
+        ForeignKey("wc_players.id"),
+        nullable=False,
+    )
+    shirt_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    minute_regulation: Mapped[int] = mapped_column(Integer, nullable=False)
+    minute_stoppage: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    match_period: Mapped[str] = mapped_column(String(64), nullable=False)
+    going_off: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    coming_on: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(),
+        nullable=False,
+    )
+
+
+class WcPenaltyKick(Base):
+    __tablename__ = "wc_penalty_kicks"
+
+    id: Mapped[str] = mapped_column(String(16), primary_key=True)
+    tournament_id: Mapped[str] = mapped_column(
+        String(16),
+        ForeignKey("wc_tournaments.id"),
+        nullable=False,
+    )
+    match_id: Mapped[str] = mapped_column(
+        String(24),
+        ForeignKey("wc_matches.id"),
+        nullable=False,
+    )
+    team_id: Mapped[str] = mapped_column(
+        String(16),
+        ForeignKey("wc_teams.id"),
+        nullable=False,
+    )
+    player_id: Mapped[str] = mapped_column(
+        String(16),
+        ForeignKey("wc_players.id"),
+        nullable=False,
+    )
+    shirt_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    converted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(),
+        nullable=False,
+    )
+
+
 class WcBooking(Base):
     __tablename__ = "wc_bookings"
 
