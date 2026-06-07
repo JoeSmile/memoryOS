@@ -58,6 +58,7 @@
 | 子项 | 文档 | 门禁 |
 |:-----|:-----|:-----|
 | Wikipedia 爬虫补充 RAG | [EP04-02-wiki-crawl](./EP04-02-wiki-crawl.md) | **EP08 上线后**再 propose/实现 |
+| Hybrid / 重排 / 多路召回 | [EP04-03-rag-retrieval-advanced](./EP04-03-rag-retrieval-advanced.md) | **`ep04-rag` archive 后**；V1 仅单向量余弦 |
 
 ---
 

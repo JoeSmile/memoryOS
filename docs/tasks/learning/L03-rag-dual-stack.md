@@ -163,6 +163,28 @@
 
 ---
 
+## 7.5 检索进阶（EP04-03 · sandbox 实验）
+
+> V1 `ep04-rag` 只有 **单向量余弦 + collection 过滤**。下面整块在主线用不到，但 **面试必问** — 详见 [EP04-03-rag-retrieval-advanced](../epics/EP04-03-rag-retrieval-advanced.md)。
+
+### 学什么
+
+- [ ] 📖 **Hybrid**：BM25/FTS + 向量；何时补专有名词与数字
+- [ ] 📖 **RRF**：多路 rank 融合（向量路 + 关键词路 + 多 query 路）
+- [ ] 📖 **Rerank**：cross-encoder 二阶段；top_20 → top_5
+- [ ] 📖 **Query 扩展 / HyDE**：改写问法、假设文档 embedding
+- [ ] 📖 **MMR**：结果多样性 vs 相关性
+- [ ] 📖 **指标**：P@k、Recall@k、MRR、nDCG；固定 20～50 条评测集
+- [ ] 🔧 sandbox：`scripts/rag/sandbox_*.py` 任完成 **1 项** 并写对比表
+- [ ] 🔧 `docs/tech/rag-retrieval-advanced.md` baseline 数字（Story 4.01 后）
+
+### 面试常问
+
+- 召回不准时你的排查顺序？单向量 vs Hybrid vs 重排各解决什么？
+- 为什么生产上多路检索常默认 **关**，用 feature flag 开？
+
+---
+
 ## 8. LangSmith 观测 RAG
 
 - [ ] 📖 分段：ingest / embed / retrieve / synthesize 耗时

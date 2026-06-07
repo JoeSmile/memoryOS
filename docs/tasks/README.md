@@ -24,6 +24,7 @@
 | EP04 | 4-5 周 | [epics/EP04-rag.md](./epics/EP04-rag.md) | [L03 RAG 双架构](./learning/L03-rag-dual-stack.md) |
 | EP04-01 | EP04 第 1 周 | [epics/EP04-01-worldcup-data-etl.md](./epics/EP04-01-worldcup-data-etl.md) | L03 §1 · 结构化 ETL |
 | EP04-02 | **上线后** | [epics/EP04-02-wiki-crawl.md](./epics/EP04-02-wiki-crawl.md) 📋 已立项暂缓 | L03 · Wiki 补充 RAG |
+| EP04-03 | **`ep04-rag` 后** | [epics/EP04-03-rag-retrieval-advanced.md](./epics/EP04-03-rag-retrieval-advanced.md) 📋 已立项暂缓 | L03 §7.5 · Hybrid/重排/RRF |
 | EP05 | 第 6 周 | [epics/EP05-agent.md](./epics/EP05-agent.md) | [L04 Agent](./learning/L04-agent.md) |
 | EP06 | 第 7 周 | [epics/EP06-memory.md](./epics/EP06-memory.md) | [L05 记忆+工作流](./learning/L05-memory-workflow.md) |
 | EP07 | 第 7 周 | [epics/EP07-workflow.md](./epics/EP07-workflow.md) | [L05 记忆+工作流](./learning/L05-memory-workflow.md) |
@@ -40,6 +41,7 @@
 | [langgraph-chat.md](../tech/langgraph-chat.md) | ✅ 已有 | EP02 |
 | [chat-stream-cancel.md](../tech/chat-stream-cancel.md) | ✅ 已有 | EP02 · Stop/Cancel |
 | `docs/tech/rag-langchain-vs-llamaindex.md` | 📋 待写 | EP04 |
+| `docs/tech/rag-retrieval-advanced.md` | 📋 待写 | EP04-03 |
 | `docs/tech/agent-langgraph.md` | 📋 待写 | EP05 |
 | `docs/tech/memory-system.md` | 📋 待写 | EP06 |
 | `docs/architecture/*.md` | 📋 待写 | EP08 / EP09 |
