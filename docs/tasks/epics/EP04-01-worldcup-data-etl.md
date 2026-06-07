@@ -139,9 +139,9 @@ Gold     document_chunks / 图节点       交给 EP04 RAG、Neo4j change
 
 ### Story 01.6 文本事实卡（衔接 EP04，轻量）
 
-- [ ] 从 Silver 生成 match / player / tournament 摘要 Markdown 或 JSONL
-- [ ] 输出到 `data/gold/worldcup/fact_cards/`（**不写 pgvector**，留给 EP04）
-- [ ] 样例 10 条人工 spot-check
+- [x] 从 Silver 生成 match / player / tournament 摘要 Markdown 或 JSONL
+- [x] 输出到 `data/gold/worldcup/fact_cards/`（**不写 pgvector**，留给 EP04）
+- [x] 样例 10 条人工 spot-check
 
 ---
 
@@ -193,7 +193,7 @@ pnpm db:migrate
 
 - [x] 2022（或选定届次）**0 校验错误**
 - [x] `worldcup-data-model.md` 与 Alembic 一致
-- [ ] 事实卡样例可人工读通
+- [x] 事实卡样例可人工读通
 
 ---
 

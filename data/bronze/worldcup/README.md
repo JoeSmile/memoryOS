@@ -49,3 +49,9 @@ bash scripts/api.sh exec python ../../scripts/etl/worldcup/validate.py --tournam
 ```
 
 模型说明见 [`docs/tech/worldcup-data-model.md`](../../../docs/tech/worldcup-data-model.md)。
+
+Gold 事实卡：
+
+```bash
+bash scripts/api.sh exec python ../../scripts/etl/worldcup/fact_cards.py
+```
