@@ -1,6 +1,7 @@
 # infra/docker — 本地数据服务
 
-EP03 Story 3.1 起提供 PostgreSQL；Story 3.3 起提供 **Redis 7**。
+EP03 Story 3.1 起提供 PostgreSQL；Story 3.3 起提供 **Redis 7**。  
+EP04 起 Postgres 使用 **`pgvector/pgvector:pg16`**（预装 `vector` 扩展，供 RAG 向量检索）。
 
 ## 前置
 
@@ -25,6 +26,20 @@ docker compose ps
 ```
 
 期望 `memoryos-postgres` 与 `memoryos-redis` 状态均为 `healthy`。
+
+### 从 `postgres:16-alpine` 升级到 pgvector（EP04，会清空数据）
+
+若你曾在旧镜像上跑过迁移，需 **重建数据卷** 后重新 `pnpm db:migrate`：
+
+```bash
+cd infra/docker
+docker compose down -v
+docker compose up -d
+# 仓库根目录
+pnpm db:migrate
+```
+
+本地 chat / 世界杯 Silver 等数据会丢失；Gold `jsonl` 在仓库内，EP04 摄入可重跑。
 
 ### 连接信息（开发默认）
 
@@ -82,6 +97,14 @@ docker compose down -v
 docker compose exec postgres psql -U memoryos -d memoryos -c "SELECT 1 AS ok;"
 docker compose exec redis redis-cli ping
 ```
+
+### 验证 pgvector（EP04）
+
+```bash
+docker compose exec postgres psql -U memoryos -d memoryos -c "CREATE EXTENSION IF NOT EXISTS vector; SELECT extname FROM pg_extension WHERE extname = 'vector';"
+```
+
+期望输出一行 `vector`。Alembic `011` 迁移也会执行 `CREATE EXTENSION`；首次换镜像后请先 `down -v` 再 `up`。
 
 ## Redis 缓存约定（Story 3.3）
 

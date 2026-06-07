@@ -24,7 +24,7 @@
 
 ## 1. Infrastructure
 
-- [ ] 1.1 Docker Postgres → `pgvector/pgvector:pg16` + `infra/docker/README.md`
+- [x] 1.1 Docker Postgres → `pgvector/pgvector:pg16` + `infra/docker/README.md`
   - 预计文件：2 · 层：infra
 
 - [ ] 1.2 Alembic `011`：`vector` 扩展 + `documents` / `document_chunks` + SQLAlchemy models

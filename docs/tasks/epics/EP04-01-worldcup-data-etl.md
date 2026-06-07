@@ -234,7 +234,8 @@ bash scripts/api.sh exec python ../../scripts/etl/worldcup/fact_cards.py
 
 **WC-2022 黄金集**：64 场 · 172 球 · 831 名单 · 决赛 3–3（validate 45/45 全绿）。
 
-**未做（可选后续）**：其余低价值 CSV（如 press、media 等）；Neo4j 图导入另开 change。
+**未做（可选后续）**：其余低价值 CSV（如 press、media 等）；Neo4j 图导入另开 change。  
+**上线后（已立项）**：[EP04-02 Wikipedia 爬虫补充 RAG](./EP04-02-wiki-crawl.md) — 消费 CSV 中 wiki 链接，**EP08 后再做**。
 
 ---
 

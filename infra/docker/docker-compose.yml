@@ -1,10 +1,10 @@
-# MemoryOS 本地开发 — EP03
+# MemoryOS 本地开发 — EP03 + EP04 pgvector
 # 用法: docker compose up -d
 # API 在宿主机运行时 DATABASE_URL / REDIS_URL 主机名用 localhost（见 README）
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: memoryos-postgres
     restart: unless-stopped
     ports:
