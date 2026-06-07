@@ -32,6 +32,8 @@
 
 ## 2. 切块（Chunking）
 
+> **项目落地笔记**（方法、坑、面试、实施记录）：[`docs/tech/rag-embedding-chunking.md`](../../tech/rag-embedding-chunking.md)
+
 ### 学什么
 
 - [ ] 📖 固定长度 + overlap（512/128 起步调参）
@@ -55,6 +57,8 @@
 ---
 
 ## 3. Embedding 与 pgvector
+
+> 同上：[rag-embedding-chunking.md §3–§4](../../tech/rag-embedding-chunking.md)
 
 ### 学什么
 
