@@ -41,7 +41,7 @@
 | [langgraph-chat.md](../tech/langgraph-chat.md) | ✅ 已有 | EP02 |
 | [chat-stream-cancel.md](../tech/chat-stream-cancel.md) | ✅ 已有 | EP02 · Stop/Cancel |
 | `docs/tech/rag-langchain-vs-llamaindex.md` | 📋 待写 | EP04 |
-| `docs/tech/rag-retrieval-advanced.md` | 📋 待写 | EP04-03 |
+| `docs/tech/rag-retrieval-advanced.md` | ✅ 已有 | EP04-03 · sandbox 方法说明 |
 | `docs/tech/agent-langgraph.md` | 📋 待写 | EP05 |
 | `docs/tech/memory-system.md` | 📋 待写 | EP06 |
 | `docs/architecture/*.md` | 📋 待写 | EP08 / EP09 |

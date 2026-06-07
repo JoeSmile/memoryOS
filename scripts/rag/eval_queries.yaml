@@ -1,0 +1,21 @@
+# EP04-03 Story 4.01 — fixed retrieval eval set (expand as you learn)
+# Score with: bash scripts/api.sh exec python ../../scripts/rag/sandbox_eval_baseline.py
+
+queries:
+  - query: "1930 France Mexico 4-1 group stage"
+    expected_id: match:M-1930-01
+    collection: worldcup-matches
+
+  - query: "United States Belgium 3-0 1930 World Cup"
+    expected_id: match:M-1930-02
+    collection: worldcup-matches
+
+  - query: "Argentina France 1-0 1930 Monti goal"
+    expected_id: match:M-1930-05
+    collection: worldcup-matches
+
+  # Fill after live embed ingest + manual top-5 check:
+  - query: "Lionel Messi World Cup career goals"
+    expected_id: null
+    collection: worldcup-player-careers
+    note: set expected_id from search UI or CLI

@@ -176,7 +176,7 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 - **top_k**：5–10 起步；过大 → 噪声多、prompt 贵。  
 - **collection 过滤**：世界杯场景强烈建议 API 支持，避免 `players`/`player_careers` 重复。  
 - **分数阈值**（后续）：低于阈值返回「未找到」，防幻觉（Story 4.6）。  
-- **进阶检索**（Hybrid / 重排 / RRF / HNSW）：V1 **不做**；学习与后续实现见 [EP04-03](../tasks/epics/EP04-03-rag-retrieval-advanced.md)。
+- **进阶检索**（Hybrid / 重排 / RRF / HNSW）：V1 **不做**；见 [EP04-03](../tasks/epics/EP04-03-rag-retrieval-advanced.md) 与 [sandbox 文档](./rag-retrieval-advanced.md)。
 
 ---
 

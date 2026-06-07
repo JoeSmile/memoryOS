@@ -8,7 +8,7 @@
 | **依赖** | **`ep04-rag` archive**（ingest + `POST /knowledge/search` 单向量已验证）· [EP04-01](./EP04-01-worldcup-data-etl.md) ✅ |
 | **学习路线** | [L03 §7.5 检索进阶](../learning/L03-rag-dual-stack.md#75-检索进阶ep04-03--sandbox-实验) · [L07](../learning/L07-optimization.md) |
 | **OpenSpec** | 未 propose — 开干前 `/opsx:propose ep04-rag-retrieval-advanced`（可按 Story 拆多个 change） |
-| **目标文档** | `docs/tech/rag-retrieval-advanced.md` 📋（本 epic 实施时创建） |
+| **目标文档** | [`rag-retrieval-advanced.md`](../../tech/rag-retrieval-advanced.md) ✅ · sandbox 见 [`scripts/rag/README.md`](../../../scripts/rag/README.md) |
 
 > **动机**：当前 `ep04-rag` V1 只有 **单路 pgvector 余弦检索**（+ 可选 `collection` 过滤）。对 ~2.2 万条 Gold 事实卡足够上线，但 **面试与进阶 RAG** 还缺 Hybrid、重排、多路融合、评测等一整块。本 epic 专门补这块：**产品可暂缓，学习不可缺**。
 
@@ -174,8 +174,9 @@ Phase 5  接入 LangGraph retrieve 节点 / 配置开关
 | BM25 + 向量 RRF | `scripts/rag/sandbox_hybrid.py` | 1 页笔记 + 3 query 对比 |
 | Cross-encoder rerank | `scripts/rag/sandbox_rerank.py` | latency + MRR 表 |
 | RRF 多路 | `scripts/rag/sandbox_rrf.py` | 示意图 |
+| P@5 基线 | `scripts/rag/sandbox_eval_baseline.py` | vector vs hybrid 对比 |
 
-规则：**不进** 默认 API 路径；结果写入 `docs/tech/rag-retrieval-advanced.md` 或 L03 勾选。
+运行说明见 [`scripts/rag/README.md`](../../../scripts/rag/README.md)。
 
 ---
 

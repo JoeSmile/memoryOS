@@ -175,8 +175,8 @@
 - [ ] 📖 **Query 扩展 / HyDE**：改写问法、假设文档 embedding
 - [ ] 📖 **MMR**：结果多样性 vs 相关性
 - [ ] 📖 **指标**：P@k、Recall@k、MRR、nDCG；固定 20～50 条评测集
-- [ ] 🔧 sandbox：`scripts/rag/sandbox_*.py` 任完成 **1 项** 并写对比表
-- [ ] 🔧 `docs/tech/rag-retrieval-advanced.md` baseline 数字（Story 4.01 后）
+- [ ] 🔧 sandbox：`scripts/rag/sandbox_*.py` 任完成 **1 项** 并写对比表（见 [scripts/rag/README.md](../../../scripts/rag/README.md)）
+- [ ] 🔧 [`rag-retrieval-advanced.md`](../../tech/rag-retrieval-advanced.md) baseline 数字（Story 4.01 后）
 
 ### 面试常问
 
