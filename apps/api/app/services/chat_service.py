@@ -172,7 +172,15 @@ class ChatService:
         await self.turn_lock.release(conversation_id, client_message_id)
 
     @staticmethod
-    def _interrupted_content(full: str, visible: str | None) -> str:
+    def _interrupted_content(
+        full: str,
+        visible: str | None,
+        visible_length: int | None = None,
+    ) -> str:
+        if visible_length is not None:
+            if visible_length <= 0:
+                return ""
+            return full[:visible_length] if len(full) >= visible_length else full
         if not visible:
             return full
         if not full:
@@ -189,6 +197,7 @@ class ChatService:
         stream_id: str,
         user_id: uuid.UUID,
         visible_content: str | None = None,
+        visible_length: int | None = None,
     ) -> None:
         owner = await self.cancel_cache.get_active_owner(stream_id)
         if owner is None:
@@ -206,11 +215,18 @@ class ChatService:
             )
 
         if await self.cancel_cache.is_cancelled(stream_id):
+            if visible_content is not None or visible_length is not None:
+                await self.cancel_cache.update_visible_snapshot(
+                    stream_id,
+                    visible_content=visible_content,
+                    visible_length=visible_length,
+                )
             return
 
         await self.cancel_cache.set_cancelled(
             stream_id,
             visible_content=visible_content,
+            visible_length=visible_length,
         )
 
     async def _iter_tokens_with_disconnect(
@@ -303,6 +319,9 @@ class ChatService:
         visible_content = await self.cancel_cache.get_visible_content(
             stream_state.stream_id,
         )
+        visible_length = await self.cancel_cache.get_visible_length(
+            stream_state.stream_id,
+        )
         await self.cancel_cache.clear(stream_state.stream_id)
         await self.stream_cache.delete(
             stream_state.conversation_id,
@@ -321,7 +340,13 @@ class ChatService:
             else COMPLETION_INTERRUPTED
         )
         full_content = "".join(stream_state.assistant_parts)
-        content = self._interrupted_content(full_content, visible_content)
+        content = self._interrupted_content(
+            full_content,
+            visible_content,
+            visible_length,
+        )
+        if not content:
+            return None
         assistant = await self.messages.create(
             stream_state.conversation_id,
             "assistant",

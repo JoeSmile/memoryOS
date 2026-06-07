@@ -39,3 +39,25 @@ async def test_cancel_stores_visible_content_until_clear():
 
     await cache.clear(stream_id)
     assert await cache.get_visible_content(stream_id) is None
+
+
+@pytest.mark.asyncio
+async def test_cancel_stores_visible_length_until_clear():
+    stream_id = str(uuid.uuid4())
+    cache = StreamCancelCache(redis=None)
+
+    await cache.set_cancelled(stream_id, visible_length=12_480)
+    assert await cache.get_visible_length(stream_id) == 12_480
+
+    await cache.clear(stream_id)
+    assert await cache.get_visible_length(stream_id) is None
+
+
+@pytest.mark.asyncio
+async def test_update_visible_snapshot_without_cancel_flag():
+    stream_id = str(uuid.uuid4())
+    cache = StreamCancelCache(redis=None)
+
+    await cache.update_visible_snapshot(stream_id, visible_length=42)
+    assert await cache.is_cancelled(stream_id) is False
+    assert await cache.get_visible_length(stream_id) == 42

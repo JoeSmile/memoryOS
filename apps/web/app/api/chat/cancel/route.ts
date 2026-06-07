@@ -5,6 +5,7 @@ export const maxDuration = 60;
 type CancelRouteBody = {
   stream_id?: string;
   visible_content?: string;
+  visible_length?: number;
 };
 
 export async function POST(req: Request) {
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
     streamId,
     authorization,
     visibleContent: body.visible_content ?? null,
+    visibleLength: body.visible_length ?? null,
   });
   const text = await upstream.text();
 

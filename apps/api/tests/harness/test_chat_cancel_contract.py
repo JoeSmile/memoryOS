@@ -219,3 +219,71 @@ async def test_chat_cancel_returns_404_when_active_cleared_but_cancel_remains():
         await cache.clear(stream_id)
 
 
+@pytest.mark.asyncio
+async def test_chat_cancel_rejects_visible_content_length_mismatch():
+    from app.cache.stream_cancel_cache import StreamCancelCache
+    from app.core.redis import ensure_redis
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        token, user_id = await _register_and_login(client)
+        conv = await client.post(
+            "/api/v1/conversations",
+            json={"user_id": user_id, "title": "Visible mismatch"},
+        )
+        conversation_id = conv.json()["data"]["id"]
+        stream_id = str(uuid.uuid4())
+        cache = StreamCancelCache(await ensure_redis())
+        await cache.register_active(
+            stream_id,
+            uuid.UUID(conversation_id),
+            uuid.UUID(user_id),
+        )
+
+        resp = await client.post(
+            "/api/v1/chat/completions/cancel",
+            headers={"Authorization": f"Bearer {token}"},
+            json={
+                "stream_id": stream_id,
+                "visible_content": "你",
+                "visible_length": 2,
+            },
+        )
+        assert resp.status_code == 422
+
+        await cache.clear(stream_id)
+
+
+@pytest.mark.asyncio
+async def test_chat_cancel_derives_visible_length_from_inline_content():
+    from app.cache.stream_cancel_cache import StreamCancelCache
+    from app.core.redis import ensure_redis
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        token, user_id = await _register_and_login(client)
+        conv = await client.post(
+            "/api/v1/conversations",
+            json={"user_id": user_id, "title": "Visible derive length"},
+        )
+        conversation_id = conv.json()["data"]["id"]
+        stream_id = str(uuid.uuid4())
+        cache = StreamCancelCache(await ensure_redis())
+        await cache.register_active(
+            stream_id,
+            uuid.UUID(conversation_id),
+            uuid.UUID(user_id),
+        )
+
+        resp = await client.post(
+            "/api/v1/chat/completions/cancel",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"stream_id": stream_id, "visible_content": "你好"},
+        )
+        assert resp.status_code == 200
+        assert await cache.get_visible_length(stream_id) == 2
+        assert await cache.get_visible_content(stream_id) == "你好"
+
+        await cache.clear(stream_id)
+
+

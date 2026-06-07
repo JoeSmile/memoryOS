@@ -316,3 +316,25 @@ async def test_finalize_truncates_to_visible_content_on_cancel(monkeypatch):
 
     service.messages.create.assert_called_once()
     assert service.messages.create.call_args[0][2] == "你"
+
+
+@pytest.mark.asyncio
+async def test_finalize_skips_empty_content_when_visible_length_zero():
+    db = AsyncMock()
+    service = ChatService(db, redis=None)
+    service.cancel_cache.get_visible_content = AsyncMock(return_value=None)
+    service.cancel_cache.get_visible_length = AsyncMock(return_value=0)
+    service.cancel_cache.clear = AsyncMock()
+    service.stream_cache.delete = AsyncMock()
+    service.messages.create = AsyncMock()
+
+    stream_state = service.new_completion_stream_state(
+        conversation_id=uuid.uuid4(),
+        user_id=uuid.uuid4(),
+    )
+    stream_state.assistant_parts = ["你"]
+
+    result = await service.finalize_completion_stream(stream_state)
+
+    assert result is None
+    service.messages.create.assert_not_awaited()

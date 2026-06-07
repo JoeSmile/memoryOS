@@ -31,6 +31,7 @@ import {
   type MessageRead,
   type UserRead,
 } from "@/lib/chat-types";
+import { buildCancelVisiblePayload } from "@/lib/memoryos-upstream";
 import { useChatStore } from "@/stores/chat-store";
 
 export function useChatSession() {
@@ -518,6 +519,7 @@ export function useChatSession() {
 
       const accessToken = getAccessToken();
       if (activeStreamId && accessToken) {
+        const cancelVisible = buildCancelVisiblePayload(visibleContent);
         void fetch("/api/chat/cancel", {
           method: "POST",
           headers: {
@@ -526,7 +528,7 @@ export function useChatSession() {
           },
           body: JSON.stringify({
             stream_id: activeStreamId,
-            visible_content: visibleContent || undefined,
+            ...cancelVisible,
           }),
         }).catch(() => {
           // Best-effort cancel when AbortController alone is insufficient.

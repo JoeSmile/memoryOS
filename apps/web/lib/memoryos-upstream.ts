@@ -7,6 +7,9 @@ import {
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
+/** Short assistant snapshots may inline full text; longer stops send length only. */
+export const CANCEL_VISIBLE_CONTENT_INLINE_MAX = 256;
+
 export type UpstreamChatParams = {
   conversationId: string;
   content: string;
@@ -20,7 +23,30 @@ export type UpstreamCancelParams = {
   streamId: string;
   authorization: string | null;
   visibleContent?: string | null;
+  visibleLength?: number | null;
 };
+
+export type CancelVisiblePayload = {
+  visible_length?: number;
+  visible_content?: string;
+};
+
+/** Build cancel body fields from local assistant text (Unicode code points). */
+export function buildCancelVisiblePayload(
+  visibleContent: string,
+): CancelVisiblePayload {
+  const visibleLength = [...visibleContent].length;
+  if (visibleLength === 0) {
+    return {};
+  }
+  return {
+    visible_length: visibleLength,
+    visible_content:
+      visibleLength <= CANCEL_VISIBLE_CONTENT_INLINE_MAX
+        ? visibleContent
+        : undefined,
+  };
+}
 
 export type SseTextStreamOptions = {
   onStreamId?: (streamId: string) => void;
@@ -60,6 +86,7 @@ export async function fetchMemoryosChatCancel(
     body: JSON.stringify({
       stream_id: params.streamId,
       visible_content: params.visibleContent ?? undefined,
+      visible_length: params.visibleLength ?? undefined,
     }),
   });
 }

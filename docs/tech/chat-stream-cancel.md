@@ -26,7 +26,7 @@
 ```text
 浏览器 stop()
   ├─ ① flushSync 冻结 assistant 可见文本（visible_content）
-  ├─ ② POST /api/chat/cancel  { stream_id, visible_content? }  （并行、不等响应）
+  ├─ ② POST /api/chat/cancel  { stream_id, visible_length, visible_content?≤256B }  （并行）
   └─ ③ useChat.stop() → AbortController abort BFF fetch
 
 BFF  /api/chat
@@ -60,7 +60,8 @@ API  POST /api/v1/chat/completions/cancel
 | :-------- | :--- |
 | `memoryos:stream_active:{stream_id}` | `{conversation_id, user_id}`，cancel 归属校验 |
 | `memoryos:stream_cancel:{stream_id}` | 取消标记，TTL 120s |
-| `memoryos:stream_cancel_visible:{stream_id}` | 用户点击 Stop 时 UI 快照，finalize 截断用 |
+| `memoryos:stream_cancel_visible:{stream_id}` | 短文（≤256 字符）inline 全文快照 |
+| `memoryos:stream_cancel_visible_len:{stream_id}` | 停住时的 Unicode 字符数，长篇截断用 |
 | `CompletionStreamState.assistant_parts` | 服务端已 yield 的 token 列表 |
 | `completion_status` | `interrupted`（cancel/disconnect）或 `complete` |
 
@@ -71,8 +72,8 @@ API  POST /api/v1/chat/completions/cancel
 `ChatService.finalize_completion_stream` **始终在** `chat.py` `event_generator` 的 `try` 末尾或 `finally` 中调用（dedup 起即如此），避免 BFF 先断导致未落库。
 
 ```python
-# 优先级：visible_content（用户所见）⊆ 服务端已生成全文
-content = _interrupted_content("".join(assistant_parts), visible_content)
+# 优先 visible_length（长篇）；否则 visible_content（≤256 短文，须与 length 一致）
+content = _interrupted_content("".join(assistant_parts), visible_content, visible_length)
 completion_status = (
     COMPLETION_COMPLETE
     if stream_exhausted and not disconnected
@@ -82,7 +83,7 @@ completion_status = (
 
 | 场景 | 落库内容 | status |
 | :--- | :--- | :--- |
-| 用户 Stop 且传 `visible_content` | **屏幕上停住时的文本**（服务端更长则截断） | `interrupted` |
+| 用户 Stop 且传 `visible_length` / `visible_content` | **停住时所见**（`full[:length]` 或全文前缀） | `interrupted` |
 | 用户 Stop 未传 visible（旧客户端） | cancel 前服务端已 append 的全文 | `interrupted` |
 | 正常流结束 | 全文 | `complete` |
 | Tab 关闭 / disconnect | 已 append 部分 | `interrupted` |
@@ -212,7 +213,7 @@ bash scripts/api.sh exec pytest tests/unit/test_chat_service_interrupt.py tests/
 | 项 | 说明 |
 | :--- | :--- |
 | Runner 轮询改 event-driven | 可降惯性，当前固定 250ms |
-| cancel 携带 `content_length` 替代全文 | 减 body 体积，等价截断 |
+| ~~cancel 携带 `content_length` 替代全文~~ | **已做**：`visible_length` + 短文（≤256）仍 inline `visible_content` |
 | Nginx `proxy_buffering off` | L02 §4 待勾选，防「假流式」 |
 | 从 interrupted 续生成 | EP02 Non-Goal |
 
