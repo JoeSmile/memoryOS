@@ -56,6 +56,12 @@ erDiagram
 | `wc_substitutions` | 007 | 10,222 | `id` (S-*) |
 | `wc_penalty_kicks` | 007 | 396 | `id` (PK-*) |
 | `wc_player_appearances` | 008 | 27,432 | `(match_id, team_id, player_id)` |
+| `wc_awards` | 009 | 8 | `id` (A-*) |
+| `wc_award_winners` | 009 | 200 | `(tournament_id, award_id, player_id)` |
+| `wc_qualified_teams` | 009 | 625 | `(tournament_id, team_id)` |
+| `wc_group_standings` | 009 | 626 | `(tournament_id, stage_number, group_name, team_id)` |
+| `wc_referees` | 009 | 493 | `id` (R-*) |
+| `wc_referee_appearances` | 009 | 1,248 | `match_id` |
 
 ---
 
@@ -190,6 +196,13 @@ erDiagram
 ### `wc_player_appearances`（P2）
 
 每场每球员出场；PK `(match_id, team_id, player_id)`。`starter` / `substitute` 互斥。
+
+### 赛会结构 / 荣誉 / 裁判（P2）
+
+- `wc_qualified_teams`：当届参赛队 + `performance`（如 final、group stage）
+- `wc_group_standings`：小组积分榜；1950 等特殊赛制用 `stage_number` 区分
+- `wc_awards` / `wc_award_winners`：奖项字典 + 当届获奖球员
+- `wc_referees` / `wc_referee_appearances`：裁判维度 + 每场主裁（1 行/场）
 
 ---
 

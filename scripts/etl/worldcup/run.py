@@ -15,6 +15,26 @@ DEFAULT_BRONZE_DIR = REPO_ROOT / "data" / "bronze" / "worldcup"
 sys.path.insert(0, str(API_DIR))
 
 
+async def _run_standings(bronze_dir: Path) -> int:
+    from app.core.database import AsyncSessionLocal
+    from app.etl.worldcup.loaders.standings_refs import load_standings_refs
+
+    async with AsyncSessionLocal() as session:
+        async with session.begin():
+            result = await load_standings_refs(session, bronze_dir)
+
+    print(
+        "loaded standings/refs:",
+        f"awards={result.awards}",
+        f"award_winners={result.award_winners}",
+        f"qualified_teams={result.qualified_teams}",
+        f"group_standings={result.group_standings}",
+        f"referees={result.referees}",
+        f"referee_appearances={result.referee_appearances}",
+    )
+    return 0
+
+
 async def _run_appearances(bronze_dir: Path) -> int:
     from app.core.database import AsyncSessionLocal
     from app.etl.worldcup.loaders.player_appearances import load_player_appearances
@@ -121,6 +141,7 @@ def main(argv: list[str] | None = None) -> int:
         ("events", "Load goals, squads, and bookings"),
         ("subpen", "Load substitutions and penalty kicks (P2)"),
         ("appearances", "Load player match appearances (P2)"),
+        ("standings", "Load awards, standings, qualified teams, referees (P2)"),
     ):
         sub = subparsers.add_parser(name, help=help_text)
         sub.add_argument(
@@ -149,6 +170,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(_run_subpen(bronze_dir))
     if args.command == "appearances":
         return asyncio.run(_run_appearances(bronze_dir))
+    if args.command == "standings":
+        return asyncio.run(_run_standings(bronze_dir))
 
     print(f"error: unknown command {args.command}", file=sys.stderr)
     return 1

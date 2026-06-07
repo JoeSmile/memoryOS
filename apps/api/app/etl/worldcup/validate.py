@@ -22,6 +22,12 @@ EXPECTED_COUNTS: dict[str, int] = {
     "wc_substitutions": 10222,
     "wc_penalty_kicks": 396,
     "wc_player_appearances": 27432,
+    "wc_awards": 8,
+    "wc_award_winners": 200,
+    "wc_qualified_teams": 625,
+    "wc_group_standings": 626,
+    "wc_referees": 493,
+    "wc_referee_appearances": 1248,
 }
 
 TOURNAMENT_GOLDEN: dict[str, dict[str, int | str]] = {
@@ -30,6 +36,10 @@ TOURNAMENT_GOLDEN: dict[str, dict[str, int | str]] = {
         "wc_goals": 172,
         "wc_squads": 831,
         "wc_player_appearances": 1995,
+        "wc_qualified_teams": 32,
+        "wc_group_standings": 32,
+        "wc_award_winners": 8,
+        "wc_referee_appearances": 64,
         "final_match_id": "M-2022-64",
         "final_home_score": 3,
         "final_away_score": 3,
@@ -64,6 +74,12 @@ FK_CHECKS: list[tuple[str, str]] = [
         "wc_players",
         "id",
     ),
+    ("wc_award_winners.player_id", "wc_award_winners", "player_id", "wc_players", "id"),
+    ("wc_qualified_teams.team_id", "wc_qualified_teams", "team_id", "wc_teams", "id"),
+    ("wc_group_standings.team_id", "wc_group_standings", "team_id", "wc_teams", "id"),
+    ("wc_referees.confederation_id", "wc_referees", "confederation_id", "wc_confederations", "id"),
+    ("wc_referee_appearances.match_id", "wc_referee_appearances", "match_id", "wc_matches", "id"),
+    ("wc_referee_appearances.referee_id", "wc_referee_appearances", "referee_id", "wc_referees", "id"),
 ]
 
 
@@ -99,6 +115,10 @@ async def _check_table_counts(
             "wc_goals",
             "wc_squads",
             "wc_player_appearances",
+            "wc_qualified_teams",
+            "wc_group_standings",
+            "wc_award_winners",
+            "wc_referee_appearances",
         )
         for table in tournament_tables:
             if table not in spec:
