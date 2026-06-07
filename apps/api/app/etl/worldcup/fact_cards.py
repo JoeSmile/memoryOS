@@ -16,9 +16,9 @@ SPOTLIGHT_CARD_IDS = (
     "match:M-2018-64",
     "tournament:WC-2022",
     "tournament:WC-2018",
-    "player:P-14758",
-    "player:P-64077",
-    "player:P-80404",
+    "player_career:P-14758",
+    "player_career:P-64077",
+    "player_career:P-80404",
     "match:M-2022-01",
     "match:M-1986-51",
     "match:M-1970-12",
@@ -101,6 +101,54 @@ def build_match_card_text(
         f"{stage_name} · {match_date.isoformat()}\n"
         f"Score: {score_line}. Stadium: {stadium}, {city}.{replay_note}\n"
         f"{goals_line}"
+    )
+
+
+def format_goals_by_year(goals_by_year: dict[int, int]) -> str:
+    if not goals_by_year:
+        return "0"
+    parts = [f"{year}: {count}" for year, count in sorted(goals_by_year.items())]
+    return f"{sum(goals_by_year.values())} total ({', '.join(parts)})"
+
+
+def build_player_career_card_text(
+    *,
+    display_name: str,
+    player_id: str,
+    birth_date: date | None,
+    primary_position: str | None,
+    positions: list[str],
+    tournament_years: list[int],
+    squad_count: int,
+    female: bool,
+    team_codes: list[str],
+    goals_by_year: dict[int, int],
+    own_goals: int,
+    appearances: int,
+    starts: int,
+    substitutes: int,
+    awards: list[str],
+    yellow_cards: int,
+    red_cards: int,
+) -> str:
+    gender = "Women's" if female else "Men's"
+    born = birth_date.isoformat() if birth_date else "unknown"
+    pos = primary_position or (positions[0] if positions else "unknown")
+    years = ", ".join(str(y) for y in sorted(tournament_years)) or "none"
+    teams = ", ".join(sorted(team_codes)) or "unknown"
+    goals_line = format_goals_by_year(goals_by_year)
+    og_line = f" Own goals: {own_goals}." if own_goals else ""
+    awards_line = "Awards: " + "; ".join(awards) + "." if awards else "Awards: none."
+    cards_line = ""
+    if yellow_cards or red_cards:
+        cards_line = f" Discipline: {yellow_cards} yellow, {red_cards} red."
+    return (
+        f"[Player Career] {display_name} · {gender}\n"
+        f"ID: {player_id}. Teams: {teams}. Born: {born}. Position: {pos}.\n"
+        f"World Cups ({len(tournament_years)}): {years}. Squad listings: {squad_count}.\n"
+        f"Goals: {goals_line}.{og_line}\n"
+        f"Appearances: {appearances} ({starts} starts, {substitutes} substitute).{cards_line}\n"
+        f"{awards_line}"
     )
 
 
@@ -342,6 +390,197 @@ async def generate_player_cards(
     return cards
 
 
+async def generate_player_career_cards(
+    session: AsyncSession,
+    tournament_id: str | None = None,
+) -> list[FactCard]:
+    if tournament_id:
+        players = await _fetch_rows(
+            session,
+            """
+            SELECT DISTINCT p.id, p.display_name, p.birth_date, p.female,
+                   p.primary_position, p.positions
+            FROM wc_players p
+            JOIN wc_squads sq ON p.id = sq.player_id
+            WHERE sq.tournament_id = :tid
+            ORDER BY p.display_name
+            """,
+            {"tid": tournament_id},
+        )
+    else:
+        players = await _fetch_rows(
+            session,
+            """
+            SELECT p.id, p.display_name, p.birth_date, p.female,
+                   p.primary_position, p.positions
+            FROM wc_players p
+            ORDER BY p.display_name
+            """,
+        )
+
+    if not players:
+        return []
+
+    player_ids = [row["id"] for row in players]
+
+    years_rows = await _fetch_rows(
+        session,
+        """
+        SELECT player_id, year
+        FROM wc_player_tournament_years
+        WHERE player_id = ANY(:player_ids)
+        ORDER BY player_id, year
+        """,
+        {"player_ids": player_ids},
+    )
+    years_by_player: dict[str, list[int]] = {}
+    for row in years_rows:
+        years_by_player.setdefault(row["player_id"], []).append(row["year"])
+
+    squad_rows = await _fetch_rows(
+        session,
+        """
+        SELECT sq.player_id, COUNT(*) AS squad_count
+        FROM wc_squads sq
+        WHERE sq.player_id = ANY(:player_ids)
+        GROUP BY sq.player_id
+        """,
+        {"player_ids": player_ids},
+    )
+    squad_counts = {row["player_id"]: row["squad_count"] for row in squad_rows}
+
+    team_rows = await _fetch_rows(
+        session,
+        """
+        SELECT sq.player_id, t.code
+        FROM wc_squads sq
+        JOIN wc_teams t ON sq.team_id = t.id
+        WHERE sq.player_id = ANY(:player_ids)
+        ORDER BY sq.player_id, t.code
+        """,
+        {"player_ids": player_ids},
+    )
+    teams_by_player: dict[str, list[str]] = {}
+    for row in team_rows:
+        codes = teams_by_player.setdefault(row["player_id"], [])
+        if row["code"] not in codes:
+            codes.append(row["code"])
+
+    goal_rows = await _fetch_rows(
+        session,
+        """
+        SELECT g.player_id, t.year, g.own_goal
+        FROM wc_goals g
+        JOIN wc_tournaments t ON g.tournament_id = t.id
+        WHERE g.player_id = ANY(:player_ids)
+        """,
+        {"player_ids": player_ids},
+    )
+    goals_by_player: dict[str, dict[int, int]] = {}
+    own_goals_by_player: dict[str, int] = {}
+    for row in goal_rows:
+        if row["own_goal"]:
+            own_goals_by_player[row["player_id"]] = (
+                own_goals_by_player.get(row["player_id"], 0) + 1
+            )
+            continue
+        goals_by_player.setdefault(row["player_id"], {}).setdefault(row["year"], 0)
+        goals_by_player[row["player_id"]][row["year"]] += 1
+
+    appearance_rows = await _fetch_rows(
+        session,
+        """
+        SELECT player_id,
+               COUNT(*) AS appearances,
+               SUM(CASE WHEN starter THEN 1 ELSE 0 END) AS starts,
+               SUM(CASE WHEN substitute THEN 1 ELSE 0 END) AS substitutes
+        FROM wc_player_appearances
+        WHERE player_id = ANY(:player_ids)
+        GROUP BY player_id
+        """,
+        {"player_ids": player_ids},
+    )
+    appearances_by_player = {
+        row["player_id"]: (
+            int(row["appearances"]),
+            int(row["starts"]),
+            int(row["substitutes"]),
+        )
+        for row in appearance_rows
+    }
+
+    award_rows = await _fetch_rows(
+        session,
+        """
+        SELECT aw.player_id, a.name, t.year
+        FROM wc_award_winners aw
+        JOIN wc_awards a ON aw.award_id = a.id
+        JOIN wc_tournaments t ON aw.tournament_id = t.id
+        WHERE aw.player_id = ANY(:player_ids)
+        ORDER BY aw.player_id, t.year, a.name
+        """,
+        {"player_ids": player_ids},
+    )
+    awards_by_player: dict[str, list[str]] = {}
+    for row in award_rows:
+        label = f"{row['name']} ({row['year']})"
+        awards_by_player.setdefault(row["player_id"], []).append(label)
+
+    booking_rows = await _fetch_rows(
+        session,
+        """
+        SELECT player_id,
+               SUM(CASE WHEN yellow_card OR second_yellow_card THEN 1 ELSE 0 END) AS yellow_cards,
+               SUM(CASE WHEN red_card OR sending_off THEN 1 ELSE 0 END) AS red_cards
+        FROM wc_bookings
+        WHERE player_id = ANY(:player_ids)
+        GROUP BY player_id
+        """,
+        {"player_ids": player_ids},
+    )
+    bookings_by_player = {
+        row["player_id"]: (int(row["yellow_cards"]), int(row["red_cards"]))
+        for row in booking_rows
+    }
+
+    cards: list[FactCard] = []
+    for row in players:
+        player_id = row["id"]
+        apps = appearances_by_player.get(player_id, (0, 0, 0))
+        bookings = bookings_by_player.get(player_id, (0, 0))
+        text_body = build_player_career_card_text(
+            display_name=row["display_name"],
+            player_id=player_id,
+            birth_date=row["birth_date"],
+            primary_position=row["primary_position"],
+            positions=list(row["positions"] or []),
+            tournament_years=years_by_player.get(player_id, []),
+            squad_count=squad_counts.get(player_id, 0),
+            female=row["female"],
+            team_codes=teams_by_player.get(player_id, []),
+            goals_by_year=goals_by_player.get(player_id, {}),
+            own_goals=own_goals_by_player.get(player_id, 0),
+            appearances=apps[0],
+            starts=apps[1],
+            substitutes=apps[2],
+            awards=awards_by_player.get(player_id, []),
+            yellow_cards=bookings[0],
+            red_cards=bookings[1],
+        )
+        source_ids = [player_id]
+        if tournament_id:
+            source_ids.append(tournament_id)
+        cards.append(
+            FactCard(
+                id=f"player_career:{player_id}",
+                entity_type="player_career",
+                source_ids=source_ids,
+                text=text_body,
+            )
+        )
+    return cards
+
+
 async def generate_tournament_cards(
     session: AsyncSession,
     tournament_id: str | None = None,
@@ -408,16 +647,19 @@ async def export_fact_cards(
 ) -> dict[str, int]:
     match_cards = await generate_match_cards(session, tournament_id)
     player_cards = await generate_player_cards(session, tournament_id)
+    player_career_cards = await generate_player_career_cards(session, tournament_id)
     tournament_cards = await generate_tournament_cards(session, tournament_id)
 
     write_jsonl(output_dir / "matches.jsonl", match_cards)
     write_jsonl(output_dir / "players.jsonl", player_cards)
+    write_jsonl(output_dir / "player_careers.jsonl", player_career_cards)
     write_jsonl(output_dir / "tournaments.jsonl", tournament_cards)
 
     samples = build_spotlight_samples(
         {
             "matches": match_cards,
             "players": player_cards,
+            "player_careers": player_career_cards,
             "tournaments": tournament_cards,
         }
     )
@@ -426,6 +668,7 @@ async def export_fact_cards(
     return {
         "matches": len(match_cards),
         "players": len(player_cards),
+        "player_careers": len(player_career_cards),
         "tournaments": len(tournament_cards),
         "samples": len(samples),
     }

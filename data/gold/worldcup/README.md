@@ -19,7 +19,8 @@ bash scripts/api.sh exec python ../../scripts/etl/worldcup/fact_cards.py --tourn
 | 文件 | 说明 |
 | :--- | :--- |
 | `fact_cards/matches.jsonl` | 比赛摘要 |
-| `fact_cards/players.jsonl` | 球员摘要 |
+| `fact_cards/players.jsonl` | 球员摘要（基础） |
+| `fact_cards/player_careers.jsonl` | **球员职业生涯**（进球/出场/奖项聚合，RAG 推荐） |
 | `fact_cards/tournaments.jsonl` | 赛会摘要 |
 | `fact_cards/samples.jsonl` | 10 条 spot-check 样例 |
 

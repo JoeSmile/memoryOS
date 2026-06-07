@@ -223,7 +223,8 @@ bash scripts/api.sh exec python ../../scripts/etl/worldcup/fact_cards.py
 bash scripts/api.sh exec python ../../scripts/etl/worldcup/fact_cards.py --tournament WC-2022
 ```
 
-输出：`data/gold/worldcup/fact_cards/{matches,players,tournaments,samples}.jsonl`。  
+输出：`data/gold/worldcup/fact_cards/{matches,players,player_careers,tournaments,samples}.jsonl`。  
+`player_careers.jsonl` 含进球（按届）、出场、奖项、红黄牌 — **EP04 球员问答优先 ingest 此文件**。  
 详见 [`data/gold/worldcup/README.md`](../../data/gold/worldcup/README.md)。
 
 黄金集 `WC-2022`：64 场、172 球、831 名单、决赛 `M-2022-64` 比分 3–3。
