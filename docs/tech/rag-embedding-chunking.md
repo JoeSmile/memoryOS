@@ -88,11 +88,28 @@
 
 **注意**：Mock 向量 **不反映真实语义**；全量数据 + live embed 才便于定位「查不准」是数据、切块还是模型问题。
 
+**V1 定案（2026-06-07，task 2.3）**：
+
+| 问题 | 决策 |
+|:-----|:-----|
+| 维度 1024 vs 更高 | **1024** 足够；更高维对 ~2.2 万短事实卡边际收益小，见讨论结论 |
+| 本地 dev | 配置 `OPENAI_API_KEY` → live **`text-embedding-v4`** |
+| CI / Harness | 无 Key → **`EmbeddingService` mock**（1024 维，确定性） |
+| 查询与入库 | **同一** `EmbeddingService` 实例/配置，禁止 query 用 live、库用 mock |
+
 ### 3.4 批量与速率
 
-- 全量 ~2.2 万条：宜 **batch**（如 32–100 条/批），批间 sleep 防 rate limit。  
-- 失败策略：**单条重试 3 次** → 记录失败 id → 摄入 exit 非 0 或 partial 报告（实施时二选一，记入 §6）。  
-- **幂等**：re-ingest 时先删旧 chunk 再 embed，避免双份向量。
+百炼 `text-embedding-v4` OpenAI 兼容接口 **单次最多 10 条** input；V1 摄入按此上限分批。
+
+| 参数 | V1 值 | 说明 |
+|:-----|:------|:-----|
+| **batch size** | **10** | 对齐 API 上限；`KnowledgeIngestService` 按批调用 `embed_texts` |
+| **批间间隔** | **0.5s** | 全量 ~2209 批，降低 DashScope 429；遇 429 计入重试 |
+| **失败重试** | **每批最多 3 次** | 指数退避 1s → 2s → 4s |
+| **仍失败** | **exit 1** | 日志打印 `collection` + 批内 `external_id`；**不** silent partial（可 fix 后整库 re-ingest，幂等） |
+| **Mock 路径** | 无 sleep | Harness 全速 |
+
+- **幂等**：re-ingest 时 **先删该 document 的全部 chunks，再 insert**（见 §6 re-ingest chunk）。
 
 ### 3.5 归一化与距离算子
 
@@ -109,7 +126,7 @@
 | 未归一化 + 错用内积 | 排序偏差 | 统一归一化或统一 cosine |
 | 全表扫 | 数据量大后变慢 | 见 §4 索引策略 |
 | 嵌入与原文不同步 | 删文档仍能搜到 | FK CASCADE + 摄入 replace 策略 |
-| 中文/英文混用同一模型 | 个别语种召回差 | 选多语模型（如 text-embedding-3-small 多语尚可） |
+| 中文/英文混用同一模型 | 个别语种召回差 | V1 用 **`text-embedding-v4`**（多语）；中英混排事实卡仍建议 live 抽测 |
 
 ### 3.8 本地 Ollama（可选，非 V1）
 
@@ -118,7 +135,7 @@
 | 维度 | 云 API（DashScope 等） | 本地 Ollama |
 |:-----|:-----------------------|:------------|
 | **成本/隐私** | 按量计费；数据出网 | 免费推理；数据不出本机 |
-| **Embedding 质量** | `text-embedding-3-small` 等多语稳定 | `nomic-embed-text`、`mxbai-embed-large` 等；英文为主时尚可，**中英混排事实卡需实测** |
+| **Embedding 质量** | **`text-embedding-v4`** 等多语稳定 | `nomic-embed-text`、`mxbai-embed-large` 等；英文为主时尚可，**中英混排事实卡需实测** |
 | **LLM 质量** | `qwen-turbo` 等商用模型 | 7B–14B 本地模型推理快但世界杯细节/数字 **易弱于** 云端大模型 |
 | **运维** | 配 Key 即可 | 需 RAM/VRAM（embed ~1GB，LLM 8B 常需 8GB+）；模型拉取与版本 |
 | **与 MemoryOS 集成** | 已有 `OPENAI_BASE_URL` + Key | 可设 `OPENAI_BASE_URL=http://127.0.0.1:11434/v1`（Ollama OpenAI 兼容）；**embedding 模型名需与 chat 分开配置**（V1 未做） |
@@ -164,15 +181,15 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 
 ## 5. 实施前讨论清单（与 AI/同伴过一遍）
 
-实施 task 2.x / 3.x 前，逐项定案并写入 §6：
+实施 task 2.x / 3.x 前，逐项定案并写入 §6。**粗体** 为 task 2.3 已关闭项：
 
-1. **Embedding**：Mock 384 是否足够本阶段？本地全量 ingest 是否必须 Live？  
-2. **批量大小与失败策略**：批大小、重试、partial fail 是否允许？  
-3. **players + player_careers**：search 默认是否限 `worldcup-player-careers`？  
-4. **samples.jsonl**：全量摄入是否保留（与主库内容重叠但 collection 独立）？  
-5. **pgvector 索引**：V1 是否加 HNSW？  
-6. **距离度量**：cosine + 归一化是否全员统一？  
-7. **re-ingest**：删 chunk 再 insert vs upsert embedding——选哪种？
+1. **Embedding**：~~Mock 384~~ → **1024 + v4**；本地 **live**，CI **mock** ✅  
+2. **批量大小与失败策略**：**batch 10 · 批间 0.5s · 重试 3 · 失败 exit 1** ✅  
+3. **players + player_careers**：search 默认 **`null`（全库）**；调用方可传 `collection` 过滤 ✅  
+4. **samples.jsonl**：**保留** 全量摄入（demo collection 独立） ✅  
+5. **pgvector 索引**：V1 **不加 HNSW** ✅  
+6. **距离度量**：检索 **`ORDER BY embedding <=> query`**（cosine）；live 向量由 API 返回，mock L2 归一化 ✅  
+7. **re-ingest chunk**：**删 document 下全部 chunks → insert 新 chunk** ✅  
 
 ---
 
@@ -190,8 +207,10 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 | Ollama | **V1 不接入**；V2 可选本地后端 | 2026-06-03 | 见 §3.8 |
 | re-ingest `updated_at` | `DocumentRepository.upsert` + `touch_updated_at` | 2026-06-07 | code review P1 |
 | 维度单一来源 | `app/core/rag_constants.py` + `Settings.embedding_dimensions` | 2026-06-07 | code review P2 |
-| 批量 embed batch size | — | — | 待 task 2.1 填 |
-| 失败重试策略 | — | — | 待 task 2.1 填 |
+| 批量 embed batch size | **10**（百炼 API 上限） | 2026-06-07 | task 2.3；批间 sleep 0.5s |
+| 失败重试策略 | **每批 3 次**（1s/2s/4s）；仍失败 **exit 1** + 日志 id | 2026-06-07 | task 2.3；ingest 实现见 task 3.2 |
+| 距离度量 | **cosine**（`<=>`） | 2026-06-07 | task 2.3 |
+| re-ingest chunk | **delete all chunks → insert** | 2026-06-07 | task 2.3 / design D5 |
 | search 默认 collection | `null`（不限，全库搜） | 2026-06-03 | 人审 B；可按需传 collection |
 | V1 是否 HNSW | **否**（~2.2 万行先暴力 scan + LIMIT） | 2026-06-07 | task 1.2 |
 | 全量 ingest 行数验收 | 预期 ~22090 | — | 待 task 3.3 跑完填实际数 |
@@ -207,4 +226,5 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 
 | 日期 | 说明 |
 |:-----|:-----|
+| 2026-06-07 | task 2.3：1024/v4 定案、batch/重试/cosine/re-ingest 写入 §3.4 与 §6 |
 | 2026-06-03 | 初稿：路径 A/B、切块/embedding/pgvector 坑表、实施讨论清单（ep04-rag propose） |

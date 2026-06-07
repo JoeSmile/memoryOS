@@ -41,7 +41,7 @@
 - [x] 2.2 unit：`tests/unit/test_embedding_service.py` mock 确定性
   - 预计文件：1 · 层：tests
 
-- [ ] 2.3 **与人讨论** embedding 决策（mock/live、batch、重试）并更新 `docs/tech/rag-embedding-chunking.md` §3 + §6
+- [x] 2.3 **与人讨论** embedding 决策（mock/live、batch、重试）并更新 `docs/tech/rag-embedding-chunking.md` §3 + §6
   - 预计文件：1 · 层：docs（**archive 前 §6 不得留空**）
 
 ## 3. Ingest
