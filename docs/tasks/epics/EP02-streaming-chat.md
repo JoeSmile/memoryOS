@@ -5,7 +5,7 @@
 | **周期**          | 第 3 周                                                                                        |
 | **优先级**        | P0                                                                                             |
 | **依赖**          | EP01、EP03                                                                                     |
-| **状态**          | 🟡 按 Program 7 Phase 推进                                                                     |
+| **状态**          | ✅ Program Phase 1–7 + follow-up 完成（待 PR #2 合并）                                            |
 | **OpenSpec 总控** | [`ep02-program`](../../../openspec/changes/ep02-program/) — **7 Phase 全部完成前不启动 EP04+** |
 | **子 change**     | 见下表                                                                                         |
 | **学习路线**      | [L02-streaming-langgraph.md](../learning/L02-streaming-langgraph.md)                           |
@@ -23,7 +23,7 @@
 | **4** | 最小 LangGraph                 | [`ep02-langgraph`](../../../openspec/changes/archive/2026-06-03-ep02-langgraph/)              | ✅                      |
 | **5** | SSE + Graph 上游               | [`ep02-chat-sse`](../../../openspec/changes/archive/2026-06-03-ep02-chat-sse/) 后端           | ✅                      |
 | **6** | 最小 `/chat` 冒烟              | [`ep02-chat-sse`](../../../openspec/changes/archive/2026-06-03-ep02-chat-sse/) 前端 + archive | ✅                      |
-| **7** | 分析向聊天壳（单会话、无侧栏） | [`ep02-chat-ui`](../../../openspec/changes/ep02-chat-ui/)                                     | 🟡 实现完成，待 archive |
+| **7** | 分析向聊天壳（单会话、无侧栏） | [`ep02-chat-ui`](../../../openspec/changes/archive/2026-06-07-ep02-chat-ui/)                | ✅                      |
 
 执行：`/work-next ep02-program` 或按 Phase 对子 change 说「继续实现」。  
 人审：每个 change 的 `tasks.md` §0。
@@ -131,6 +131,6 @@ abort 失效时仍有兜底。
 | C.12 | cancel 带 `visible_content`；UI 乐观冻结                    | Web · API     | 停住所见 = 落盘内容                                       | [x]  |
 | C.13 | 技术方案 + 踩坑文档                                         | Docs          | `docs/tech/chat-stream-cancel.md`                         | [x]  |
 
-**现状：** change `ep02-chat-cancel` 已实现（含 C.11–C.12 follow-up）；`pnpm test:api:harness` 全绿。  
+**现状：** change `ep02-chat-cancel` 已 archive（2026-06-07）；`pnpm test:api:harness` 29 passed。  
 **计费：** Stop 后尽最大努力停上游 HTTP + Redis cancel 标记；供应商侧停费非 100% 保证。  
 **详案：** [`docs/tech/chat-stream-cancel.md`](../../tech/chat-stream-cancel.md)
