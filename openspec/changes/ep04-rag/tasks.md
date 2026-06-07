@@ -30,7 +30,7 @@
 - [x] 1.2 Alembic `011`：`vector` 扩展 + `documents` / `document_chunks` + SQLAlchemy models
   - 预计文件：3 · 层：alembic、models
 
-- [ ] 1.3 更新 `docs/database.md` RAG 表说明
+- [x] 1.3 更新 `docs/database.md` RAG 表说明
   - 预计文件：1 · 层：docs
 
 ## 2. Embedding
