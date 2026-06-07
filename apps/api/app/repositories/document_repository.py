@@ -24,6 +24,14 @@ class DocumentRepository:
         )
         return result.scalar_one_or_none()
 
+    async def count_by_collection(self, collection: str) -> int:
+        result = await self.db.execute(
+            select(func.count())
+            .select_from(Document)
+            .where(Document.collection == collection)
+        )
+        return int(result.scalar_one())
+
     async def touch_updated_at(self, document_id: uuid.UUID) -> None:
         await self.db.execute(
             update(Document)

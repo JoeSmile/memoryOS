@@ -46,7 +46,7 @@
 
 ## 3. Ingest
 
-- [ ] 3.1 `DocumentRepository` + `DocumentChunkRepository`
+- [x] 3.1 `DocumentRepository` + `DocumentChunkRepository`
   - 预计文件：2 · 层：repositories
 
 - [ ] 3.2 `KnowledgeIngestService`：摄入 `fact_cards/` 下全部 Gold JSONL（5 文件，见 design D5）
