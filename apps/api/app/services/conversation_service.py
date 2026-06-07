@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cache import ConversationCache
 from app.core.exceptions import AppException
-from app.models import Conversation
+from app.models import Conversation, Message
 from app.repositories import (
     ConversationRepository,
     MessageRepository,
@@ -58,6 +58,27 @@ class ConversationService:
         if user is None:
             raise AppException(code=40401, message="user_not_found", status_code=404)
         return await self.conversations.create(user_id=user_id, title=title)
+
+    async def create_with_first_message(
+        self,
+        user_id: uuid.UUID,
+        title: str,
+        content: str,
+        *,
+        role: str = "user",
+    ) -> tuple[Conversation, Message]:
+        user = await self.users.get_by_id(user_id)
+        if user is None:
+            raise AppException(code=40401, message="user_not_found", status_code=404)
+        conversation = await self.conversations.create(user_id=user_id, title=title)
+        message = await self.messages.create(
+            conversation_id=conversation.id,
+            role=role,
+            content=content,
+        )
+        await self.conversations.touch_updated_at(conversation.id)
+        await self.conversations.db.refresh(conversation)
+        return conversation, message
 
     async def touch_activity(self, conversation_id: uuid.UUID) -> None:
         """Bump updated_at when messages are persisted (resume /me ordering)."""

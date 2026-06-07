@@ -2,5 +2,52 @@ from app.models.base import Base
 from app.models.conversation import Conversation
 from app.models.message import Message
 from app.models.user import User
+from app.models.worldcup import (
+    WcAward,
+    WcAwardWinner,
+    WcBooking,
+    WcConfederation,
+    WcGoal,
+    WcGroupStanding,
+    WcMatch,
+    WcPenaltyKick,
+    WcPlayer,
+    WcPlayerAppearance,
+    WcPlayerTournamentYear,
+    WcQualifiedTeam,
+    WcReferee,
+    WcRefereeAppearance,
+    WcSquad,
+    WcSubstitution,
+    WcStadium,
+    WcTeam,
+    WcTeamMatchStat,
+    WcTournament,
+)
 
-__all__ = ["Base", "User", "Conversation", "Message"]
+__all__ = [
+    "Base",
+    "User",
+    "Conversation",
+    "Message",
+    "WcConfederation",
+    "WcAward",
+    "WcAwardWinner",
+    "WcQualifiedTeam",
+    "WcGroupStanding",
+    "WcReferee",
+    "WcRefereeAppearance",
+    "WcTeam",
+    "WcTournament",
+    "WcStadium",
+    "WcPlayer",
+    "WcPlayerAppearance",
+    "WcPlayerTournamentYear",
+    "WcMatch",
+    "WcTeamMatchStat",
+    "WcGoal",
+    "WcSquad",
+    "WcBooking",
+    "WcSubstitution",
+    "WcPenaltyKick",
+]

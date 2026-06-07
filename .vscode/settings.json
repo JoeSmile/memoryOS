@@ -1,8 +1,8 @@
 {
-  // Markdown：保存时用 Prettier 排版（docs/tech/knowledge 等），无需每次让 AI 改格式
+  // Markdown：关闭保存时格式化（长表格/规划文档不被 Prettier 折行）；需要时 Shift+Option+F
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.wordWrap": "on"
   },
   // 保存自动格式化

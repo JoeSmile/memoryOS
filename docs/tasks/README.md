@@ -22,6 +22,7 @@
 | EP03 | 1-2 周并行 | [epics/EP03-data-storage.md](./epics/EP03-data-storage.md) | [L01 基建](./learning/L01-foundation.md) |
 | EP02 | 第 3 周 | [epics/EP02-streaming-chat.md](./epics/EP02-streaming-chat.md) | [L02 流式+LangGraph](./learning/L02-streaming-langgraph.md) |
 | EP04 | 4-5 周 | [epics/EP04-rag.md](./epics/EP04-rag.md) | [L03 RAG 双架构](./learning/L03-rag-dual-stack.md) |
+| EP04-01 | EP04 第 1 周 | [epics/EP04-01-worldcup-data-etl.md](./epics/EP04-01-worldcup-data-etl.md) | L03 §1 · 结构化 ETL |
 | EP05 | 第 6 周 | [epics/EP05-agent.md](./epics/EP05-agent.md) | [L04 Agent](./learning/L04-agent.md) |
 | EP06 | 第 7 周 | [epics/EP06-memory.md](./epics/EP06-memory.md) | [L05 记忆+工作流](./learning/L05-memory-workflow.md) |
 | EP07 | 第 7 周 | [epics/EP07-workflow.md](./epics/EP07-workflow.md) | [L05 记忆+工作流](./learning/L05-memory-workflow.md) |

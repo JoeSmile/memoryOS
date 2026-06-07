@@ -169,6 +169,42 @@ async def test_conversations_me_orders_by_last_message_activity(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_conversations_create_with_initial_message_atomic():
+    transport = ASGITransport(app=app)
+
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        token, user_id = await _register_and_login(client)
+        headers = {"Authorization": f"Bearer {token}"}
+
+        create_resp = await client.post(
+            "/api/v1/conversations",
+            json={
+                "user_id": user_id,
+                "title": "With first message",
+                "initial_message": "Hello harness",
+            },
+        )
+        assert create_resp.status_code == 200
+        create_body = create_resp.json()
+        _envelope(create_body)
+        conv_id = create_body["data"]["id"]
+        initial = create_body["data"]["initial_message"]
+        assert initial["content"] == "Hello harness"
+        assert initial["role"] == "user"
+        assert initial["conversation_id"] == conv_id
+
+        messages_resp = await client.get(
+            f"/api/v1/conversations/{conv_id}/messages",
+            headers=headers,
+        )
+        assert messages_resp.status_code == 200
+        messages_body = messages_resp.json()
+        _envelope(messages_body)
+        assert len(messages_body["data"]) == 1
+        assert messages_body["data"][0]["content"] == "Hello harness"
+
+
+@pytest.mark.asyncio
 async def test_conversations_invalid_user_id_query():
     transport = ASGITransport(app=app)
 
