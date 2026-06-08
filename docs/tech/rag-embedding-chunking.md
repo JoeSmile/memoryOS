@@ -191,6 +191,8 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 5. **pgvector 索引**：V1 **不加 HNSW** ✅  
 6. **距离度量**：检索 **`ORDER BY embedding <=> query`**（cosine）；live 向量由 API 返回，mock L2 归一化 ✅  
 7. **re-ingest chunk**：**删 document 下全部 chunks → insert 新 chunk** ✅  
+8. **ingest 并发锁**：**per-stem Redis NX**；冲突 **40902** ✅（task 4.3+）  
+9. **ingest skip 未变行**：**metadata 三元组** hash + model + dim ✅（task 4.3+）
 
 ---
 
@@ -214,7 +216,10 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 | re-ingest chunk | **delete all chunks → insert** | 2026-06-07 | task 2.3 / design D5 |
 | search 默认 collection | `null`（不限，全库搜） | 2026-06-03 | 人审 B；可按需传 collection |
 | V1 是否 HNSW | **否**（~2.2 万行先暴力 scan + LIMIT） | 2026-06-07 | task 1.2 |
-| 全量 ingest 行数验收 | 预期 ~22090 | — | 待 task 3.3 跑完填实际数 |
+| ingest 并发锁 | **per-stem Redis `SET NX`**，TTL **1h** | 2026-06-08 | key `memoryos:ingest:worldcup:stem:{stem}`；全量 vs `--collections samples` 共享 `samples` 锁；冲突 **HTTP 40902** / CLI exit 1 |
+| ingest skip（未变行） | **`documents.metadata`** 存 `content_hash` + `embedding_model` + `embedding_dimensions` | 2026-06-08 | 三者均匹配则 **不 embed、不写 chunk**；换模型/维度/text 变更仍 re-embed |
+| ingest 锁 fallback | Redis 异常 → **进程内 mutex**（与 `CompletionTurnLock` 同模式） | 2026-06-08 | Harness/单进程可用；**生产多 worker ingest 须配 `REDIS_URL`** |
+| 全量 ingest 行数验收 | 预期 **~22090**；`--collections samples` 已验证 **10 行** | 2026-06-08 | task 3.3 CLI；全量 live 待 dev 跑完 |
 
 ### 6.1 实施后复盘（可选）
 
@@ -227,5 +232,6 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 
 | 日期 | 说明 |
 |:-----|:-----|
+| 2026-06-08 | ingest 并发锁（per-stem Redis）+ content skip（metadata 三元组）写入 §5/§6 |
 | 2026-06-07 | task 2.3：1024/v4 定案、batch/重试/cosine/re-ingest 写入 §3.4 与 §6 |
 | 2026-06-03 | 初稿：路径 A/B、切块/embedding/pgvector 坑表、实施讨论清单（ep04-rag propose） |

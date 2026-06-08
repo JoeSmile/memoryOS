@@ -30,3 +30,8 @@ def stream_cancel_visible_key(stream_id: str) -> str:
 
 def stream_cancel_visible_len_key(stream_id: str) -> str:
     return f"memoryos:stream_cancel_visible_len:{stream_id}"
+
+
+def worldcup_ingest_stem_lock_key(stem: str) -> str:
+    """One in-flight ingest per jsonl stem (subset vs full ingest share stem locks)."""
+    return f"memoryos:ingest:worldcup:stem:{stem}"

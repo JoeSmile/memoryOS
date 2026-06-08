@@ -20,3 +20,20 @@ class KnowledgeChunkHit(BaseModel):
 
 class KnowledgeSearchResult(BaseModel):
     chunks: list[KnowledgeChunkHit]
+
+
+class KnowledgeIngestRequest(BaseModel):
+    collections: list[str] | None = None
+
+
+class KnowledgeIngestCollectionData(BaseModel):
+    collection: str
+    lines_read: int
+    documents_created: int
+    documents_updated: int
+    documents_skipped: int = 0
+
+
+class KnowledgeIngestData(BaseModel):
+    total_lines: int
+    collections: list[KnowledgeIngestCollectionData]

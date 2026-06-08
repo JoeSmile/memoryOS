@@ -67,7 +67,7 @@
 - [x] 4.2 `KnowledgeSearchService` + schemas
   - 预计文件：2 · 层：services、schemas
 
-- [ ] 4.3 Router `POST /knowledge/search` + `POST /knowledge/ingest/worldcup` + 注册 main
+- [x] 4.3 Router `POST /knowledge/search` + `POST /knowledge/ingest/worldcup` + 注册 main
   - 预计文件：2 · 层：api
 
 ## 5. Closeout

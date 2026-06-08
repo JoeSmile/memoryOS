@@ -47,6 +47,17 @@ class EmbeddingService:
     def use_mock(self) -> bool:
         return self._settings.use_mock_embedding
 
+    @property
+    def model_label(self) -> str:
+        """Stored on documents.metadata to invalidate skip when model/mode changes."""
+        if self.use_mock:
+            return "mock"
+        return self._settings.embedding_model
+
+    @property
+    def embedding_dimensions(self) -> int:
+        return self._settings.embedding_dimensions
+
     async def embed_texts(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             return []

@@ -13,7 +13,13 @@ from app.main import app
 SAMPLES_STEM = "samples"
 SAMPLES_COLLECTION = "worldcup-samples"
 SAMPLES_LINE_COUNT = 10
-SEEDED_QUERY = "Argentina vs France final 2022-12-18"
+# Mock embed is hash-based: only exact text match guarantees top hit.
+SEEDED_QUERY = (
+    "[Match] 2022 FIFA Men's World Cup · Argentina vs France · final · 2022-12-18\n"
+    "Score: 3-3 (ET), penalties 4-2. Stadium: Lusail Stadium, Lusail.\n"
+    "Goals: Lionel Messi (pen) (23'), Ángel Di María (36'), Kylian Mbappé (pen) (80'), "
+    "Kylian Mbappé (81'), Lionel Messi (108'), Kylian Mbappé (pen) (118')."
+)
 
 
 def _envelope(body: dict) -> None:
@@ -49,6 +55,33 @@ async def _ingest_samples(client: AsyncClient, headers: dict[str, str]) -> dict:
     body = resp.json()
     _envelope(body)
     return body["data"]
+
+
+@pytest.fixture(autouse=True)
+def _clear_worldcup_ingest_locks():
+    from app.cache import ingest_lock
+    from app.cache.keys import worldcup_ingest_stem_lock_key
+    from app.core.config import settings
+    from app.services.knowledge_ingest_service import DEFAULT_COLLECTION_STEMS
+
+    def _clear() -> None:
+        ingest_lock._LOCAL_KEYS.clear()
+        if not settings.redis_url:
+            return
+        import redis
+
+        client = redis.from_url(settings.redis_url, decode_responses=True)
+        try:
+            keys = [
+                worldcup_ingest_stem_lock_key(stem) for stem in DEFAULT_COLLECTION_STEMS
+            ]
+            client.delete(*keys)
+        finally:
+            client.close()
+
+    _clear()
+    yield
+    _clear()
 
 
 @pytest.fixture
@@ -93,7 +126,11 @@ async def test_knowledge_ingest_worldcup_samples(mock_embedding):
         assert SAMPLES_COLLECTION in collections
         item = collections[SAMPLES_COLLECTION]
         assert item["lines_read"] == SAMPLES_LINE_COUNT
-        assert item["documents_created"] + item["documents_updated"] == SAMPLES_LINE_COUNT
+        assert (
+            item["documents_created"]
+            + item["documents_updated"]
+            + item.get("documents_skipped", 0)
+        ) == SAMPLES_LINE_COUNT
 
 
 @pytest.mark.asyncio
@@ -110,7 +147,8 @@ async def test_knowledge_ingest_idempotent_samples(mock_embedding):
         item = collections[SAMPLES_COLLECTION]
         assert item["lines_read"] == SAMPLES_LINE_COUNT
         assert item["documents_created"] == 0
-        assert item["documents_updated"] == SAMPLES_LINE_COUNT
+        assert item["documents_updated"] == 0
+        assert item["documents_skipped"] == SAMPLES_LINE_COUNT
 
 
 @pytest.mark.asyncio
@@ -146,6 +184,35 @@ async def test_knowledge_search_returns_ranked_chunks(mock_embedding):
         scores = [chunk["score"] for chunk in chunks]
         assert scores == sorted(scores, reverse=True)
         assert any("Argentina" in chunk["content"] for chunk in chunks)
+
+
+@pytest.mark.asyncio
+async def test_knowledge_ingest_rejects_when_stem_lock_held(mock_embedding, monkeypatch):
+    from app.cache.ingest_lock import WorldcupIngestLock
+
+    async def _no_redis():
+        yield None
+
+    monkeypatch.setattr("app.api.v1.knowledge.get_redis", _no_redis)
+
+    lock = WorldcupIngestLock(None)
+    assert await lock.try_acquire((SAMPLES_STEM,))
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            token = await _register_and_login(client)
+            headers = {"Authorization": f"Bearer {token}"}
+            resp = await client.post(
+                "/api/v1/knowledge/ingest/worldcup",
+                headers=headers,
+                json={"collections": [SAMPLES_STEM]},
+            )
+            assert resp.status_code == 409
+            body = resp.json()
+            assert body["code"] == 40902
+            assert body["message"] == "ingest_in_progress"
+    finally:
+        await lock.release((SAMPLES_STEM,))
 
 
 @pytest.mark.asyncio
