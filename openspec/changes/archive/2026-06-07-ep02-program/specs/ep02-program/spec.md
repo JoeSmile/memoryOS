@@ -2,7 +2,7 @@
 
 ### Requirement: Seven-phase EP02 delivery order
 
-The project SHALL complete EP02 work in seven ordered phases documented in `openspec/changes/ep02-program/tasks.md` before starting EP04 or later feature epics.
+The project SHALL complete EP02 work in seven ordered phases documented in `openspec/changes/archive/2026-06-07-ep02-program/tasks.md` before starting EP04 or later feature epics.
 
 #### Scenario: Phase gate
 

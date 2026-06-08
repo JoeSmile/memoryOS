@@ -2,7 +2,7 @@
 
 - **现状**：`conversations` CRUD 存在，通过 query `user_id` 未强制 JWT 绑定；`messages` 表与 `StreamCache` 已有（EP03.3）；`/chat` 为占位页；JWT + `apiFetch` 已就绪。
 - **约束**：统一 HTTP 错误体 `{ code, message, data }`；SSE 数据帧内用 **JSON** 描述事件；分层 Router → Service → Repository。
-- **依赖**：**必须** `ep02-langgraph` archive；**推荐** `ep03-db-optimize`（[`ep02-program`](../ep02-program/tasks.md) Phase 1）。
+- **依赖**：**必须** `ep02-langgraph` archive；**推荐** `ep03-db-optimize`（[`ep02-program`](../2026-06-07-ep02-program/tasks.md) Phase 1）。
 
 ## Goals / Non-Goals
 
@@ -78,5 +78,5 @@
 
 ## Open Questions
 
-- [ ] 是否在 apply 前合并 `ep03-db-optimize` 的「创建会话+首条消息」API？（推荐是）
+- [x] 是否在 apply 前合并 `ep03-db-optimize` 的「创建会话+首条消息」API？（推荐是）
 - [ ] `ep02-chat-ui` 是否复用本 change 的 `/chat` 或新建 `/chat/[id]`？（建议 ui change 再迁路由）

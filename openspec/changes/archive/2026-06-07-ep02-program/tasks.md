@@ -7,10 +7,10 @@
 
 ### Review checklist
 
-- [ ] Phase 6（最小 /chat）合并在 `ep02-chat-sse` 是否接受
-- [ ] 子 change 列表完整：`ep03-db-optimize` → `ep02-langgraph` →
+- [x] Phase 6（最小 /chat）合并在 `ep02-chat-sse` 是否接受
+- [x] 子 change 列表完整：`ep03-db-optimize` → `ep02-langgraph` →
       `ep02-chat-sse` → `ep02-chat-ui`
-- [ ] Phase 2 学习产出可验收
+- [x] Phase 2 学习产出可验收
 
 **Reviewer notes:**
 
@@ -18,10 +18,10 @@
 
 ## Phase 1 — 数据层收尾
 
-**子 change：** [`ep03-db-optimize`](../ep03-db-optimize/)  
+**子 change：** [`ep03-db-optimize`](../2026-06-07-ep03-db-optimize/)  
 **Done：** archive + EP03 Story 3.5 勾选
 
-- [ ] 1.1 完成并 archive `ep03-db-optimize`（`pnpm test:api:harness` 绿）
+- [x] 1.1 完成并 archive `ep03-db-optimize`（`pnpm test:api:harness` 绿）
 
 ---
 

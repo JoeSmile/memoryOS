@@ -4,8 +4,8 @@
 | :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **周期**     | 第 1-2 周（与 EP01 并行）                                                                                                                                    |
 | **优先级**   | P0                                                                                                                                                           |
-| **状态**     | 🟡 进行中（3.1–3.4 完成，3.5 待做）                                                                                                                          |
-| **OpenSpec** | 进行中 [`ep03-db-optimize`](../../../openspec/changes/ep03-db-optimize/)（**EP02 Program Phase 1**）· 已归档 [`ep03-jwt`](../../../openspec/changes/archive/2026-05-22-ep03-jwt/) · [`ep03-redis`](../../../openspec/changes/archive/2026-05-22-ep03-redis/) |
+| **状态**     | ✅ 完成（Story 3.1–3.5）                                                                                                                                     |
+| **OpenSpec** | 已归档 [`ep03-data-storage`](../../../openspec/changes/archive/2026-05-22-ep03-data-storage/) · [`ep03-jwt`](../../../openspec/changes/archive/2026-05-22-ep03-jwt/) · [`ep03-redis`](../../../openspec/changes/archive/2026-05-22-ep03-redis/) · [`ep03-db-optimize`](../../../openspec/changes/archive/2026-06-07-ep03-db-optimize/)（EP02 Program Phase 1） |
 | **学习路线** | [L01-foundation.md](../learning/L01-foundation.md) · [L00](../learning/L00-ai-collab-stack.md)                                                               |
 
 ---
@@ -47,8 +47,8 @@
 
 ## 同步学习
 
-- [ ] [L00](../learning/L00-ai-collab-stack.md) OpenSpec 本变更 propose →
-      archive
+- [x] [L00](../learning/L00-ai-collab-stack.md) OpenSpec 本变更 propose →
+      archive（`ep03-*` changes 均已 archive）
 - [ ] SQLAlchemy ORM 高阶用法（理解 / 落地）
 - [ ] Alembic 迁移流程（理解 / 落地）
 - [ ] Redis 过期策略与会话缓存设计（理解 / 落地）

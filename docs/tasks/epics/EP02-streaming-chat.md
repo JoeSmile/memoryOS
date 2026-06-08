@@ -5,8 +5,8 @@
 | **周期**          | 第 3 周                                                                                        |
 | **优先级**        | P0                                                                                             |
 | **依赖**          | EP01、EP03                                                                                     |
-| **状态**          | ✅ Program Phase 1–7 + follow-up 完成（待 PR #2 合并）                                            |
-| **OpenSpec 总控** | [`ep02-program`](../../../openspec/changes/ep02-program/) — **7 Phase 全部完成前不启动 EP04+** |
+| **状态**          | ✅ Program Phase 1–7 + follow-up 完成（已合并 `main`）                                          |
+| **OpenSpec 总控** | 已归档 [`ep02-program`](../../../openspec/changes/archive/2026-06-07-ep02-program/)            |
 | **子 change**     | 见下表                                                                                         |
 | **学习路线**      | [L02-streaming-langgraph.md](../learning/L02-streaming-langgraph.md)                           |
 | **目标文档**      | `docs/tech/langgraph-chat.md` · Stop/Cancel：[`chat-stream-cancel.md`](../../tech/chat-stream-cancel.md) |
@@ -17,7 +17,7 @@
 
 | Phase | 内容                           | OpenSpec / 产出                                                                               | 状态                    |
 | :---: | :----------------------------- | :-------------------------------------------------------------------------------------------- | :---------------------- |
-| **1** | 数据层收尾                     | [`ep03-db-optimize`](../../../openspec/changes/ep03-db-optimize/)                             | ⬜                      |
+| **1** | 数据层收尾                     | [`ep03-db-optimize`](../../../openspec/changes/archive/2026-06-07-ep03-db-optimize/)          | ✅                      |
 | **2** | LangGraph 学习                 | L02 §5 + `langgraph-chat.md`                                                                  | ✅                      |
 | **3** | LangSmith 环境                 | 并入 Phase 4（`.env.example`）                                                                | ✅                      |
 | **4** | 最小 LangGraph                 | [`ep02-langgraph`](../../../openspec/changes/archive/2026-06-03-ep02-langgraph/)              | ✅                      |

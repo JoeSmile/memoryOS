@@ -62,7 +62,7 @@ Harness L2/L3 等 EP02 再说。
 
 | 何时打开       | 文档                                    |
 | :------------- | :-------------------------------------- |
-| EP02 七阶段顺序 | `openspec/changes/ep02-program/tasks.md` |
+| EP02 七阶段顺序 | `openspec/changes/archive/2026-06-07-ep02-program/tasks.md` |
 | 不知道本周干啥 | `docs/tasks/epics/EP02-*.md`（EP04 前做完 Program） |
 | 概念忘了       | `docs/tech/ai-collab-stack.md`          |
 | 规范/PR 怎么写 | `docs/tech/ai-collab-best-practices.md` |
