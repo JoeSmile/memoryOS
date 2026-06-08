@@ -55,8 +55,8 @@
 
 ## 7. Closeout
 
-- [ ] 7.1 `pnpm test:api:harness` 全绿；勾选 `docs/tasks/epics/EP04-rag.md` Story 4.4/4.6 首项
+- [x] 7.1 `pnpm test:api:harness` 全绿；勾选 `docs/tasks/epics/EP04-rag.md` Story 4.4/4.6 首项
   - 预计文件：1 · 层：`docs/epic`
 
-- [ ] 7.2 archive change
+- [x] 7.2 archive change
   - 预计文件：0 · openspec archive

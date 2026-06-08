@@ -3,9 +3,7 @@
 ## Purpose
 
 SSE streaming chat completions for EP02: authenticated users send messages and receive token-level assistant output via `POST /api/v1/chat/completions`.
-
 ## Requirements
-
 ### Requirement: Chat completions SSE endpoint
 
 The API SHALL expose `POST /api/v1/chat/completions` that returns `text/event-stream` for authenticated users.
@@ -39,15 +37,15 @@ Each SSE `data:` line SHALL be a JSON object with `event` and `data` fields.
 - **WHEN** model produces incremental text
 - **THEN** a line is sent as `{"event":"token","data":{"content":"<string>"}}`
 
-#### Scenario: Start event shape
+#### Scenario: Sources event for RAG chat
 
-- **WHEN** stream begins for an authenticated completion
-- **THEN** a line is sent as `{"event":"start","data":{"stream_id":"<uuid>"}}`
+- **WHEN** chat completion uses RAG retrieval and qualifying knowledge chunks exist
+- **THEN** a line is sent as `{"event":"sources","data":{"items":[...]}}` after `start` and before the first `token` event
 
-#### Scenario: Done event shape
+#### Scenario: Done event may include sources summary
 
-- **WHEN** stream completes successfully
-- **THEN** a line is sent as `{"event":"done","data":{"message_id":"<uuid>","stream_id":"<uuid>"}}` and assistant message is persisted
+- **WHEN** a RAG chat stream completes successfully with qualifying sources
+- **THEN** the final `done` event MAY include `data.sources` mirroring the earlier `sources` event items for client binding to `message_id`
 
 ### Requirement: User message persistence before stream
 
@@ -85,3 +83,4 @@ The system SHALL stop reading the model stream and close upstream LLM HTTP when 
 
 - **WHEN** cancel marker is set for the active `stream_id`
 - **THEN** upstream consumption stops without waiting for another client disconnect
+

@@ -30,7 +30,7 @@
 ## Story 4.4 LangChain 快速 RAG
 
 - [x] 轻量化 RAG Pipeline（**首 slice**：Gold ingest → embed → `POST /knowledge/search`；**不含**生成 · `ep04-rag` ✅）
-- [ ] 满足快速问答与 Demo（需 chat 接入 · 后续）
+- [x] 满足快速问答与 Demo（LangGraph retrieve + chat SSE · `ep04-rag-chat` ✅）
 
 ## Story 4.5 LlamaIndex 自研体系
 
@@ -41,9 +41,9 @@
 
 ## Story 4.6 对话与溯源
 
-- [ ] RAG Prompt 模板（`ep04-rag-chat` 排期）
-- [ ] 答案引用来源（文档名、片段、页码）— V1 Markdown 脚注；**structured chips** 见 [`chat-rag-stream.md`](../../tech/chat-rag-stream.md)
-- [ ] 无命中兜底策略（`ep04-rag-chat` 排期）
+- [x] RAG Prompt 模板（`ep04-rag-chat` ✅）
+- [x] 答案引用来源（V1 Markdown 脚注 · `ep04-rag-chat` ✅；**structured chips** 见 [`chat-rag-stream.md`](../../tech/chat-rag-stream.md)）
+- [x] 无命中兜底策略（`ep04-rag-chat` ✅）
 
 ## Story 4.7 维护与双模式
 

@@ -3,9 +3,7 @@
 ## Purpose
 
 Single-session analysis chat shell for EP02 Phase 7: message stream, Markdown, management hooks, no sidebar.
-
 ## Requirements
-
 ### Requirement: Single-session chat layout without sidebar
 
 The web application SHALL provide a chat page focused on one conversation at a time without a multi-conversation sidebar.
@@ -79,3 +77,18 @@ The web application SHALL expose Core Web Vitals in local development and provid
 
 - **WHEN** developer runs `pnpm lighthouse:chat` with web dev server on port 3000
 - **THEN** a performance HTML report is written under `apps/web/.lighthouse/`
+
+### Requirement: RAG reference section in assistant Markdown
+
+The chat UI SHALL render assistant messages that include a `## 参考来源` Markdown section with readable styling distinct from the main answer body.
+
+#### Scenario: Reference section visible after stream
+
+- **WHEN** assistant streaming completes and content includes `## 参考来源`
+- **THEN** the reference block is displayed below the main answer with subdued typography or collapsible presentation
+
+#### Scenario: Messages without references unchanged
+
+- **WHEN** assistant content has no reference heading
+- **THEN** message layout matches pre-RAG chat rendering
+
