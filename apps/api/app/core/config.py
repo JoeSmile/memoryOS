@@ -2,7 +2,7 @@ import logging
 import os
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.core.rag_constants import EMBEDDING_DIMENSIONS
@@ -45,6 +45,27 @@ class Settings(BaseSettings):
     embedding_model: str = Field(
         default="text-embedding-v4",
         description="DashScope/OpenAI-compatible embedding model when API key is set",
+    )
+
+    rag_chat_enabled: bool = Field(
+        default=True,
+        description="Inject knowledge retrieval before chat generation (RAG_CHAT_ENABLED)",
+    )
+    rag_chat_top_k: int = Field(
+        default=5,
+        ge=1,
+        le=50,
+        description="Max chunks passed to RAG prompt (RAG_CHAT_TOP_K)",
+    )
+    rag_chat_min_score: float = Field(
+        default=0.35,
+        ge=0.0,
+        le=1.0,
+        description="Min similarity score (1 - cosine distance) to include a chunk (RAG_CHAT_MIN_SCORE)",
+    )
+    rag_chat_collection: str | None = Field(
+        default=None,
+        description="Optional collection filter; unset searches all ingested collections (RAG_CHAT_COLLECTION)",
     )
 
     redis_url: str | None = Field(
@@ -101,6 +122,13 @@ class Settings(BaseSettings):
         default="https://api.smith.langchain.com",
         description="LangSmith API endpoint (LANGSMITH_ENDPOINT)",
     )
+
+    @field_validator("rag_chat_collection", mode="before")
+    @classmethod
+    def _blank_rag_chat_collection_as_none(cls, value: object) -> object:
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
 
     @property
     def cors_origin_list(self) -> list[str]:
