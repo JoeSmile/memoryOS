@@ -2,7 +2,7 @@
 
 > propose 完成后 **必须停在这里**等人审；未勾选前 **禁止** 写业务代码。
 
-- [ ] **Tasks reviewed by human** — 人审通过后再 `/opsx:apply`、`/work-next` 或说「继续实现」
+- [x] **Tasks reviewed by human** — 人审通过后再 `/opsx:apply`、`/work-next` 或说「继续实现」
 
 ### Review checklist
 
@@ -22,12 +22,12 @@
 
 ## 1. Settings
 
-- [ ] 1.1 `Settings` 增加 `rag_chat_enabled` / `top_k` / `min_score` / `collection` + `.env.example`
+- [x] 1.1 `Settings` 增加 `rag_chat_enabled` / `top_k` / `min_score` / `collection` + `.env.example`
   - 预计文件：2 · 层：`core/config` + `.env.example`
 
 ## 2. RAG prompt
 
-- [ ] 2.1 `rag_chat_prompt.py`：build system message（有命中 / 无命中两模板）
+- [x] 2.1 `rag_chat_prompt.py`：build system message（有命中 / 无命中两模板）
   - 预计文件：1 · 层：`graphs/prompts`
 
 ## 3. LangGraph retrieve
