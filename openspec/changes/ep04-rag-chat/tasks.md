@@ -32,7 +32,7 @@
 
 ## 3. LangGraph retrieve
 
-- [ ] 3.1 `ChatState` 增加 `retrieved_chunks`；`retrieve_knowledge` 节点 + 图拓扑
+- [x] 3.1 `ChatState` 增加 `retrieved_chunks`；`retrieve_knowledge` 节点 + 图拓扑
   - 预计文件：3 · 层：`graphs/`（`chat_state.py`、`nodes/retrieve.py`、`chat_graph.py`）
 
 - [ ] 3.2 `ChatGraphRunner` 注入 `db` 到 `configurable`；`call_model` 消费 RAG system prompt
