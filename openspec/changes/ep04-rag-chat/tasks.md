@@ -45,7 +45,7 @@
 
 ## 5. Harness
 
-- [ ] 5.1 `tests/harness/test_rag_chat_contract.py`：ingest samples → chat → assert sources + tokens + no-hit case
+- [x] 5.1 `tests/harness/test_rag_chat_contract.py`：ingest samples → chat → assert sources + tokens + no-hit case
   - 预计文件：1 · 层：`tests/harness`（TDD 先写）
 
 ## 6. Frontend（最小溯源 UI）
