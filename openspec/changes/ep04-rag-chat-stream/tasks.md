@@ -31,10 +31,10 @@
 
 ## 2. BFF Data Stream
 
-- [ ] 2.1 `memoryos-upstream.ts`：`memoryosSseResponseToDataStream`（保留 `onStreamId` / `drainThenAbort` / `clientStopped`）
+- [x] 2.1 `memoryos-upstream.ts`：`memoryosSseResponseToDataStream`（保留 `onStreamId` / `drainThenAbort` / `clientStopped`）
   - 预计文件：1 · 层：`apps/web/lib`
 
-- [ ] 2.2 `route.ts` + `use-chat-session.ts`：切换 Data Stream transport 与响应 MIME
+- [x] 2.2 `route.ts` + `use-chat-session.ts`：切换 Data Stream transport 与响应 MIME
   - 预计文件：2 · 层：BFF route + hook
 
 ## 3. API 持久化

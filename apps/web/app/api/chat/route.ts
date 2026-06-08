@@ -1,12 +1,33 @@
 import type { UIMessage } from "ai";
+import { UI_MESSAGE_STREAM_HEADERS } from "ai";
 
 import { getTextFromUIMessage } from "@/lib/chat-types";
 import {
   fetchMemoryosChatCompletion,
-  memoryosSseResponseToTextStream,
+  memoryosSseResponseToDataStream,
 } from "@/lib/memoryos-upstream";
 
 export const maxDuration = 60;
+
+const EMPTY_UI_MESSAGE_STREAM_BODY = [
+  'data: {"type":"start"}\n\n',
+  'data: {"type":"start-step"}\n\n',
+  'data: {"type":"finish-step"}\n\n',
+  'data: {"type":"finish"}\n\n',
+  "data: [DONE]\n\n",
+].join("");
+
+function uiMessageStreamResponse(
+  body: BodyInit,
+  extraHeaders?: Record<string, string>,
+): Response {
+  return new Response(body, {
+    headers: {
+      ...UI_MESSAGE_STREAM_HEADERS,
+      ...extraHeaders,
+    },
+  });
+}
 
 type ChatRouteBody = {
   id?: string;
@@ -83,12 +104,8 @@ export async function POST(req: Request) {
           message?: string;
         };
         if (payload.code === 40902 && payload.message === "duplicate_message") {
-          return new Response(new ReadableStream({ start(c) { c.close(); } }), {
-            status: 200,
-            headers: {
-              "Content-Type": "text/plain; charset=utf-8",
-              "X-Chat-Duplicate": "1",
-            },
+          return uiMessageStreamResponse(EMPTY_UI_MESSAGE_STREAM_BODY, {
+            "X-Chat-Duplicate": "1",
           });
         }
       } catch {
@@ -102,7 +119,7 @@ export async function POST(req: Request) {
   }
 
   let streamId = upstream.headers.get("X-Stream-Id");
-  const textStream = memoryosSseResponseToTextStream(upstream, {
+  const dataStream = memoryosSseResponseToDataStream(upstream, {
     onStreamId: (id) => {
       streamId = id;
     },
@@ -113,13 +130,11 @@ export async function POST(req: Request) {
   });
 
   const responseHeaders: Record<string, string> = {
-    "Content-Type": "text/plain; charset=utf-8",
-    "Cache-Control": "no-cache, no-transform",
-    Connection: "keep-alive",
+    ...UI_MESSAGE_STREAM_HEADERS,
   };
   if (streamId) {
     responseHeaders["X-Stream-Id"] = streamId;
   }
 
-  return new Response(textStream, { headers: responseHeaders });
+  return new Response(dataStream, { headers: responseHeaders });
 }

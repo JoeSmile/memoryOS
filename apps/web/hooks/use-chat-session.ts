@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { TextStreamChatTransport } from "ai";
+import { DefaultChatTransport } from "ai";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   FormEvent,
@@ -82,7 +82,7 @@ export function useChatSession() {
 
   const transport = useMemo(
     () =>
-      new TextStreamChatTransport({
+      new DefaultChatTransport({
         api: "/api/chat",
         fetch: async (input, init) => {
           streamIdRef.current = null;
