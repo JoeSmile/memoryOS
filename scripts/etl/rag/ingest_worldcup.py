@@ -17,16 +17,22 @@ sys.path.insert(0, str(API_DIR))
 
 async def _run(gold_dir: Path, collection_stems: list[str] | None) -> int:
     from app.core.database import AsyncSessionLocal
+    from app.core.redis import ensure_redis
     from app.services.knowledge_ingest_service import (
         DEFAULT_COLLECTION_STEMS,
         KnowledgeIngestError,
+        KnowledgeIngestInProgressError,
         KnowledgeIngestService,
     )
 
+    redis = await ensure_redis()
     async with AsyncSessionLocal() as session:
-        service = KnowledgeIngestService(session, gold_dir=gold_dir)
+        service = KnowledgeIngestService(session, gold_dir=gold_dir, redis=redis)
         try:
             summary = await service.ingest_worldcup_fact_cards(collection_stems)
+        except KnowledgeIngestInProgressError as exc:
+            print(f"ingest already in progress: stems={exc.stems}", file=sys.stderr)
+            return 1
         except KnowledgeIngestError as exc:
             print(f"ingest failed: {exc}", file=sys.stderr)
             if exc.external_ids:
@@ -39,7 +45,8 @@ async def _run(gold_dir: Path, collection_stems: list[str] | None) -> int:
     for item in summary.collections:
         print(
             f"  {item.collection}: lines={item.lines_read} "
-            f"created={item.documents_created} updated={item.documents_updated}"
+            f"created={item.documents_created} updated={item.documents_updated} "
+            f"skipped={item.documents_skipped}"
         )
     print(f"total lines: {summary.total_lines}")
     return 0

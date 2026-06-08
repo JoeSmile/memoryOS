@@ -6,9 +6,9 @@
 
 ### Review checklist
 
-- [ ] 本 change **不含** 前端上传/PDF 解析（Story 4.1–4.2 本史诗暂不排期，无对应 task）
-- [ ] Harness 覆盖 design scenarios（ingest 幂等、search、401、mock embed）
-- [ ] 与 EP04 Story 4.3–4.4 首 slice 一致；无 LlamaIndex/聊天生成 scope 膨胀
+- [x] 本 change **不含** 前端上传/PDF 解析（Story 4.1–4.2 本史诗暂不排期，无对应 task）
+- [x] Harness 覆盖 design scenarios（ingest 幂等、search、401、mock embed）
+- [x] 与 EP04 Story 4.3–4.4 首 slice 一致；无 LlamaIndex/聊天生成 scope 膨胀
 - [ ] 每条 task ≤3 文件 / ~150 行
 
 **Reviewer notes:**
@@ -61,19 +61,19 @@
 
 ## 4. Retrieval API
 
-- [ ] 4.1 Harness `tests/harness/test_rag_contract.py`（ingest + search + 401）
+- [x] 4.1 Harness `tests/harness/test_rag_contract.py`（ingest + search + 401）
   - 预计文件：1 · 层：tests（TDD 先写）
 
-- [ ] 4.2 `KnowledgeSearchService` + schemas
+- [x] 4.2 `KnowledgeSearchService` + schemas
   - 预计文件：2 · 层：services、schemas
 
-- [ ] 4.3 Router `POST /knowledge/search` + `POST /knowledge/ingest/worldcup` + 注册 main
+- [x] 4.3 Router `POST /knowledge/search` + `POST /knowledge/ingest/worldcup` + 注册 main
   - 预计文件：2 · 层：api
 
 ## 5. Closeout
 
-- [ ] 5.1 `pnpm db:migrate` + `pnpm test:api:harness` 全绿；勾选 EP04-rag Story 4.3/4.4 首项
+- [x] 5.1 `pnpm db:migrate` + `pnpm test:api:harness` 全绿；勾选 EP04-rag Story 4.3/4.4 首项
   - 预计文件：1 · 层：docs/epic
 
-- [ ] 5.2 archive change
+- [x] 5.2 archive change
   - 预计文件：0 · openspec archive

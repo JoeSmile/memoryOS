@@ -24,13 +24,13 @@
 
 ## Story 4.3 切块策略
 
-- [ ] 固定长度、语义、层级标题切块
-- [ ] `document_chunks` 表
+- [ ] 固定长度、语义、层级标题切块（PDF/MD · Story 4.2 排期）
+- [x] `document_chunks` 表（Gold **路径 A**：一卡一块 · `ep04-rag` ✅）
 
 ## Story 4.4 LangChain 快速 RAG
 
-- [ ] 轻量化 RAG Pipeline（加载 → 切分 → 向量 → 检索 → 生成）
-- [ ] 满足快速问答与 Demo
+- [x] 轻量化 RAG Pipeline（**首 slice**：Gold ingest → embed → `POST /knowledge/search`；**不含**生成 · `ep04-rag` ✅）
+- [ ] 满足快速问答与 Demo（需 chat 接入 · 后续）
 
 ## Story 4.5 LlamaIndex 自研体系
 
