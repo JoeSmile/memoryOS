@@ -6,9 +6,9 @@
 
 ### Review checklist
 
-- [ ] 本 change **不含** 前端上传/PDF 解析（Story 4.1–4.2 本史诗暂不排期，无对应 task）
-- [ ] Harness 覆盖 design scenarios（ingest 幂等、search、401、mock embed）
-- [ ] 与 EP04 Story 4.3–4.4 首 slice 一致；无 LlamaIndex/聊天生成 scope 膨胀
+- [x] 本 change **不含** 前端上传/PDF 解析（Story 4.1–4.2 本史诗暂不排期，无对应 task）
+- [x] Harness 覆盖 design scenarios（ingest 幂等、search、401、mock embed）
+- [x] 与 EP04 Story 4.3–4.4 首 slice 一致；无 LlamaIndex/聊天生成 scope 膨胀
 - [ ] 每条 task ≤3 文件 / ~150 行
 
 **Reviewer notes:**
@@ -56,7 +56,7 @@
 - [x] 3.3 CLI `scripts/etl/rag/ingest_worldcup.py`（默认全量；`--collections` 可 subset）
   - 预计文件：1 · 层：scripts
 
-- [ ] 3.4 **与人讨论** 切块/摄入策略（路径 A 一卡一块、双 collection 球员）并更新 `rag-embedding-chunking.md` §2 + §6
+- [x] 3.4 **与人讨论** 切块/摄入策略（路径 A 一卡一块、双 collection 球员）并更新 `rag-embedding-chunking.md` §2 + §6
   - 预计文件：1 · 层：docs
 
 ## 4. Retrieval API
@@ -72,8 +72,8 @@
 
 ## 5. Closeout
 
-- [ ] 5.1 `pnpm db:migrate` + `pnpm test:api:harness` 全绿；勾选 EP04-rag Story 4.3/4.4 首项
+- [x] 5.1 `pnpm db:migrate` + `pnpm test:api:harness` 全绿；勾选 EP04-rag Story 4.3/4.4 首项
   - 预计文件：1 · 层：docs/epic
 
-- [ ] 5.2 archive change
+- [x] 5.2 archive change
   - 预计文件：0 · openspec archive

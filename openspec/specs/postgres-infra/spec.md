@@ -2,18 +2,18 @@
 
 ## Purpose
 
-Local PostgreSQL and Redis via Docker Compose for MemoryOS development (EP03).
+Local PostgreSQL (pgvector) and Redis via Docker Compose for MemoryOS development (EP03, EP04 RAG).
 
 ## Requirements
 
 ### Requirement: Local PostgreSQL via Docker Compose
 
-The project SHALL provide a Docker Compose configuration that starts PostgreSQL 16 and Redis 7 for local development with documented default connection strings.
+The project SHALL provide a Docker Compose configuration that starts PostgreSQL 16 with the pgvector extension available and Redis 7 for local development with documented default connection strings.
 
 #### Scenario: Developer starts database stack
 
 - **WHEN** developer runs `docker compose up -d` from `infra/docker/`
-- **THEN** PostgreSQL accepts connections on port 5432 and Redis on port 6379
+- **THEN** PostgreSQL accepts connections on port 5432 with `CREATE EXTENSION vector` available, and Redis on port 6379
 
 #### Scenario: Connection string documented
 
