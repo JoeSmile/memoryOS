@@ -2,7 +2,7 @@
 
 > propose 完成后 **必须停在这里**等人审；未勾选前 **禁止** 写业务代码。
 
-- [ ] **Tasks reviewed by human** — 人审通过后再 `/opsx:apply`、`/work-next` 或说「继续实现」
+- [x] **Tasks reviewed by human** — 人审通过后再 `/opsx:apply`、`/work-next` 或说「继续实现」
 
 ### Review checklist
 
@@ -26,7 +26,7 @@
 
 ## 1. SSE 解析
 
-- [ ] 1.1 `sse-frames.ts`：`extractSourcesItems`、`extractDonePayload`（含 `message_id`、`sources`）
+- [x] 1.1 `sse-frames.ts`：`extractSourcesItems`、`extractDonePayload`（含 `message_id`、`sources`）
   - 预计文件：1 · 层：`apps/web/lib`
 
 ## 2. BFF Data Stream
