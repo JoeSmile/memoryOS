@@ -280,5 +280,6 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 |:-----|:-----|
 | 2026-06-08 | task 3.4：路径 A 一卡一块、五 collection 行数、球员双 collection、samples 写入 §2.4–§2.5 与 §6 |
 | 2026-06-08 | ingest 并发锁（per-stem Redis）+ content skip（metadata 三元组）写入 §5/§6 |
+| 2026-06-08 | BFF RAG 流升级路线写入 [`chat-rag-stream.md`](./chat-rag-stream.md)（follow-up `ep04-rag-chat-stream`） |
 | 2026-06-07 | task 2.3：1024/v4 定案、batch/重试/cosine/re-ingest 写入 §3.4 与 §6 |
 | 2026-06-03 | 初稿：路径 A/B、切块/embedding/pgvector 坑表、实施讨论清单（ep04-rag propose） |

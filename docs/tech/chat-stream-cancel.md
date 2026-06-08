@@ -2,6 +2,7 @@
 
 > **OpenSpec**：[`ep02-chat-cancel`](../../openspec/changes/ep02-chat-cancel/)  
 > **学习**： [L02 §4](../tasks/learning/L02-streaming-langgraph.md)  
+> **RAG 流升级**（BFF TextStream → Data Stream，须回归本章 Stop/drain）：[`chat-rag-stream.md`](./chat-rag-stream.md)  
 > **代码**：`apps/api/app/graphs/runner.py` · `services/chat_service.py` · `cache/stream_cancel_cache.py` · `apps/web/hooks/use-chat-session.ts` · `apps/web/lib/memoryos-upstream.ts`
 
 ---
