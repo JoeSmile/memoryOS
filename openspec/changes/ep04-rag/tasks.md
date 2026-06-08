@@ -56,7 +56,7 @@
 - [ ] 3.3 CLI `scripts/etl/rag/ingest_worldcup.py`（默认全量；`--collections` 可 subset）
   - 预计文件：1 · 层：scripts
 
-- [ ] 3.4 **与人讨论** 切块/摄入策略（路径 A 一卡一块、双 collection 球员）并更新 `rag-embedding-chunking.md` §2 + §6
+- [x] 3.4 **与人讨论** 切块/摄入策略（路径 A 一卡一块、双 collection 球员）并更新 `rag-embedding-chunking.md` §2 + §6
   - 预计文件：1 · 层：docs
 
 ## 4. Retrieval API

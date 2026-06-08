@@ -46,11 +46,54 @@
 {"id": "player_career:P-14758", "entity_type": "player_career", "text": "[Player Career] Lionel Messi · ..."}
 ```
 
-- **决策**：`text` 已是 ETL 阶段写好的摘要 → `chunk_index = 0`，**一块一卡**。  
-- **collection**：`worldcup-{文件名 stem}`，与 `external_id = id` 幂等 upsert。  
-- **注意**：`players.jsonl` 与 `player_careers.jsonl` **并存**（基础 vs  enriched）；检索不限 collection 时可能双命中，调用方可用 `collection` 过滤或后续默认只查 `worldcup-player-careers`。
+**V1 定案（2026-06-08，task 3.4）**：
 
-### 2.5 切块踩坑清单
+| 问题 | 决策 |
+|:-----|:-----|
+| 是否二次切块 | **否** — `text` 已是 ETL 写好的摘要 → **`chunk_index = 0`，一块一卡** |
+| collection 命名 | **`worldcup-{jsonl stem}`**（如 `matches.jsonl` → `worldcup-matches`） |
+| 幂等键 | `(collection, external_id)`，`external_id = JSONL id` |
+| chunk 写入 | upsert document → **删该 document 下全部 chunks → insert 新 embedding** |
+| 摄入范围 | **全量 5 个 jsonl**（CLI 默认；`--collections` 可 subset） |
+
+**五 collection 与行数**（design / Gold 全量）：
+
+| stem | collection | 行数 | 说明 |
+|:-----|:-----------|:-----|:-----|
+| `matches` | `worldcup-matches` | 1248 | 比赛摘要 |
+| `players` | `worldcup-players` | 10401 | 球员基础摘要 |
+| `player_careers` | `worldcup-player-careers` | 10401 | 球员职业生涯（进球/出场/奖项聚合） |
+| `tournaments` | `worldcup-tournaments` | 30 | 赛会摘要 |
+| `samples` | `worldcup-samples` | 10 | spot-check 样例（与主库内容重叠但 **独立 collection**） |
+| **合计** | | **~22090** | Harness mock 可全量；live 建议先 `--collections samples` 冒烟 |
+
+实现：`KnowledgeIngestService` + `scripts/etl/rag/ingest_worldcup.py`。
+
+### 2.5 球员双 collection（players vs player_careers）
+
+同一球员在 Silver 有两张事实卡：**基础**（`players.jsonl`）与 **enriched 职业生涯**（`player_careers.jsonl`），`external_id` 前缀不同（`player:P-*` vs `player_career:P-*`），但语义相近。
+
+| 选项 | 做法 | V1 |
+|:-----|:-----|:---|
+| 只摄入 careers | 丢弃 `players.jsonl` | ❌ |
+| 合并为一个 collection | 摄入时去重/合并 text | ❌ |
+| **双 collection 全量摄入** | 两个 jsonl 各入各库 | ✅ **人审 B** |
+
+**为何保留两份**：
+
+1. **定位召回问题** — 「查不准」时可对比基础卡 vs 职业生涯卡谁被召回、分数多少。  
+2. **调用方自选粒度** — 问答偏统计/奖项时用 `collection=worldcup-player-careers`；偏姓名/国籍时用 `worldcup-players`。  
+3. **不丢 ETL 产物** — Gold README 已标明 careers 为 RAG 推荐，但基础卡仍有独立字段价值。
+
+**检索行为（V1）**：
+
+- `POST /knowledge/search` **`collection` 默认 `null`** → 五库全搜（人审 B）。  
+- 同一 query 可能对同一球员 **双命中**（players + player_careers 各一条）— **预期行为**；调用方传 `collection` 过滤即可。  
+- **推荐用法（非强制）**：面向用户的球员问答默认 `worldcup-player-careers`；调试/对比时 `null` 或分别测两库。
+
+**samples.jsonl**：10 条 spotlight 卡 **仍默认摄入** → `worldcup-samples`，便于 demo / 小集 harness，不与删双 collection 冲突。
+
+### 2.6 切块踩坑清单
 
 | 坑 | 现象 | 规避 |
 |:---|:-----|:-----|
@@ -186,8 +229,8 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 
 1. **Embedding**：~~Mock 384~~ → **1024 + v4**；本地 **live**，CI **mock** ✅  
 2. **批量大小与失败策略**：**batch 10 · 批间 0.5s · 重试 3 · 失败 exit 1** ✅  
-3. **players + player_careers**：search 默认 **`null`（全库）**；调用方可传 `collection` 过滤 ✅  
-4. **samples.jsonl**：**保留** 全量摄入（demo collection 独立） ✅  
+3. **players + player_careers**：**双 collection 全量摄入**；search 默认 **`null`（全库）**；调用方可传 `collection` 过滤 ✅（task 3.4 · §2.5）  
+4. **samples.jsonl**：**保留** 全量摄入（demo collection 独立） ✅（task 3.4）  
 5. **pgvector 索引**：V1 **不加 HNSW** ✅  
 6. **距离度量**：检索 **`ORDER BY embedding <=> query`**（cosine）；live 向量由 API 返回，mock L2 归一化 ✅  
 7. **re-ingest chunk**：**删 document 下全部 chunks → insert 新 chunk** ✅  
@@ -214,7 +257,10 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 | re-ingest chunk | **delete all chunks → insert** | 2026-06-07 | task 2.3 / design D5 |
 | search 默认 collection | `null`（不限，全库搜） | 2026-06-03 | 人审 B；可按需传 collection |
 | V1 是否 HNSW | **否**（~2.2 万行先暴力 scan + LIMIT） | 2026-06-07 | task 1.2 |
-| 全量 ingest 行数验收 | 预期 ~22090 | — | 待 task 3.3 跑完填实际数 |
+| 切块策略 | **路径 A · 一卡一块**（`chunk_index=0`，无二次 splitter） | 2026-06-08 | task 3.4 · design D3 |
+| 球员双 collection | **`players` + `player_careers` 均摄入**；全库搜可双命中，filter 可选 | 2026-06-08 | task 3.4 · 人审 B · §2.5 |
+| samples collection | **`worldcup-samples` 独立摄入**（10 条，与主库重叠可接受） | 2026-06-08 | task 3.4 |
+| 全量 ingest 行数验收 | 预期 **~22090**；`--collections samples` 已验证 **10 行** | 2026-06-08 | task 3.3 CLI；全量 live 待 dev 跑完 |
 
 ### 6.1 实施后复盘（可选）
 
@@ -227,5 +273,6 @@ V1 ~2.2 万：实施时讨论是否在 `011` 后加 HNSW，或留到数据量/�
 
 | 日期 | 说明 |
 |:-----|:-----|
+| 2026-06-08 | task 3.4：路径 A 一卡一块、五 collection 行数、球员双 collection、samples 写入 §2.4–§2.5 与 §6 |
 | 2026-06-07 | task 2.3：1024/v4 定案、batch/重试/cosine/re-ingest 写入 §3.4 与 §6 |
 | 2026-06-03 | 初稿：路径 A/B、切块/embedding/pgvector 坑表、实施讨论清单（ep04-rag propose） |
