@@ -64,7 +64,7 @@
 - [x] 4.1 Harness `tests/harness/test_rag_contract.py`（ingest + search + 401）
   - 预计文件：1 · 层：tests（TDD 先写）
 
-- [ ] 4.2 `KnowledgeSearchService` + schemas
+- [x] 4.2 `KnowledgeSearchService` + schemas
   - 预计文件：2 · 层：services、schemas
 
 - [ ] 4.3 Router `POST /knowledge/search` + `POST /knowledge/ingest/worldcup` + 注册 main
