@@ -241,6 +241,7 @@ class ChatService:
         async for token in self.runner.stream_tokens(
             state,
             thread_id=str(conversation_id),
+            db=self.db,
             request=request,
             stream_id=stream_id,
             cancel_cache=self.cancel_cache,

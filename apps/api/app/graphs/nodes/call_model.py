@@ -1,8 +1,10 @@
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, BaseMessage
 
 from app.core.config import settings
 from app.graphs.chat_state import ChatState
 from app.graphs.nodes.mock_model import mock_invoke
+from app.graphs.prompts.rag_chat import build_rag_system_message
+from app.schemas.knowledge import KnowledgeChunkHit
 
 
 def _build_chat_openai(*, streaming: bool = True):
@@ -34,8 +36,19 @@ def _chunk_text(chunk: object) -> str:
     return ""
 
 
+def _messages_with_rag_system(state: ChatState) -> list[BaseMessage]:
+    messages = list(state["messages"])
+    if not settings.rag_chat_enabled:
+        return messages
+
+    raw_chunks = state.get("retrieved_chunks") or []
+    hits = [KnowledgeChunkHit.model_validate(chunk) for chunk in raw_chunks]
+    rag_system = build_rag_system_message(hits)
+    return [rag_system, *messages]
+
+
 async def call_model(state: ChatState) -> dict:
-    messages = state["messages"]
+    messages = _messages_with_rag_system(state)
     if settings.use_mock_llm:
         response = await mock_invoke(messages)
         return {"messages": [response]}
