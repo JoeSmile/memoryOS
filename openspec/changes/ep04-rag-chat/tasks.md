@@ -50,7 +50,7 @@
 
 ## 6. Frontend（最小溯源 UI）
 
-- [ ] 6.1 `chat-message` / `markdown-body`：样式化 `## 参考来源` 区块（折叠或小字）
+- [x] 6.1 `chat-message` / `markdown-body`：样式化 `## 参考来源` 区块（折叠或小字）
   - 预计文件：2 · 层：`apps/web/components/chat`
 
 ## 7. Closeout

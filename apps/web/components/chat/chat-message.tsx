@@ -26,6 +26,8 @@ export function ChatMessage({
     !isUser &&
     !isStreaming &&
     getCompletionStatus(message) === COMPLETION_INTERRUPTED;
+  const hasRagSources =
+    !isUser && !isStreaming && text.includes("## 参考来源");
 
   return (
     <div
@@ -34,6 +36,7 @@ export function ChatMessage({
           ? "ml-8 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
           : "mr-8 border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
       }`}
+      data-rag-sources={hasRagSources || undefined}
     >
       <div className="mb-1 flex items-center justify-between gap-2">
         <p className="text-xs font-medium uppercase tracking-wide opacity-60">
