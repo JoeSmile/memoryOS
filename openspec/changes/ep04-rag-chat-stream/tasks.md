@@ -42,7 +42,7 @@
 - [x] 3.1 Alembic `messages.metadata` JSONB + `Message` model
   - 预计文件：2 · 层：alembic、models
 
-- [ ] 3.2 `MessageRead` schema + list API 返回 `metadata`
+- [x] 3.2 `MessageRead` schema + list API 返回 `metadata`
   - 预计文件：2 · 层：schemas、api（若 router 需改则 ≤3 含 router）
 
 - [ ] 3.3 `chat_service.py` finalize 写入 `metadata.rag_sources`（与 assistant row 同事务）
