@@ -39,7 +39,7 @@
 
 ## 3. API 持久化
 
-- [ ] 3.1 Alembic `messages.metadata` JSONB + `Message` model
+- [x] 3.1 Alembic `messages.metadata` JSONB + `Message` model
   - 预计文件：2 · 层：alembic、models
 
 - [ ] 3.2 `MessageRead` schema + list API 返回 `metadata`

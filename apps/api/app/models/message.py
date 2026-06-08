@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -33,6 +34,11 @@ class Message(Base):
     )
     completion_status: Mapped[str | None] = mapped_column(
         String(32),
+        nullable=True,
+    )
+    metadata_: Mapped[dict[str, Any] | None] = mapped_column(
+        "metadata",
+        JSONB,
         nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
