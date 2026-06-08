@@ -34,6 +34,8 @@ class EmbeddingService:
             kwargs: dict[str, object] = {
                 "model": self._settings.embedding_model,
                 "dimensions": self._settings.embedding_dimensions,
+                # DashScope expects raw strings, not tiktoken token ids.
+                "check_embedding_ctx_length": False,
             }
             if self._settings.openai_api_key:
                 kwargs["api_key"] = self._settings.openai_api_key
