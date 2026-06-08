@@ -29,6 +29,7 @@ class CompletionStreamState:
     user_id: uuid.UUID
     stream_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     assistant_parts: list[str] = field(default_factory=list)
+    rag_source_items: list[dict] | None = None
     stream_exhausted: bool = False
     disconnected: bool = False
     terminal_error: bool = False
@@ -280,6 +281,8 @@ class ChatService:
         )
         yield {"event": "start", "data": {"stream_id": stream_state.stream_id}}
 
+        sources_emitted = False
+
         try:
             async for token in self._iter_tokens_with_disconnect(
                 graph_state,
@@ -287,6 +290,15 @@ class ChatService:
                 stream_id=stream_state.stream_id,
                 request=request,
             ):
+                if not sources_emitted:
+                    source_items = ChatGraphRunner.format_rag_source_items(
+                        self.runner.last_retrieved_chunks,
+                    )
+                    if source_items:
+                        stream_state.rag_source_items = source_items
+                        yield {"event": "sources", "data": {"items": source_items}}
+                    sources_emitted = True
+
                 stream_state.assistant_parts.append(token)
                 await self.stream_cache.append(
                     stream_state.conversation_id,

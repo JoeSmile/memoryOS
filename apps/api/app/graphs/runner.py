@@ -16,6 +16,9 @@ from app.graphs.nodes.retrieve import retrieve_knowledge
 _DISCONNECT_POLL_SECONDS = 0.25
 
 
+_CONTENT_PREVIEW_MAX_LEN = 240
+
+
 class ChatGraphRunner:
     """Stream text tokens from the chat graph for SSE (ep02-chat-sse)."""
 
@@ -27,6 +30,30 @@ class ChatGraphRunner:
     def last_retrieved_chunks(self) -> list[dict[str, Any]]:
         """Chunks from the latest retrieve pass (for RAG sources SSE in task 4.1)."""
         return self._last_retrieved_chunks
+
+    @staticmethod
+    def format_rag_source_items(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Map retrieve node payloads to chat SSE `sources.data.items` shape."""
+        items: list[dict[str, Any]] = []
+        for chunk in chunks:
+            content = chunk.get("content")
+            preview = ""
+            if isinstance(content, str):
+                text = content.strip()
+                if len(text) > _CONTENT_PREVIEW_MAX_LEN:
+                    preview = f"{text[:_CONTENT_PREVIEW_MAX_LEN]}…"
+                else:
+                    preview = text
+            items.append(
+                {
+                    "external_id": chunk.get("external_id"),
+                    "collection": chunk.get("collection"),
+                    "entity_type": chunk.get("entity_type"),
+                    "score": chunk.get("score"),
+                    "content_preview": preview,
+                }
+            )
+        return items
 
     @staticmethod
     async def _should_stop(

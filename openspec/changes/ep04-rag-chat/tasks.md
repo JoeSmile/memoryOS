@@ -40,7 +40,7 @@
 
 ## 4. Chat SSE
 
-- [ ] 4.1 `ChatService.stream_completion_events` 发 `sources`（及 `done.data.sources`）；Runner 回传检索结果
+- [x] 4.1 `ChatService.stream_completion_events` 发 `sources`（及 `done.data.sources`）；Runner 回传检索结果
   - 预计文件：2 · 层：`services/chat_service.py`、`graphs/runner.py`
 
 ## 5. Harness

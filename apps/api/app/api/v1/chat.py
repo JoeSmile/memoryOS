@@ -49,13 +49,13 @@ async def chat_completions(
 
             assistant_id = await service.finalize_completion_stream(stream_state)
             if assistant_id is not None:
-                done_frame = {
-                    "event": "done",
-                    "data": {
-                        "message_id": str(assistant_id),
-                        "stream_id": stream_state.stream_id,
-                    },
+                done_data: dict = {
+                    "message_id": str(assistant_id),
+                    "stream_id": stream_state.stream_id,
                 }
+                if stream_state.rag_source_items:
+                    done_data["sources"] = stream_state.rag_source_items
+                done_frame = {"event": "done", "data": done_data}
                 yield f"data: {json.dumps(done_frame, ensure_ascii=False)}\n\n"
         finally:
             if not stream_state.persisted:
