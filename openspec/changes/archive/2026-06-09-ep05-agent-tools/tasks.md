@@ -82,11 +82,11 @@ POST /chat/completions（无 mode）
 
 ## 6. Tests & docs
 
-- [ ] 6.1 unit：`test_should_continue.py` + `test_execute_tools.py` + `test_tavily_tool.py`
+- [x] 6.1 unit：`test_should_continue.py` + `test_execute_tools.py` + `test_tavily_tool.py`
   - 预计文件：3 · 层：`apps/api/tests/unit`（可拆 6.1a/6.1b 若超 3 文件 — apply 时拆 task）
 
-- [ ] 6.2 `docs/tech/agent-langgraph.md`（ReAct 教材）+ EP05 epic；web converter 单测
+- [x] 6.2 `docs/tech/agent-langgraph.md`（ReAct 教材）+ EP05 epic；web converter 单测
   - 预计文件：2 · 层：docs + `apps/web/tests/unit`
 
-- [ ] 6.3 archive change
+- [x] 6.3 archive change
   - 预计文件：0 · openspec archive

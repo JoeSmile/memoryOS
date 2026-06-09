@@ -1,6 +1,6 @@
 ## MODIFIED Requirements
 
-### Requirement: RAG retrieval before generation
+### Requirement: LangGraph retrieve before generation
 
 The chat graph SHALL run a `retrieve_knowledge` step before the ReAct agent loop, querying ingested knowledge with the latest user message text and injecting results into agent state and system prompt context.
 

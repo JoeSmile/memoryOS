@@ -7,6 +7,7 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from app.core.config import settings
+from app.graphs.chat_graph import build_chat_graph
 from app.main import app
 
 
@@ -38,6 +39,11 @@ async def _register_and_login(client: AsyncClient) -> tuple[str, str]:
 @pytest.fixture(autouse=True)
 def mock_llm(monkeypatch):
     monkeypatch.setattr(settings, "openai_api_key", None)
+    # Basic SSE contract tests target EP04 retrieve→call_model (no ReAct loop).
+    monkeypatch.setattr(settings, "agent_tools_enabled", False)
+    build_chat_graph.cache_clear()
+    yield
+    build_chat_graph.cache_clear()
 
 
 @pytest.mark.asyncio
