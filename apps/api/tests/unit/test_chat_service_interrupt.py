@@ -14,6 +14,7 @@ from app.services.chat_service import ChatService
 @pytest.fixture(autouse=True)
 def force_mock_llm(monkeypatch):
     monkeypatch.setattr(settings, "openai_api_key", None)
+    monkeypatch.setattr(settings, "agent_tools_enabled", False)
 
 
 class _DisconnectAfterFirstToken:

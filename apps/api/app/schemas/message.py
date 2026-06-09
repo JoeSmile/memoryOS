@@ -8,6 +8,19 @@ from pydantic_core import PydanticCustomError
 # Keep in sync with web `CANCEL_VISIBLE_CONTENT_INLINE_MAX`.
 CANCEL_VISIBLE_CONTENT_INLINE_MAX = 256
 
+TOOL_STEP_SUMMARY_MAX_LEN = 512
+
+
+class ToolStepRead(BaseModel):
+    """Persisted ReAct tool round (metadata.tool_steps item)."""
+
+    id: str
+    name: str
+    arguments: dict[str, Any] = Field(default_factory=dict)
+    success: bool
+    summary: str = Field(max_length=TOOL_STEP_SUMMARY_MAX_LEN)
+    duration_ms: int | None = None
+
 
 class MessageRead(BaseModel):
     id: UUID

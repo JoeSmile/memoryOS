@@ -14,6 +14,7 @@ from app.graphs.runner import ChatGraphRunner
 @pytest.fixture(autouse=True)
 def force_mock_llm(monkeypatch):
     monkeypatch.setattr(settings, "openai_api_key", None)
+    monkeypatch.setattr(settings, "agent_tools_enabled", False)
 
 
 @pytest.mark.asyncio

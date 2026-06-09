@@ -18,6 +18,23 @@ export type MemoryosDonePayload = {
   sources?: RagSourceItem[];
 };
 
+/** Aligns with FastAPI chat SSE `tool_call.data`. */
+export type ToolCallPayload = {
+  id: string;
+  name: string;
+  arguments: Record<string, unknown>;
+};
+
+/** Aligns with FastAPI chat SSE `tool_result.data` / persisted `metadata.tool_steps`. */
+export type ToolResultPayload = {
+  id: string;
+  name: string;
+  success: boolean;
+  summary: string;
+  duration_ms?: number;
+  error?: string;
+};
+
 export function parseSseDataLine(line: string): MemoryosSseFrame | null {
   const trimmed = line.trim();
   if (!trimmed.startsWith("data:")) {
@@ -78,6 +95,62 @@ function parseRagSourceItems(value: unknown): RagSourceItem[] | null {
   return items;
 }
 
+function parsePlainObject(value: unknown): Record<string, unknown> | null {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return null;
+  }
+  return value as Record<string, unknown>;
+}
+
+function parseToolCallData(data: Record<string, unknown>): ToolCallPayload | null {
+  const id = data.id;
+  const name = data.name;
+  if (typeof id !== "string" || id.length === 0) {
+    return null;
+  }
+  if (typeof name !== "string" || name.length === 0) {
+    return null;
+  }
+  const argsRaw = data.arguments;
+  if (argsRaw === undefined) {
+    return { id, name, arguments: {} };
+  }
+  const arguments_ = parsePlainObject(argsRaw);
+  if (arguments_ === null) {
+    return null;
+  }
+  return { id, name, arguments: arguments_ };
+}
+
+function parseToolResultData(data: Record<string, unknown>): ToolResultPayload | null {
+  const id = data.id;
+  const name = data.name;
+  const success = data.success;
+  const summary = data.summary;
+  if (typeof id !== "string" || id.length === 0) {
+    return null;
+  }
+  if (typeof name !== "string" || name.length === 0) {
+    return null;
+  }
+  if (typeof success !== "boolean") {
+    return null;
+  }
+  if (typeof summary !== "string") {
+    return null;
+  }
+  const payload: ToolResultPayload = { id, name, success, summary };
+  const durationMs = data.duration_ms;
+  if (typeof durationMs === "number" && Number.isFinite(durationMs)) {
+    payload.duration_ms = durationMs;
+  }
+  const error = data.error;
+  if (typeof error === "string" && error.length > 0) {
+    payload.error = error;
+  }
+  return payload;
+}
+
 export function extractTokenContent(frame: MemoryosSseFrame): string | null {
   if (frame.event !== "token") {
     return null;
@@ -99,6 +172,24 @@ export function extractSourcesItems(frame: MemoryosSseFrame): RagSourceItem[] | 
     return null;
   }
   return parseRagSourceItems(frame.data.items);
+}
+
+export function extractToolCallPayload(
+  frame: MemoryosSseFrame,
+): ToolCallPayload | null {
+  if (frame.event !== "tool_call") {
+    return null;
+  }
+  return parseToolCallData(frame.data);
+}
+
+export function extractToolResultPayload(
+  frame: MemoryosSseFrame,
+): ToolResultPayload | null {
+  if (frame.event !== "tool_result") {
+    return null;
+  }
+  return parseToolResultData(frame.data);
 }
 
 export function extractDonePayload(frame: MemoryosSseFrame): MemoryosDonePayload | null {
