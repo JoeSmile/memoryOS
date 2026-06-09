@@ -56,10 +56,10 @@ export function ChatMessageList({
     <div
       ref={scrollRef}
       onScroll={updateNearBottom}
-      className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-4"
+      className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pb-4"
     >
       {messages.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 py-12 text-center">
+        <div className="flex min-h-[12rem] flex-col items-center justify-center gap-2 py-12 text-center">
           <p className="text-sm text-zinc-500">{emptyLabel}</p>
           <p className="text-xs text-zinc-400">
             支持连续追问；完整上下文裁剪在后端（EP05）

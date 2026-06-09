@@ -61,7 +61,15 @@ ToolRegistry + ToolExecutor
 | `messages` | `add_messages` reducer；含 Human / AI / ToolMessage |
 | `user_id` | JWT 用户，传给 ToolContext |
 | `retrieved_chunks` | retrieve 节点写入；runner 发 `sources` SSE |
-| `rag_sufficient` | prompt 提示用：`len(chunks)>0` 且 `max(score)≥阈值` |
+| `rag_sufficient` | prompt 提示用：`max(score)≥阈值` 且通过 **时间语境** 校验（见 [`unified_react.py`](../../apps/api/app/graphs/prompts/unified_react.py)） |
+
+**`compute_rag_sufficient` 规则（EP05 后校准）：**
+
+1. 无 chunk 或最高分 `< rag_chat_min_score` → `False`
+2. 用户写出 **具体年份**（如 2022、2026）→ chunk 须 **全部覆盖** 这些年份
+3. 用户 **未写年份** → 默认 **现在/今年/今日**；若 chunk 仅含往年且无当前年 → `False`（应走 Tavily）；chunk 无年份信息则不做时间否决（通用知识）
+
+仍 **不** 用条件边强制 Tavily — 仅注入 `_WEAK_SUFFIX` / `_SUFFICIENT_SUFFIX`。
 
 实现：[`chat_state.py`](../../apps/api/app/graphs/chat_state.py)。
 

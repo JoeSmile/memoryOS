@@ -101,6 +101,32 @@
 - [ ] 🔧 `docs/architecture/`：系统总览、RAG、Agent 三张图
 - [ ] 📖 生产 tracing 采样率；错误 100% 采样
 
+---
+
+## 7. Agent 过程态 UI（Story 9.8）
+
+> EP05 只有 **结果态**（RAG chips、ToolTimeline）；retrieve / tool 执行时前端常静默。
+
+### 学什么
+
+- [ ] 📖 流式 UX 空窗：用户消息发出 → 首个 SSE 帧之间的感知延迟
+- [ ] 📖 过程 vs 结果：phase 事件（retrieve / model / tool）与 chips / timeline 分工
+- [ ] 📖 AI SDK `submitted` vs `streaming`；何时显示 Thinking 占位
+- [ ] 🔧 L1 纯前端占位 → L2 SSE `phase` → L3 pending polish
+
+### 实战易踩坑
+
+| 坑 | 现象 | 规避 |
+|:---|:-----|:-----|
+| 等首个 token 才建助手气泡 | 长时间空白 | `submitted` 即显示 skeleton |
+| retrieve 无 SSE | 检索 1–2s 无反馈 | runner 发 `phase:retrieve` |
+| tool 结果到了才渲染 timeline | Tavily 期间像卡死 | `tool_call` 即 pending 行 |
+| phase 与 EP05 chips 重复 | UI 噪音 | phase 简短条；chips 仍表检索命中 |
+
+### 面试常问
+
+- 如何让用户感知 Agent「正在干活」而不泄露完整 chain-of-thought？
+
 ## 阶段自测
 
 - [ ] 用真实 trace 讲一次 RAG 慢在哪个 span  

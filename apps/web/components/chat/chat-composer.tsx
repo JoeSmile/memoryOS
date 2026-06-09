@@ -22,7 +22,7 @@ export function ChatComposer({
   onRetry,
 }: ChatComposerProps) {
   return (
-    <div className="shrink-0 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+    <div className="shrink-0 border-t border-zinc-200 pt-4 dark:border-zinc-800 relative z-10 bg-[var(--background)]">
       {errorMessage ? (
         <div
           className="mb-2 flex flex-wrap items-center gap-2 text-sm text-red-600 dark:text-red-400"

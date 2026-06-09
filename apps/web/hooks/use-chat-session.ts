@@ -311,6 +311,10 @@ export function useChatSession() {
   }, [conversationId, resetConversationSync]);
 
   useEffect(() => {
+    clearSendMeta();
+  }, [conversationId, clearSendMeta]);
+
+  useEffect(() => {
     if (status !== "ready" || messagesLoading || messagesFetching) {
       return;
     }
@@ -469,10 +473,22 @@ export function useChatSession() {
     bootstrapConversation,
   ]);
 
+  const awaitingConversation =
+    Boolean(token) &&
+    !conversationId &&
+    !meLoading &&
+    Boolean(me) &&
+    !meError &&
+    !error;
+
   const loading =
     bootstrapping ||
     (!conversationId && meLoading) ||
+    awaitingConversation ||
     (Boolean(conversationId) && messagesLoading);
+
+  const canCompose =
+    Boolean(conversationId) && !isStreaming && !isSending && !loading;
 
   const queryErrorMessage =
     messagesError && messagesQueryError instanceof Error
@@ -569,6 +585,7 @@ export function useChatSession() {
     isStreaming,
     isSending,
     loading,
+    canCompose,
     streamingMessageId,
     loadedMessageCount: messages.length,
     errorMessage: queryErrorMessage ?? error,

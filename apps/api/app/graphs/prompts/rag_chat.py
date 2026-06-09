@@ -40,6 +40,7 @@ def _build_grounded_prompt(chunks: Sequence[KnowledgeChunkHit]) -> str:
 
 回答要求：
 - 用简洁中文回答用户问题
+- 用户未写明具体年份或日期时，默认按 **现在 / 今年 / 今日** 的最新语境理解（勿用往年资料冒充当前答案）
 - 正文结束后另起一段，使用 Markdown 二级标题「{_REFERENCE_HEADING}」
 - 列表项格式：- [external_id] 一句摘要（可截断）
 - 仅引用上方参考资料中出现过的 external_id"""

@@ -9,12 +9,10 @@ import { useChatSession } from "@/hooks/use-chat-session";
 
 export function MinimalChat() {
   const {
-    conversationId,
     messages,
     input,
     setInput,
     isStreaming,
-    isSending,
     loading,
     streamingMessageId,
     loadedMessageCount,
@@ -24,6 +22,7 @@ export function MinimalChat() {
     startNewConversation,
     retrySession,
     canRetrySession,
+    canCompose,
     stop,
   } = useChatSession();
 
@@ -47,7 +46,7 @@ export function MinimalChat() {
           onSubmit={handleSubmit}
           isStreaming={isStreaming}
           onStop={() => stop()}
-          disabled={!conversationId || isSending}
+          disabled={!canCompose}
           errorMessage={errorMessage}
           onRetry={
             canRetrySession ? () => void retrySession() : undefined

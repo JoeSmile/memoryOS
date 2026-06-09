@@ -1,4 +1,4 @@
-from langchain_core.messages import AIMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from app.core.config import settings
 from app.graphs.chat_state import ChatState
@@ -41,6 +41,15 @@ def _chunk_text(chunk: object) -> str:
     return ""
 
 
+def _last_human_text(state: ChatState) -> str | None:
+    for message in reversed(state.get("messages") or []):
+        if isinstance(message, HumanMessage):
+            content = message.content
+            if isinstance(content, str) and content.strip():
+                return content.strip()
+    return None
+
+
 def _resolve_rag_sufficient(state: ChatState) -> bool:
     if "rag_sufficient" in state:
         return bool(state["rag_sufficient"])
@@ -48,6 +57,7 @@ def _resolve_rag_sufficient(state: ChatState) -> bool:
     return compute_rag_sufficient(
         raw_chunks,
         min_score=settings.rag_chat_min_score,
+        user_query=_last_human_text(state),
     )
 
 

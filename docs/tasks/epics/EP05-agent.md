@@ -75,4 +75,5 @@
 
 1. **archive** `ep05-agent-tools` → 同步 `openspec/specs/`
 2. 可选：DB 只读 tool、SearXNG、LangSmith L3 pass rate
-3. EP09 Agent 稳定性统计
+3. EP09 Story 9.8 Agent 过程态 UI（Thinking / phase SSE）
+4. EP09 Agent 稳定性统计

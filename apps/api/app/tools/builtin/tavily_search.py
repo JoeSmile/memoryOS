@@ -59,7 +59,9 @@ def build_tavily_search_tool() -> ToolDefinition:
         name="tavily_search",
         description=(
             "Search the public web for up-to-date information. "
-            "Use only when retrieved knowledge is missing or insufficient for the user question."
+            "Use when retrieved knowledge does not answer the user's question—"
+            "e.g. wrong year, stale corpus, or missing entities—or when the question "
+            "requires current events not in the knowledge base."
         ),
         parameters=TAVILY_SEARCH_PARAMETERS,
         handler=tavily_search_handler,
