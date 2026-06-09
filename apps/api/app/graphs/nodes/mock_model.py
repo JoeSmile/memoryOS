@@ -1,14 +1,45 @@
 import asyncio
 from collections.abc import AsyncIterator
 
-from langchain_core.messages import AIMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 
 MOCK_TOKEN_CHUNKS: list[str] = ["你", "好", "！"]
 MOCK_ASSISTANT_TEXT = "".join(MOCK_TOKEN_CHUNKS)
 
+MOCK_AFTER_TOOL_CHUNKS: list[str] = ["联", "网", "答", "案"]
+MOCK_AFTER_TOOL_TEXT = "".join(MOCK_AFTER_TOOL_CHUNKS)
 
-async def mock_invoke(_messages: list[BaseMessage]) -> AIMessage:
-    return AIMessage(content=MOCK_ASSISTANT_TEXT)
+_MOCK_TAVILY_CALL_ID = "mock_call_tavily"
+
+
+def _after_tool_round(messages: list[BaseMessage]) -> bool:
+    return any(isinstance(message, ToolMessage) for message in messages)
+
+
+async def mock_invoke(
+    messages: list[BaseMessage],
+    *,
+    rag_sufficient: bool,
+    agent_tools_enabled: bool,
+) -> AIMessage:
+    """Deterministic mock: sufficient RAG → text only; weak RAG → tool then text."""
+    if not agent_tools_enabled or rag_sufficient:
+        return AIMessage(content=MOCK_ASSISTANT_TEXT)
+
+    if _after_tool_round(messages):
+        return AIMessage(content=MOCK_AFTER_TOOL_TEXT)
+
+    return AIMessage(
+        content="",
+        tool_calls=[
+            {
+                "name": "tavily_search",
+                "args": {"query": "mock web search"},
+                "id": _MOCK_TAVILY_CALL_ID,
+                "type": "tool_call",
+            }
+        ],
+    )
 
 
 async def mock_stream_tokens() -> AsyncIterator[str]:

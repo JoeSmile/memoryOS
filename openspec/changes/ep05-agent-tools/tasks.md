@@ -50,7 +50,7 @@ POST /chat/completions（无 mode）
 - [x] 2.2 `execute_tools` 节点 + `should_continue` 条件边；扩展 `chat_graph.py` ReAct 环
   - 预计文件：2 · 层：`graphs/nodes/` + `chat_graph.py`
 
-- [ ] 2.3 `call_model` 改 `bind_tools`；mock ReAct 两场景（够/弱 RAG）
+- [x] 2.3 `call_model` 改 `bind_tools`；mock ReAct 两场景（够/弱 RAG）
   - 预计文件：2 · 层：`nodes/call_model.py` + `nodes/mock_model.py`
 
 ## 3. Runner & API
