@@ -1,11 +1,16 @@
+"use client";
+
 import type { UIMessage } from "ai";
 
 import { MessageContent } from "@/components/chat/message-content";
+import { RagSourceChipList } from "@/components/chat/rag-source-chip";
 import {
   COMPLETION_INTERRUPTED,
   getCompletionStatus,
+  getRagSourcesFromUIMessage,
   getTextFromUIMessage,
 } from "@/lib/chat-types";
+import { useChatStore } from "@/stores/chat-store";
 
 type ChatMessageProps = {
   message: UIMessage;
@@ -26,7 +31,18 @@ export function ChatMessage({
     !isUser &&
     !isStreaming &&
     getCompletionStatus(message) === COMPLETION_INTERRUPTED;
-  const hasRagSources =
+  const storeSources = useChatStore((state) => {
+    if (isUser) {
+      return null;
+    }
+    if (isStreaming && state.streamingRagSources?.length) {
+      return state.streamingRagSources;
+    }
+    return state.ragSourcesByMessageId[message.id] ?? null;
+  });
+  const ragSources =
+    getRagSourcesFromUIMessage(message) ?? storeSources ?? null;
+  const hasMarkdownRagSources =
     !isUser && !isStreaming && text.includes("## 参考来源");
 
   return (
@@ -36,7 +52,13 @@ export function ChatMessage({
           ? "ml-8 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
           : "mr-8 border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
       }`}
-      data-rag-sources={hasRagSources || undefined}
+      data-rag-sources={
+        ragSources?.length
+          ? "structured"
+          : hasMarkdownRagSources
+            ? "markdown"
+            : undefined
+      }
     >
       <div className="mb-1 flex items-center justify-between gap-2">
         <p className="text-xs font-medium uppercase tracking-wide opacity-60">
@@ -54,6 +76,7 @@ export function ChatMessage({
           </button>
         ) : null}
       </div>
+      {ragSources ? <RagSourceChipList items={ragSources} /> : null}
       <MessageContent
         content={text}
         markdown={!isUser && !isStreaming}

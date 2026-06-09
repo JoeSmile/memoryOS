@@ -50,10 +50,10 @@
 
 ## 4. 前端 citation UI
 
-- [ ] 4.1 `chat-types.ts` + `chat-store.ts`：`RagSourceItem`、stream/history sources 状态
+- [x] 4.1 `chat-types.ts` + `chat-store.ts`：`RagSourceItem`、stream/history sources 状态
   - 预计文件：2 · 层：lib + store
 
-- [ ] 4.2 `chat-message.tsx`（+ `rag-source-chip` 或内联 Popover）：citation chips；与 Markdown `## 参考来源` **并存**；chip click → Popover（preview + 元数据，**不跳转**）
+- [x] 4.2 `chat-message.tsx`（+ `rag-source-chip` 或内联 Popover）：citation chips；与 Markdown `## 参考来源` **并存**；chip click → Popover（preview + 元数据，**不跳转**）
   - 预计文件：2 · 层：`components/chat`
 
 ## 5. Tests

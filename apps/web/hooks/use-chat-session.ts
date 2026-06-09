@@ -24,6 +24,7 @@ import { getAccessToken } from "@/lib/auth-token";
 import { chatQueryKeys } from "@/lib/chat-query-keys";
 import {
   EMPTY_MESSAGES,
+  getRagSourcesFromUIMessage,
   getTextFromUIMessage,
   messagesFingerprint,
   toUIMessages,
@@ -56,6 +57,18 @@ export function useChatSession() {
     (state) => state.markPersistedMessagesSynced,
   );
   const prepareSend = useChatStore((state) => state.prepareSend);
+  const resetPersistedSyncFingerprint = useChatStore(
+    (state) => state.resetPersistedSyncFingerprint,
+  );
+  const setStreamingRagSources = useChatStore(
+    (state) => state.setStreamingRagSources,
+  );
+  const commitStreamingRagSources = useChatStore(
+    (state) => state.commitStreamingRagSources,
+  );
+  const hydrateHistoryRagSources = useChatStore(
+    (state) => state.hydrateHistoryRagSources,
+  );
 
   const token = getAccessToken();
   const {
@@ -124,7 +137,7 @@ export function useChatSession() {
         return;
       }
 
-      resetConversationSync();
+      resetPersistedSyncFingerprint();
       const queryKey = chatQueryKeys.messages(conversationId);
       const maxAttempts = options?.retryUntilAssistant ? 15 : 1;
 
@@ -144,8 +157,16 @@ export function useChatSession() {
         }
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
+
+      const rows = queryClient.getQueryData<MessageRead[]>(queryKey) ?? [];
+      hydrateHistoryRagSources(rows);
     },
-    [conversationId, queryClient, resetConversationSync],
+    [
+      conversationId,
+      queryClient,
+      resetPersistedSyncFingerprint,
+      hydrateHistoryRagSources,
+    ],
   );
 
   const { messages, sendMessage, status, stop, setMessages } = useChat({
@@ -298,6 +319,7 @@ export function useChatSession() {
     }
 
     markPersistedMessagesSynced(fingerprint);
+    hydrateHistoryRagSources(persistedMessages);
     setMessages(toUIMessages(persistedMessages));
   }, [
     messages,
@@ -308,9 +330,43 @@ export function useChatSession() {
     setMessages,
     shouldSyncPersistedMessages,
     markPersistedMessagesSynced,
+    hydrateHistoryRagSources,
   ]);
 
   const isStreaming = status === "submitted" || status === "streaming";
+
+  useEffect(() => {
+    const last = messages.at(-1);
+    if (last?.role !== "assistant") {
+      if (!isStreaming) {
+        setStreamingRagSources(null);
+      }
+      return;
+    }
+
+    const sources = getRagSourcesFromUIMessage(last);
+    if (isStreaming) {
+      setStreamingRagSources(sources);
+      return;
+    }
+
+    if (sources) {
+      setStreamingRagSources(sources);
+    }
+    commitStreamingRagSources(last.id);
+  }, [
+    messages,
+    isStreaming,
+    setStreamingRagSources,
+    commitStreamingRagSources,
+  ]);
+
+  useEffect(() => {
+    if (messagesLoading || !persistedMessages.length) {
+      return;
+    }
+    hydrateHistoryRagSources(persistedMessages);
+  }, [conversationId, messagesLoading, persistedMessages, hydrateHistoryRagSources]);
 
   const startNewConversation = useCallback(async () => {
     if (isStreaming) {
