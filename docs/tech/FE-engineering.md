@@ -32,7 +32,7 @@ memoryOS（pnpm Monorepo）
 | API 客户端    | `lib/api-client.ts` + Bearer        |    ✅ EP03.4 |
 | 状态管理      | Zustand                             |  📋 EP02  |
 | 流式通信      | Vercel AI SDK `useChat` + BFF `/api/chat` |    ✅ EP02  |
-| RAG 流升级    | BFF TextStream → Data Stream（待 `ep04-rag-chat-stream`） | 📋 见 [`chat-rag-stream.md`](./chat-rag-stream.md) |
+| RAG 流升级    | BFF TextStream → Data Stream（`ep04-rag-chat-stream`） | ✅ 见 [`chat-rag-stream.md`](./chat-rag-stream.md) |
 | 服务端状态    | TanStack Query（`@tanstack/react-query`） |    ✅ EP02  |
 | 富文本        | react-markdown + 高亮               |  📋 EP02  |
 | 单元测试      | —                                   | ❌ 未选型 |

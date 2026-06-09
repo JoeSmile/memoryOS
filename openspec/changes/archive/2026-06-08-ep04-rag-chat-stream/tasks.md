@@ -69,5 +69,5 @@
 - [x] 6.1 `pnpm test:api:harness` + web unit 绿；更新 EP04-rag Story 4.6 + `chat-rag-stream.md` 状态
   - 预计文件：2 · 层：docs
 
-- [ ] 6.2 archive change
+- [x] 6.2 archive change
   - 预计文件：0 · openspec archive
