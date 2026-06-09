@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Self
+from typing import Any, Self
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -16,6 +16,10 @@ class MessageRead(BaseModel):
     content: str
     client_message_id: UUID | None = None
     completion_status: str | None = None
+    metadata: dict[str, Any] | None = Field(
+        default=None,
+        validation_alias="metadata_",
+    )
     created_at: datetime
 
     model_config = {"from_attributes": True}
