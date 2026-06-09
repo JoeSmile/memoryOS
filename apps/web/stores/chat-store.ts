@@ -2,8 +2,10 @@ import { create } from "zustand";
 
 import {
   getRagSourcesFromMessageRead,
+  getToolStepsFromMessageRead,
   type MessageRead,
   type RagSourceItem,
+  type ToolStepItem,
 } from "@/lib/chat-types";
 
 type RagSourcesState = {
@@ -13,19 +15,27 @@ type RagSourcesState = {
   ragSourcesByMessageId: Record<string, RagSourceItem[]>;
 };
 
-type ChatStoreState = RagSourcesState & {
-  input: string;
-  error: string | null;
-  bootstrapping: boolean;
-  syncedFingerprint: string;
+type ToolStepsState = {
+  /** Tool rounds for the in-flight assistant turn (before message id is known). */
+  streamingToolSteps: ToolStepItem[] | null;
+  /** Persisted or finalized tool steps keyed by assistant message id. */
+  toolStepsByMessageId: Record<string, ToolStepItem[]>;
 };
+
+type ChatStoreState = RagSourcesState &
+  ToolStepsState & {
+    input: string;
+    error: string | null;
+    bootstrapping: boolean;
+    syncedFingerprint: string;
+  };
 
 type ChatStoreActions = {
   setInput: (input: string) => void;
   setError: (error: string | null) => void;
   setBootstrapping: (bootstrapping: boolean) => void;
   resetConversationSync: () => void;
-  /** Clear sync fingerprint only — keeps rag sources during in-flight persist fetch. */
+  /** Clear sync fingerprint only — keeps rag/tool auxiliary state during in-flight persist fetch. */
   resetPersistedSyncFingerprint: () => void;
   shouldSyncPersistedMessages: (fingerprint: string) => boolean;
   markPersistedMessagesSynced: (fingerprint: string) => void;
@@ -42,6 +52,18 @@ type ChatStoreActions = {
     messageId: string | undefined,
     isStreaming: boolean,
   ) => RagSourceItem[] | null;
+  resetToolSteps: () => void;
+  setStreamingToolSteps: (items: ToolStepItem[] | null) => void;
+  commitStreamingToolSteps: (messageId: string) => void;
+  setToolStepsForMessage: (
+    messageId: string,
+    items: ToolStepItem[] | null,
+  ) => void;
+  hydrateHistoryToolSteps: (rows: MessageRead[]) => void;
+  getToolStepsForMessage: (
+    messageId: string | undefined,
+    isStreaming: boolean,
+  ) => ToolStepItem[] | null;
 };
 
 export type ChatStore = ChatStoreState & ChatStoreActions;
@@ -51,8 +73,14 @@ const emptyRagSourcesState = (): RagSourcesState => ({
   ragSourcesByMessageId: {},
 });
 
+const emptyToolStepsState = (): ToolStepsState => ({
+  streamingToolSteps: null,
+  toolStepsByMessageId: {},
+});
+
 export const useChatStore = create<ChatStore>((set, get) => ({
   ...emptyRagSourcesState(),
+  ...emptyToolStepsState(),
   input: "",
   error: null,
   bootstrapping: false,
@@ -65,7 +93,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setBootstrapping: (bootstrapping) => set({ bootstrapping }),
 
   resetConversationSync: () =>
-    set({ syncedFingerprint: "", ...emptyRagSourcesState() }),
+    set({
+      syncedFingerprint: "",
+      ...emptyRagSourcesState(),
+      ...emptyToolStepsState(),
+    }),
 
   resetPersistedSyncFingerprint: () => set({ syncedFingerprint: "" }),
 
@@ -76,7 +108,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set({ syncedFingerprint: fingerprint }),
 
   prepareSend: () =>
-    set({ input: "", error: null, streamingRagSources: null }),
+    set({
+      input: "",
+      error: null,
+      streamingRagSources: null,
+      streamingToolSteps: null,
+    }),
 
   resetRagSources: () => set(emptyRagSourcesState()),
 
@@ -133,6 +170,65 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
     if (messageId && state.ragSourcesByMessageId[messageId]) {
       return state.ragSourcesByMessageId[messageId];
+    }
+    return null;
+  },
+
+  resetToolSteps: () => set(emptyToolStepsState()),
+
+  setStreamingToolSteps: (items) => set({ streamingToolSteps: items }),
+
+  commitStreamingToolSteps: (messageId) => {
+    const { streamingToolSteps, toolStepsByMessageId } = get();
+    if (!streamingToolSteps?.length) {
+      set({ streamingToolSteps: null });
+      return;
+    }
+    set({
+      toolStepsByMessageId: {
+        ...toolStepsByMessageId,
+        [messageId]: streamingToolSteps,
+      },
+      streamingToolSteps: null,
+    });
+  },
+
+  setToolStepsForMessage: (messageId, items) =>
+    set((state) => {
+      if (!items?.length) {
+        const next = { ...state.toolStepsByMessageId };
+        delete next[messageId];
+        return { toolStepsByMessageId: next };
+      }
+      return {
+        toolStepsByMessageId: {
+          ...state.toolStepsByMessageId,
+          [messageId]: items,
+        },
+      };
+    }),
+
+  hydrateHistoryToolSteps: (rows) => {
+    const toolStepsByMessageId: Record<string, ToolStepItem[]> = {};
+    for (const row of rows) {
+      if (row.role !== "assistant") {
+        continue;
+      }
+      const steps = getToolStepsFromMessageRead(row);
+      if (steps) {
+        toolStepsByMessageId[row.id] = steps;
+      }
+    }
+    set({ toolStepsByMessageId });
+  },
+
+  getToolStepsForMessage: (messageId, isStreaming) => {
+    const state = get();
+    if (isStreaming && state.streamingToolSteps?.length) {
+      return state.streamingToolSteps;
+    }
+    if (messageId && state.toolStepsByMessageId[messageId]) {
+      return state.toolStepsByMessageId[messageId];
     }
     return null;
   },
