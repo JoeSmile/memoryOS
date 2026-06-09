@@ -26,6 +26,7 @@ import {
   EMPTY_MESSAGES,
   getRagSourcesFromUIMessage,
   getTextFromUIMessage,
+  getToolStepsFromUIMessage,
   messagesFingerprint,
   toUIMessages,
   type ConversationRead,
@@ -68,6 +69,15 @@ export function useChatSession() {
   );
   const hydrateHistoryRagSources = useChatStore(
     (state) => state.hydrateHistoryRagSources,
+  );
+  const setStreamingToolSteps = useChatStore(
+    (state) => state.setStreamingToolSteps,
+  );
+  const commitStreamingToolSteps = useChatStore(
+    (state) => state.commitStreamingToolSteps,
+  );
+  const hydrateHistoryToolSteps = useChatStore(
+    (state) => state.hydrateHistoryToolSteps,
   );
 
   const token = getAccessToken();
@@ -160,12 +170,14 @@ export function useChatSession() {
 
       const rows = queryClient.getQueryData<MessageRead[]>(queryKey) ?? [];
       hydrateHistoryRagSources(rows);
+      hydrateHistoryToolSteps(rows);
     },
     [
       conversationId,
       queryClient,
       resetPersistedSyncFingerprint,
       hydrateHistoryRagSources,
+      hydrateHistoryToolSteps,
     ],
   );
 
@@ -320,6 +332,7 @@ export function useChatSession() {
 
     markPersistedMessagesSynced(fingerprint);
     hydrateHistoryRagSources(persistedMessages);
+    hydrateHistoryToolSteps(persistedMessages);
     setMessages(toUIMessages(persistedMessages));
   }, [
     messages,
@@ -331,6 +344,7 @@ export function useChatSession() {
     shouldSyncPersistedMessages,
     markPersistedMessagesSynced,
     hydrateHistoryRagSources,
+    hydrateHistoryToolSteps,
   ]);
 
   const isStreaming = status === "submitted" || status === "streaming";
@@ -340,25 +354,34 @@ export function useChatSession() {
     if (last?.role !== "assistant") {
       if (!isStreaming) {
         setStreamingRagSources(null);
+        setStreamingToolSteps(null);
       }
       return;
     }
 
     const sources = getRagSourcesFromUIMessage(last);
+    const toolSteps = getToolStepsFromUIMessage(last);
     if (isStreaming) {
       setStreamingRagSources(sources);
+      setStreamingToolSteps(toolSteps);
       return;
     }
 
     if (sources) {
       setStreamingRagSources(sources);
     }
+    if (toolSteps) {
+      setStreamingToolSteps(toolSteps);
+    }
     commitStreamingRagSources(last.id);
+    commitStreamingToolSteps(last.id);
   }, [
     messages,
     isStreaming,
     setStreamingRagSources,
     commitStreamingRagSources,
+    setStreamingToolSteps,
+    commitStreamingToolSteps,
   ]);
 
   useEffect(() => {
@@ -366,7 +389,14 @@ export function useChatSession() {
       return;
     }
     hydrateHistoryRagSources(persistedMessages);
-  }, [conversationId, messagesLoading, persistedMessages, hydrateHistoryRagSources]);
+    hydrateHistoryToolSteps(persistedMessages);
+  }, [
+    conversationId,
+    messagesLoading,
+    persistedMessages,
+    hydrateHistoryRagSources,
+    hydrateHistoryToolSteps,
+  ]);
 
   const startNewConversation = useCallback(async () => {
     if (isStreaming) {

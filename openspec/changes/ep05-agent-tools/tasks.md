@@ -77,7 +77,7 @@ POST /chat/completions（无 mode）
 - [x] 5.1 `chat-types.ts` + `chat-store.ts`：`ToolStepItem`、streaming/commit/hydrate（mirror `rag_sources`）
   - 预计文件：2 · 层：lib + store
 
-- [ ] 5.2 `tool-timeline.tsx` + `chat-message.tsx` + `use-chat-session` hydrate（dev summary；刷新读 metadata）
+- [x] 5.2 `tool-timeline.tsx` + `chat-message.tsx` + `use-chat-session` hydrate（dev summary；刷新读 metadata）
   - 预计文件：3 · 层：`components/chat` + hook — **apply 时若超 3 文件拆 5.2a/5.2b**
 
 ## 6. Tests & docs

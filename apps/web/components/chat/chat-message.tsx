@@ -4,11 +4,13 @@ import type { UIMessage } from "ai";
 
 import { MessageContent } from "@/components/chat/message-content";
 import { RagSourceChipList } from "@/components/chat/rag-source-chip";
+import { ToolTimeline } from "@/components/chat/tool-timeline";
 import {
   COMPLETION_INTERRUPTED,
   getCompletionStatus,
   getRagSourcesFromUIMessage,
   getTextFromUIMessage,
+  getToolStepsFromUIMessage,
 } from "@/lib/chat-types";
 import { useChatStore } from "@/stores/chat-store";
 
@@ -42,6 +44,17 @@ export function ChatMessage({
   });
   const ragSources =
     getRagSourcesFromUIMessage(message) ?? storeSources ?? null;
+  const storeToolSteps = useChatStore((state) => {
+    if (isUser) {
+      return null;
+    }
+    if (isStreaming && state.streamingToolSteps?.length) {
+      return state.streamingToolSteps;
+    }
+    return state.toolStepsByMessageId[message.id] ?? null;
+  });
+  const toolSteps =
+    getToolStepsFromUIMessage(message) ?? storeToolSteps ?? null;
   const hasMarkdownRagSources =
     !isUser && !isStreaming && text.includes("## 参考来源");
 
@@ -77,6 +90,13 @@ export function ChatMessage({
         ) : null}
       </div>
       {ragSources ? <RagSourceChipList items={ragSources} /> : null}
+      {!isUser ? (
+        <ToolTimeline
+          message={message}
+          steps={toolSteps}
+          isStreaming={isStreaming}
+        />
+      ) : null}
       <MessageContent
         content={text}
         markdown={!isUser && !isStreaming}
