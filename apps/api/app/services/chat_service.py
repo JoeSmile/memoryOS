@@ -1,7 +1,9 @@
 import asyncio
+import logging
 import uuid
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
+from typing import Any
 
 from langchain_core.messages import AIMessage, HumanMessage
 from redis.asyncio import Redis
@@ -13,11 +15,15 @@ from app.cache.stream_cancel_cache import StreamCancelCache
 from app.cache.stream_cache import StreamCache
 from app.core.exceptions import AppException
 from app.graphs.chat_state import ChatState
-from app.graphs.runner import ChatGraphRunner
+from app.graphs.runner import ChatGraphRunner, RunnerStreamEvent
 from app.models import Message
 from app.models.message import COMPLETION_COMPLETE, COMPLETION_INTERRUPTED
 from app.repositories import MessageRepository
+from app.schemas.message import TOOL_STEP_SUMMARY_MAX_LEN
 from app.services.conversation_service import ConversationService
+
+logger = logging.getLogger(__name__)
+
 
 class _ClientDisconnected(Exception):
     """Consumer closed the SSE connection (stop / tab close / proxy abort)."""
@@ -30,6 +36,7 @@ class CompletionStreamState:
     stream_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     assistant_parts: list[str] = field(default_factory=list)
     rag_source_items: list[dict] | None = None
+    tool_steps: list[dict] = field(default_factory=list)
     stream_exhausted: bool = False
     disconnected: bool = False
     terminal_error: bool = False
@@ -230,6 +237,69 @@ class ChatService:
             visible_length=visible_length,
         )
 
+    async def _iter_runner_events_with_disconnect(
+        self,
+        state: ChatState,
+        *,
+        conversation_id: uuid.UUID,
+        stream_id: str,
+        request: Request | None,
+    ) -> AsyncIterator[RunnerStreamEvent]:
+        """Delegate to runner stream_events; raise when HTTP client disconnects."""
+        async for event in self.runner.stream_events(
+            state,
+            thread_id=str(conversation_id),
+            db=self.db,
+            request=request,
+            stream_id=stream_id,
+            cancel_cache=self.cancel_cache,
+        ):
+            yield event
+
+        if request is not None and await request.is_disconnected():
+            raise _ClientDisconnected
+
+    @staticmethod
+    def _truncate_tool_summary(summary: str) -> str:
+        text = summary.strip()
+        if len(text) <= TOOL_STEP_SUMMARY_MAX_LEN:
+            return text
+        return f"{text[:TOOL_STEP_SUMMARY_MAX_LEN]}…"
+
+    @classmethod
+    def _merge_tool_step(
+        cls,
+        pending: dict[str, Any],
+        result_data: dict[str, Any],
+    ) -> dict[str, Any]:
+        step: dict[str, Any] = {
+            "id": str(result_data.get("id") or pending.get("id") or ""),
+            "name": str(result_data.get("name") or pending.get("name") or ""),
+            "arguments": pending.get("arguments") or {},
+            "success": bool(result_data.get("success", False)),
+            "summary": cls._truncate_tool_summary(str(result_data.get("summary") or "")),
+        }
+        duration_ms = result_data.get("duration_ms")
+        if isinstance(duration_ms, int):
+            step["duration_ms"] = duration_ms
+        return step
+
+    def _maybe_emit_sources(
+        self,
+        stream_state: CompletionStreamState,
+        *,
+        sources_emitted: bool,
+    ) -> tuple[dict | None, bool]:
+        if sources_emitted:
+            return None, True
+        source_items = ChatGraphRunner.format_rag_source_items(
+            self.runner.last_retrieved_chunks,
+        )
+        if source_items:
+            stream_state.rag_source_items = source_items
+            return {"event": "sources", "data": {"items": source_items}}, True
+        return None, True
+
     async def _iter_tokens_with_disconnect(
         self,
         state: ChatState,
@@ -282,23 +352,52 @@ class ChatService:
         yield {"event": "start", "data": {"stream_id": stream_state.stream_id}}
 
         sources_emitted = False
+        pending_tool_calls: dict[str, dict[str, Any]] = {}
 
         try:
-            async for token in self._iter_tokens_with_disconnect(
+            async for event in self._iter_runner_events_with_disconnect(
                 graph_state,
                 conversation_id=stream_state.conversation_id,
                 stream_id=stream_state.stream_id,
                 request=request,
             ):
-                if not sources_emitted:
-                    source_items = ChatGraphRunner.format_rag_source_items(
-                        self.runner.last_retrieved_chunks,
-                    )
-                    if source_items:
-                        stream_state.rag_source_items = source_items
-                        yield {"event": "sources", "data": {"items": source_items}}
-                    sources_emitted = True
+                sources_frame, sources_emitted = self._maybe_emit_sources(
+                    stream_state,
+                    sources_emitted=sources_emitted,
+                )
+                if sources_frame is not None:
+                    yield sources_frame
 
+                event_type = event.get("type")
+                if event_type == "tool_call":
+                    data = event["data"]
+                    call_id = str(data.get("id") or "")
+                    if call_id:
+                        pending_tool_calls[call_id] = {
+                            "id": call_id,
+                            "name": data.get("name"),
+                            "arguments": data.get("arguments") or {},
+                        }
+                    yield {"event": "tool_call", "data": data}
+                    continue
+
+                if event_type == "tool_result":
+                    data = event["data"]
+                    call_id = str(data.get("id") or "")
+                    pending = pending_tool_calls.pop(call_id, {})
+                    stream_state.tool_steps.append(
+                        self._merge_tool_step(pending, data),
+                    )
+                    yield {"event": "tool_result", "data": data}
+                    continue
+
+                if event_type != "token":
+                    logger.warning("ignoring unknown runner stream event: %r", event_type)
+                    continue
+
+                token = event.get("content")
+                if not token:
+                    continue
                 stream_state.assistant_parts.append(token)
                 await self.stream_cache.append(
                     stream_state.conversation_id,
@@ -340,11 +439,12 @@ class ChatService:
             stream_state.conversation_id,
             stream_state.stream_id,
         )
-        if (
-            stream_state.persisted
-            or stream_state.terminal_error
-            or not stream_state.assistant_parts
-        ):
+        if stream_state.persisted or stream_state.terminal_error:
+            return None
+
+        has_assistant_text = bool(stream_state.assistant_parts)
+        has_tool_steps = bool(stream_state.tool_steps)
+        if not has_assistant_text and not has_tool_steps:
             return None
 
         completion_status = (
@@ -358,7 +458,7 @@ class ChatService:
             visible_content,
             visible_length,
         )
-        if not content:
+        if not content and not has_tool_steps:
             return None
         assistant = await self.messages.create(
             stream_state.conversation_id,
@@ -366,8 +466,13 @@ class ChatService:
             content,
             completion_status=completion_status,
         )
+        metadata: dict[str, Any] = {}
         if stream_state.rag_source_items:
-            assistant.metadata_ = {"rag_sources": stream_state.rag_source_items}
+            metadata["rag_sources"] = stream_state.rag_source_items
+        if stream_state.tool_steps:
+            metadata["tool_steps"] = stream_state.tool_steps
+        if metadata:
+            assistant.metadata_ = metadata
         await self.conversations.touch_activity(stream_state.conversation_id)
         await self.db.commit()
         await self.conversations.invalidate_list_cache(stream_state.user_id)

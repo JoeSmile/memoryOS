@@ -55,13 +55,13 @@ POST /chat/completions（无 mode）
 
 ## 3. Runner & API
 
-- [ ] 3.1 `ChatGraphRunner` 多轮 `tool_call`/`tool_result` SSE + 流式 token
+- [x] 3.1 `ChatGraphRunner` 多轮 `tool_call`/`tool_result` SSE + 流式 token
   - 预计文件：1 · 层：`graphs/runner.py`
 
-- [ ] 3.2 `chat_service.py`：`stream_state.tool_steps` 累积 + `finalize` 写 `metadata.tool_steps`；`AGENT_TOOLS_ENABLED` 回滚
+- [x] 3.2 `chat_service.py`：`stream_state.tool_steps` 累积 + `finalize` 写 `metadata.tool_steps`；`AGENT_TOOLS_ENABLED` 回滚
   - 预计文件：2 · 层：`services/chat_service.py` + `schemas/message.py`（`ToolStepRead` 类型）
 
-- [ ] 3.3 Harness `test_unified_react_contract.py`（RAG 够无 tool / 弱 RAG 有 Tavily + **assert `metadata.tool_steps`**；TDD 先写）
+- [x] 3.3 Harness `test_unified_react_contract.py`（RAG 够无 tool / 弱 RAG 有 Tavily + **assert `metadata.tool_steps`**；TDD 先写）
   - 预计文件：1 · 层：`tests/harness`
 
 ## 4. BFF Data Stream

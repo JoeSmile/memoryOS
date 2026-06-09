@@ -58,6 +58,7 @@ def _tool_result_content(result: Any) -> str:
     payload: dict[str, Any] = {
         "success": result.success,
         "summary": result.summary,
+        "duration_ms": result.duration_ms,
     }
     if result.success:
         payload["output"] = result.output
