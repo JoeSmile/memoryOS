@@ -39,7 +39,7 @@ POST /chat/completions（无 mode）
 - [x] 1.1 `ToolDefinition` + `ToolRegistry` + `ToolExecutor`
   - 预计文件：3 · 层：`apps/api/app/tools/`
 
-- [ ] 1.2 `tavily_search` + config（`TAVILY_API_KEY`、`AGENT_MAX_ITERATIONS`）；无 Key mock
+- [x] 1.2 `tavily_search` + config（`TAVILY_API_KEY`、`AGENT_MAX_ITERATIONS`）；无 Key mock
   - 预计文件：2 · 层：`tools/builtin/` + `core/config.py`
 
 ## 2. Unified ReAct LangGraph

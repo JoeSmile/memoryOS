@@ -123,6 +123,33 @@ class Settings(BaseSettings):
         description="LangSmith API endpoint (LANGSMITH_ENDPOINT)",
     )
 
+    agent_tools_enabled: bool = Field(
+        default=True,
+        description="Enable unified ReAct tool loop (AGENT_TOOLS_ENABLED)",
+    )
+    agent_max_iterations: int = Field(
+        default=5,
+        ge=1,
+        le=20,
+        description="LangGraph recursion_limit for tool loop (AGENT_MAX_ITERATIONS)",
+    )
+    agent_tool_timeout_seconds: float = Field(
+        default=10.0,
+        gt=0.0,
+        le=120.0,
+        description="Per-tool execution timeout seconds (AGENT_TOOL_TIMEOUT_SECONDS)",
+    )
+    tavily_api_key: str | None = Field(
+        default=None,
+        description="Tavily API key — unset uses mock web search (TAVILY_API_KEY)",
+    )
+    tavily_max_results: int = Field(
+        default=3,
+        ge=1,
+        le=10,
+        description="Max Tavily results returned to the model (TAVILY_MAX_RESULTS)",
+    )
+
     @field_validator("rag_chat_collection", mode="before")
     @classmethod
     def _blank_rag_chat_collection_as_none(cls, value: object) -> object:
@@ -142,6 +169,10 @@ class Settings(BaseSettings):
     def use_mock_embedding(self) -> bool:
         """Same gate as LLM: no OPENAI_API_KEY → deterministic mock vectors."""
         return self.use_mock_llm
+
+    @property
+    def use_mock_tavily(self) -> bool:
+        return not (self.tavily_api_key and self.tavily_api_key.strip())
 
 
 def _sync_llm_observability_env(s: Settings) -> None:
