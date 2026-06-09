@@ -6,7 +6,7 @@
 | **优先级** | P0 |
 | **依赖** | EP02、EP03、**[EP04-01 世界杯 CSV ETL](./EP04-01-worldcup-data-etl.md)** ✅（Silver + Gold 事实卡已就绪） |
 | **学习路线** | [L03-rag-dual-stack.md](../learning/L03-rag-dual-stack.md) |
-| **目标文档** | [`rag-embedding-chunking.md`](../../tech/rag-embedding-chunking.md) ✅ · [`chat-rag-stream.md`](../../tech/chat-rag-stream.md) 📋（BFF 结构化溯源升级） · `rag-langchain-vs-llamaindex.md` 📋 |
+| **目标文档** | [`rag-embedding-chunking.md`](../../tech/rag-embedding-chunking.md) ✅ · [`chat-rag-stream.md`](../../tech/chat-rag-stream.md) ✅（BFF Data Stream + citation chips · `ep04-rag-chat-stream`） · `rag-langchain-vs-llamaindex.md` 📋 |
 
 > **世界杯 30 CSV**：清洗与规范化见子史诗 [EP04-01](./EP04-01-worldcup-data-etl.md)；EP04 消费其 **Gold 事实卡**，不直接吃原始 CSV。
 
@@ -42,7 +42,7 @@
 ## Story 4.6 对话与溯源
 
 - [x] RAG Prompt 模板（`ep04-rag-chat` ✅）
-- [x] 答案引用来源（V1 Markdown 脚注 · `ep04-rag-chat` ✅；**structured chips** 见 [`chat-rag-stream.md`](../../tech/chat-rag-stream.md)）
+- [x] 答案引用来源（V1 Markdown 脚注 · `ep04-rag-chat` ✅；**structured chips + metadata 持久化** · `ep04-rag-chat-stream` ✅）
 - [x] 无命中兜底策略（`ep04-rag-chat` ✅）
 
 ## Story 4.7 维护与双模式
