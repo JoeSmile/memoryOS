@@ -17,6 +17,7 @@
     "db:migrate": "bash scripts/api.sh exec alembic upgrade head",
     "setup:api": "bash scripts/api.sh setup",
     "test:api:harness": "bash scripts/api.sh exec pytest tests/harness -q",
+    "test:web": "pnpm --filter @memoryos/web test:unit",
     "branch:change": "bash scripts/branch-task.sh --change-only",
     "branch:task": "bash scripts/branch-task.sh",
     "install:all": "pnpm install && pnpm setup:api",

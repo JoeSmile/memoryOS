@@ -178,6 +178,85 @@ async def test_rag_chat_no_sources_without_ingested_knowledge():
         assert _event_index(events, "done") >= 0
 
 
+async def _list_conversation_messages(
+    client: AsyncClient,
+    *,
+    token: str,
+    conversation_id: str,
+) -> list[dict]:
+    resp = await client.get(
+        f"/api/v1/conversations/{conversation_id}/messages",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["code"] == 0
+    return body["data"]
+
+
+@pytest.mark.asyncio
+async def test_rag_chat_persists_rag_sources_metadata_after_stream():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        token, user_id = await _register_and_login(client)
+        headers = {"Authorization": f"Bearer {token}"}
+        await _ingest_samples(client, headers)
+
+        conversation_id = await _create_conversation(client, token, user_id)
+        events = await _stream_chat_events(
+            client,
+            token=token,
+            conversation_id=conversation_id,
+            content=SEEDED_QUERY,
+        )
+
+        sources_index = _event_index(events, "sources")
+        done_index = _event_index(events, "done")
+        assert sources_index >= 0
+        assert done_index >= 0
+
+        items = events[sources_index]["data"]["items"]
+        message_id = events[done_index]["data"]["message_id"]
+
+        rows = await _list_conversation_messages(
+            client,
+            token=token,
+            conversation_id=conversation_id,
+        )
+        assistant = next(row for row in rows if row["id"] == message_id)
+        assert assistant["role"] == "assistant"
+        metadata = assistant.get("metadata")
+        assert metadata is not None
+        assert metadata.get("rag_sources") == items
+
+
+@pytest.mark.asyncio
+async def test_rag_chat_omits_rag_sources_metadata_without_hit():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        token, user_id = await _register_and_login(client)
+        conversation_id = await _create_conversation(client, token, user_id)
+        events = await _stream_chat_events(
+            client,
+            token=token,
+            conversation_id=conversation_id,
+            content=NO_HIT_QUERY,
+        )
+
+        done_index = _event_index(events, "done")
+        assert done_index >= 0
+        message_id = events[done_index]["data"]["message_id"]
+
+        rows = await _list_conversation_messages(
+            client,
+            token=token,
+            conversation_id=conversation_id,
+        )
+        assistant = next(row for row in rows if row["id"] == message_id)
+        metadata = assistant.get("metadata")
+        assert metadata is None or "rag_sources" not in metadata
+
+
 @pytest.mark.asyncio
 async def test_rag_chat_no_sources_when_scores_below_min_threshold(monkeypatch):
     monkeypatch.setattr(settings, "rag_chat_min_score", 0.99)

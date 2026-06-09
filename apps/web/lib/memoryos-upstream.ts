@@ -332,7 +332,6 @@ export function memoryosSseResponseToDataStream(
     if (streamFinalized || state.clientStopped) {
       return;
     }
-    streamFinalized = true;
     if (!streamInitialized) {
       initializeStream(controller);
     }
@@ -355,6 +354,7 @@ export function memoryosSseResponseToDataStream(
     }
     enqueuePart(controller, { type: "finish-step" });
     enqueuePart(controller, { type: "finish" });
+    streamFinalized = true;
     controller.enqueue(new TextEncoder().encode(UI_MESSAGE_STREAM_DONE));
     controller.close();
   }

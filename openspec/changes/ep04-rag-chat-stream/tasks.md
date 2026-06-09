@@ -58,10 +58,10 @@
 
 ## 5. Tests
 
-- [ ] 5.1 `tests/unit/test_memoryos_data_stream.ts`（或 `.tsx`）：converter mock SSE → data parts
+- [x] 5.1 `tests/unit/test_memoryos_data_stream.ts`（或 `.tsx`）：converter mock SSE → data parts
   - 预计文件：1 · 层：`apps/web` unit
 
-- [ ] 5.2 扩展 `test_rag_chat_contract.py`：assert assistant message `metadata.rag_sources`
+- [x] 5.2 扩展 `test_rag_chat_contract.py`：assert assistant message `metadata.rag_sources`
   - 预计文件：1 · 层：`tests/harness`（TDD 先写）
 
 ## 6. Closeout
