@@ -47,7 +47,7 @@ POST /chat/completions（无 mode）
 - [x] 2.1 扩展 `ChatState`（`rag_sufficient` 等）+ unified system prompt（RAG + tool 指引）
   - 预计文件：2 · 层：`graphs/chat_state.py` + `prompts/`
 
-- [ ] 2.2 `execute_tools` 节点 + `should_continue` 条件边；扩展 `chat_graph.py` ReAct 环
+- [x] 2.2 `execute_tools` 节点 + `should_continue` 条件边；扩展 `chat_graph.py` ReAct 环
   - 预计文件：2 · 层：`graphs/nodes/` + `chat_graph.py`
 
 - [ ] 2.3 `call_model` 改 `bind_tools`；mock ReAct 两场景（够/弱 RAG）
