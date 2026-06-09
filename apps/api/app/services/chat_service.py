@@ -366,6 +366,8 @@ class ChatService:
             content,
             completion_status=completion_status,
         )
+        if stream_state.rag_source_items:
+            assistant.metadata_ = {"rag_sources": stream_state.rag_source_items}
         await self.conversations.touch_activity(stream_state.conversation_id)
         await self.db.commit()
         await self.conversations.invalidate_list_cache(stream_state.user_id)
