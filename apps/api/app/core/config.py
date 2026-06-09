@@ -150,6 +150,49 @@ class Settings(BaseSettings):
         description="Max Tavily results returned to the model (TAVILY_MAX_RESULTS)",
     )
 
+    memory_enabled: bool = Field(
+        default=True,
+        description="Enable memory trim, summary, and extract (MEMORY_ENABLED)",
+    )
+    memory_short_term_enabled: bool = Field(
+        default=True,
+        description="Enable short-term message trimming in graph (MEMORY_SHORT_TERM_ENABLED)",
+    )
+    memory_long_term_enabled: bool = Field(
+        default=True,
+        description="Enable long-term memories table and extract (MEMORY_LONG_TERM_ENABLED)",
+    )
+    max_context_tokens: int = Field(
+        default=8192,
+        ge=512,
+        le=128_000,
+        description="Max input context tokens per LLM turn (MAX_CONTEXT_TOKENS)",
+    )
+    reserve_for_reply: int = Field(
+        default=1024,
+        ge=128,
+        le=32_000,
+        description="Tokens reserved for assistant reply (RESERVE_FOR_REPLY)",
+    )
+    summary_trigger_tokens: int = Field(
+        default=4096,
+        ge=512,
+        le=128_000,
+        description="First summary when full history exceeds this (SUMMARY_TRIGGER_TOKENS)",
+    )
+    summary_increment_tokens: int = Field(
+        default=1024,
+        ge=128,
+        le=32_000,
+        description="Min new message tokens since last summary for rolling update (SUMMARY_INCREMENT_TOKENS)",
+    )
+    summary_cooldown_seconds: int = Field(
+        default=300,
+        ge=0,
+        le=86_400,
+        description="Min seconds between rolling summary updates (SUMMARY_COOLDOWN_SECONDS)",
+    )
+
     @field_validator("rag_chat_collection", mode="before")
     @classmethod
     def _blank_rag_chat_collection_as_none(cls, value: object) -> object:
