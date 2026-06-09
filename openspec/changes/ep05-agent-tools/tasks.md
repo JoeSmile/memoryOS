@@ -44,7 +44,7 @@ POST /chat/completions（无 mode）
 
 ## 2. Unified ReAct LangGraph
 
-- [ ] 2.1 扩展 `ChatState`（`rag_sufficient` 等）+ unified system prompt（RAG + tool 指引）
+- [x] 2.1 扩展 `ChatState`（`rag_sufficient` 等）+ unified system prompt（RAG + tool 指引）
   - 预计文件：2 · 层：`graphs/chat_state.py` + `prompts/`
 
 - [ ] 2.2 `execute_tools` 节点 + `should_continue` 条件边；扩展 `chat_graph.py` ReAct 环
