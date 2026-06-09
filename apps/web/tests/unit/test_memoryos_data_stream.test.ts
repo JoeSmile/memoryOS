@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   memoryosSseResponseToDataStream,
   RAG_SOURCES_UI_DATA_TYPE,
+  TOOL_CALL_UI_DATA_TYPE,
+  TOOL_RESULT_UI_DATA_TYPE,
 } from "@/lib/memoryos-upstream";
 import { extractDonePayload, parseSseDataLine } from "@/lib/sse-frames";
 import type { RagSourceItem } from "@/lib/sse-frames";
@@ -145,5 +147,62 @@ describe("memoryosSseResponseToDataStream", () => {
 
     const metadataPart = parts.find((part) => part.type === "message-metadata");
     expect(metadataPart?.messageMetadata).toEqual({ messageId: plainMessageId });
+  });
+
+  it("maps tool_call and tool_result before text in ReAct order", async () => {
+    const upstream = mockSseResponse(
+      [
+        sseFrame("start", { stream_id: "stream-react" }),
+        sseFrame("tool_call", {
+          id: "mock_call_tavily",
+          name: "tavily_search",
+          arguments: { query: "mock web search" },
+        }),
+        sseFrame("tool_result", {
+          id: "mock_call_tavily",
+          name: "tavily_search",
+          success: true,
+          summary: "mock summary",
+          duration_ms: 12,
+        }),
+        sseFrame("token", { content: "联" }),
+        sseFrame("token", { content: "网" }),
+        sseFrame("done", { message_id: MESSAGE_ID }),
+      ].join(""),
+    );
+
+    const parts = await readUiStreamParts(
+      memoryosSseResponseToDataStream(upstream),
+    );
+    const types = partTypes(parts);
+
+    const toolCallIndex = types.indexOf(TOOL_CALL_UI_DATA_TYPE);
+    const toolResultIndex = types.indexOf(TOOL_RESULT_UI_DATA_TYPE);
+    const textStartIndex = types.indexOf("text-start");
+
+    expect(toolCallIndex).toBeGreaterThanOrEqual(0);
+    expect(toolResultIndex).toBeGreaterThan(toolCallIndex);
+    expect(textStartIndex).toBeGreaterThan(toolResultIndex);
+
+    const toolCallPart = parts.find((part) => part.type === TOOL_CALL_UI_DATA_TYPE);
+    expect(toolCallPart?.data).toEqual({
+      id: "mock_call_tavily",
+      name: "tavily_search",
+      arguments: { query: "mock web search" },
+    });
+
+    const toolResultPart = parts.find(
+      (part) => part.type === TOOL_RESULT_UI_DATA_TYPE,
+    );
+    expect(toolResultPart?.data).toEqual({
+      id: "mock_call_tavily",
+      name: "tavily_search",
+      success: true,
+      summary: "mock summary",
+      duration_ms: 12,
+    });
+
+    const textDeltas = parts.filter((part) => part.type === "text-delta");
+    expect(textDeltas.map((part) => part.delta)).toEqual(["联", "网"]);
   });
 });

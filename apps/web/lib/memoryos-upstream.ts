@@ -3,10 +3,14 @@ import {
   extractSourcesItems,
   extractStartStreamId,
   extractTokenContent,
+  extractToolCallPayload,
+  extractToolResultPayload,
   parseSseDataLine,
   type MemoryosDonePayload,
   type MemoryosSseFrame,
   type RagSourceItem,
+  type ToolCallPayload,
+  type ToolResultPayload,
 } from "@/lib/sse-frames";
 
 const API_BASE =
@@ -17,6 +21,10 @@ export const CANCEL_VISIBLE_CONTENT_INLINE_MAX = 256;
 
 /** AI SDK UI message stream custom data part for RAG sources. */
 export const RAG_SOURCES_UI_DATA_TYPE = "data-rag-sources" as const;
+
+/** AI SDK UI message stream custom data parts for Unified ReAct tool rounds. */
+export const TOOL_CALL_UI_DATA_TYPE = "data-tool-call" as const;
+export const TOOL_RESULT_UI_DATA_TYPE = "data-tool-result" as const;
 
 const UI_MESSAGE_TEXT_PART_ID = "text-1";
 const UI_MESSAGE_STREAM_DONE = "data: [DONE]\n\n";
@@ -306,6 +314,28 @@ export function memoryosSseResponseToDataStream(
     });
   }
 
+  function enqueueToolCall(
+    controller: ReadableStreamDefaultController<Uint8Array>,
+    payload: ToolCallPayload,
+  ): void {
+    initializeStream(controller);
+    enqueuePart(controller, {
+      type: TOOL_CALL_UI_DATA_TYPE,
+      data: payload,
+    });
+  }
+
+  function enqueueToolResult(
+    controller: ReadableStreamDefaultController<Uint8Array>,
+    payload: ToolResultPayload,
+  ): void {
+    initializeStream(controller);
+    enqueuePart(controller, {
+      type: TOOL_RESULT_UI_DATA_TYPE,
+      data: payload,
+    });
+  }
+
   function enqueueTokenDelta(
     controller: ReadableStreamDefaultController<Uint8Array>,
     token: string,
@@ -401,6 +431,18 @@ export function memoryosSseResponseToDataStream(
             const sources = extractSourcesItems(frame);
             if (sources) {
               enqueueRagSources(controller, sources);
+              continue;
+            }
+
+            const toolCall = extractToolCallPayload(frame);
+            if (toolCall) {
+              enqueueToolCall(controller, toolCall);
+              continue;
+            }
+
+            const toolResult = extractToolResultPayload(frame);
+            if (toolResult) {
+              enqueueToolResult(controller, toolResult);
               continue;
             }
 

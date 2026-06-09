@@ -66,10 +66,10 @@ POST /chat/completions（无 mode）
 
 ## 4. BFF Data Stream
 
-- [ ] 4.1 `sse-frames.ts` 解析 `tool_call` / `tool_result`
+- [x] 4.1 `sse-frames.ts` 解析 `tool_call` / `tool_result`
   - 预计文件：1 · 层：`apps/web/lib`
 
-- [ ] 4.2 `memoryos-upstream.ts` → `data-tool-call` / `data-tool-result`
+- [x] 4.2 `memoryos-upstream.ts` → `data-tool-call` / `data-tool-result`
   - 预计文件：1 · 层：`apps/web/lib`
 
 ## 5. 前端（无 mode）
