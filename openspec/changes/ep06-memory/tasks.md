@@ -70,7 +70,7 @@ POST /chat/completions
 
 ## 6. 长期记忆抽取与检索（Story 6.2）
 
-- [ ] 6.1 `services/memory/long_term.py` — 抽取 JSON、upsert、embed、prune expired/low importance
+- [x] 6.1 `services/memory/long_term.py` — 抽取 JSON、upsert、embed、prune expired/low importance
   - 预计文件：2 · 层：`long_term.py` + `tests/unit/test_long_term.py`
 
 - [ ] 6.2 `chat_service` finalize 后调度 memory extract（与 summary 并列）

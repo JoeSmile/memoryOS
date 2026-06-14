@@ -174,6 +174,12 @@ class Settings(BaseSettings):
         le=1.0,
         description="Min cosine similarity for injecting a memory snippet (MEMORY_MIN_SCORE)",
     )
+    memory_prune_threshold: float = Field(
+        default=0.1,
+        ge=0.0,
+        le=1.0,
+        description="Delete memories below this importance during extract prune (MEMORY_PRUNE_THRESHOLD)",
+    )
     max_context_tokens: int = Field(
         default=8192,
         ge=512,
