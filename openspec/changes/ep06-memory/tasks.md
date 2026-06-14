@@ -46,7 +46,7 @@ POST /chat/completions
 
 ## 3. Schema & repository（Story 6.2 基础）
 
-- [ ] 3.1 Alembic：`memories` 表 + `conversations.context_summary` / `summary_updated_at`；更新 `docs/database.md`
+- [x] 3.1 Alembic：`memories` 表 + `conversations.context_summary` / `summary_updated_at`；更新 `docs/database.md`
   - 预计文件：2 · 层：`alembic/versions/` + `docs/database.md`
 
 - [ ] 3.2 `Memory` ORM + `MemoryRepository` + Pydantic schemas（`MemoryRead`）

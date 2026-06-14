@@ -12,6 +12,7 @@
 ```mermaid
 erDiagram
     users ||--o{ conversations : owns
+    users ||--o{ memories : owns
     conversations ||--o{ messages : contains
     documents ||--o{ document_chunks : contains
 
@@ -27,6 +28,21 @@ erDiagram
         uuid id PK
         uuid user_id FK
         string title
+        text context_summary "nullable, EP06 rolling summary"
+        timestamptz summary_updated_at "nullable"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    memories {
+        uuid id PK
+        uuid user_id FK
+        string memory_key "upsert key per user"
+        string memory_type "preference | fact | constraint"
+        text content
+        numeric importance "0-1"
+        vector embedding "1024-dim, nullable until embed"
+        timestamptz expires_at "nullable"
         timestamptz created_at
         timestamptz updated_at
     }
@@ -63,7 +79,7 @@ erDiagram
 
 **删除策略**：
 
-- `users` 删除 → 级联删除其 `conversations` → 级联删除其 `messages`。
+- `users` 删除 → 级联删除其 `conversations` → 级联删除其 `messages`；级联删除其 `memories`。
 - `documents` 删除 → 级联删除其 `document_chunks`。
 
 ---
@@ -88,9 +104,11 @@ erDiagram
 | :----------- | :------------- | :------------------------------------------ | :----------- |
 | `id`         | `UUID`         | PK                                          | 会话 ID      |
 | `user_id`    | `UUID`         | FK → `users.id` ON DELETE CASCADE, NOT NULL | 所属用户     |
-| `title`      | `VARCHAR(500)` | NOT NULL, default `''`                      | 列表展示标题 |
-| `created_at` | `TIMESTAMPTZ`  | NOT NULL, default `now()`                   |              |
-| `updated_at` | `TIMESTAMPTZ`  | NOT NULL, default `now()`                   | 最后活动时间 |
+| `title`               | `VARCHAR(500)` | NOT NULL, default `''`                      | 列表展示标题 |
+| `context_summary`     | `TEXT`         | NULL                                        | 会话 rolling 摘要（EP06 · 迁移 `014`） |
+| `summary_updated_at`  | `TIMESTAMPTZ`  | NULL                                        | 上次摘要写入时间（节流 rolling 更新） |
+| `created_at`          | `TIMESTAMPTZ`  | NOT NULL, default `now()`                   |              |
+| `updated_at`          | `TIMESTAMPTZ`  | NOT NULL, default `now()`                   | 最后活动时间 |
 
 **索引（Story 3.5）**：`ix_conversations_user_updated (user_id, updated_at DESC)` — 会话列表（迁移 `010`）。
 
@@ -107,6 +125,43 @@ erDiagram
 | `created_at`      | `TIMESTAMPTZ` | NOT NULL, default `now()`                           | 排序依据                                                   |
 
 **索引（Story 3.5）**：`ix_messages_conv_created (conversation_id, created_at)` — 拉取历史（迁移 `010`）。
+
+---
+
+## 长期记忆（EP06 · 迁移 `014`）
+
+用户域长期记忆；向量检索与 RAG `document_chunks` 分离（不写入知识库 collection）。
+
+| 项 | 值 |
+| :--- | :--- |
+| 向量维度 | **1024**（与 RAG 一致 · `app/core/rag_constants.py`） |
+| 幂等键 | `(user_id, memory_key)` — 抽取 upsert |
+| V1 ANN 索引 | **无**（按用户过滤后暴力 scan + `LIMIT`） |
+
+ORM（task 3.2）：`app/models/memory.py` · Repository：`memory_repository`。
+
+### 表：`memories`
+
+| 列 | 类型 | 约束 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | `UUID` | PK, default `gen_random_uuid()` | 记忆 ID |
+| `user_id` | `UUID` | FK → `users.id` ON DELETE CASCADE, NOT NULL | 所属用户 |
+| `memory_key` | `VARCHAR(128)` | NOT NULL | 规范化 key（同用户 upsert） |
+| `memory_type` | `VARCHAR(32)` | NOT NULL | `preference` / `fact` / `constraint` |
+| `content` | `TEXT` | NOT NULL | 记忆正文 |
+| `importance` | `NUMERIC(4,3)` | NOT NULL, default `0.500` | 0–1 重要性 |
+| `embedding` | `vector(1024)` | NULL | 语义向量；抽取后 embed，可为空 |
+| `expires_at` | `TIMESTAMPTZ` | NULL | 可选过期时间 |
+| `created_at` | `TIMESTAMPTZ` | NOT NULL, default `now()` | |
+| `updated_at` | `TIMESTAMPTZ` | NOT NULL, default `now()` | 覆盖 upsert 时更新 |
+
+**约束**：
+
+- `uq_memories_user_memory_key (user_id, memory_key)`
+- `ck_memories_memory_type` — 类型枚举
+- `ck_memories_importance_range` — `importance` ∈ [0, 1]
+
+**索引**：`ix_memories_user_id (user_id)` — 列表与按用户检索。
 
 ---
 
