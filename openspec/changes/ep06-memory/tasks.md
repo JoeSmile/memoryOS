@@ -81,7 +81,7 @@ POST /chat/completions
 - [x] 7.1 `GET /api/v1/memories` + `DELETE /api/v1/memories/{id}` + `memory_service.py` 薄层
   - 预计文件：3 · 层：`api/v1/memories.py` + `services/memory_service.py` + `main.py` 注册
 
-- [ ] 7.2 Harness `test_memories_api_contract.py`（list / delete / 403 跨用户）TDD 先写
+- [x] 7.2 Harness `test_memories_api_contract.py`（list / delete / 403 跨用户）TDD 先写
   - 预计文件：1 · 层：`tests/harness/`
 
 ## 8. Harness 长历史（Story 6.1 + 6.5）
