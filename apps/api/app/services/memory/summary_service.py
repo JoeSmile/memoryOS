@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
+import logging
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.core.config import Settings, settings
+from app.core.database import AsyncSessionLocal
 from app.models import Conversation, Message
+from app.repositories import ConversationRepository, MessageRepository
+
+logger = logging.getLogger(__name__)
 from app.services.memory.token_counter import count_text_tokens
 
 _SUMMARY_ROLES = frozenset({"user", "assistant"})
@@ -174,3 +180,27 @@ async def produce_summary_text(
         return None
     prompt = build_summary_prompt(conversation, messages)
     return await generate_summary_text(prompt, settings_=settings_ or settings)
+
+
+async def run_summary_background(conversation_id: uuid.UUID) -> None:
+    """Background job: produce rolling summary and persist when still warranted."""
+    async with AsyncSessionLocal() as db:
+        conversations = ConversationRepository(db)
+        messages_repo = MessageRepository(db)
+        conversation = await conversations.get_by_id(conversation_id)
+        if conversation is None:
+            return
+
+        all_messages = await messages_repo.list_by_conversation_id(conversation_id)
+        summary_text = await produce_summary_text(conversation, all_messages)
+        if summary_text is None:
+            return
+
+        now = datetime.now(timezone.utc)
+        await conversations.update_context_summary(
+            conversation_id,
+            summary_text,
+            now,
+        )
+        await db.commit()
+        logger.info("conversation summary updated conversation_id=%s", conversation_id)

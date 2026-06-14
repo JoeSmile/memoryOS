@@ -1,6 +1,6 @@
 import json
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import StreamingResponse
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,6 +20,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 async def chat_completions(
     body: ChatCompletionRequest,
     request: Request,
+    background_tasks: BackgroundTasks,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     redis: Redis | None = Depends(get_redis),
@@ -47,7 +48,10 @@ async def chat_completions(
             ):
                 yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 
-            assistant_id = await service.finalize_completion_stream(stream_state)
+            assistant_id = await service.finalize_completion_stream(
+                stream_state,
+                background_tasks=background_tasks,
+            )
             if assistant_id is not None:
                 done_data: dict = {
                     "message_id": str(assistant_id),
@@ -59,7 +63,10 @@ async def chat_completions(
                 yield f"data: {json.dumps(done_frame, ensure_ascii=False)}\n\n"
         finally:
             if not stream_state.persisted:
-                await service.finalize_completion_stream(stream_state)
+                await service.finalize_completion_stream(
+                    stream_state,
+                    background_tasks=background_tasks,
+                )
             await service.release_turn_inflight_lock(
                 body.conversation_id,
                 body.client_message_id,

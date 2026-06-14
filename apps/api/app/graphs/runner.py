@@ -194,9 +194,13 @@ class ChatGraphRunner:
     ) -> dict[str, Any]:
         config = self._graph_config(db=db, thread_id=thread_id)
         if settings.agent_tools_enabled:
+            recursion_limit = settings.agent_max_iterations
+            if settings.memory_enabled:
+                # EP06 prep nodes (trim_history, load_user_memories) precede retrieve.
+                recursion_limit += 2
             config = {
                 **config,
-                "recursion_limit": settings.agent_max_iterations,
+                "recursion_limit": recursion_limit,
             }
         return config
 

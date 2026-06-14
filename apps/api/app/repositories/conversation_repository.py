@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,4 +40,19 @@ class ConversationRepository:
             update(Conversation)
             .where(Conversation.id == conversation_id)
             .values(updated_at=func.now())
+        )
+
+    async def update_context_summary(
+        self,
+        conversation_id: uuid.UUID,
+        context_summary: str,
+        summary_updated_at: datetime,
+    ) -> None:
+        await self.db.execute(
+            update(Conversation)
+            .where(Conversation.id == conversation_id)
+            .values(
+                context_summary=context_summary,
+                summary_updated_at=summary_updated_at,
+            )
         )

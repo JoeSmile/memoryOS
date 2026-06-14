@@ -1,6 +1,7 @@
 """ChatService SSE tool_call / tool_result + metadata.tool_steps."""
 
 import uuid
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -13,6 +14,7 @@ from app.graphs.nodes.mock_model import (
     MOCK_TOKEN_CHUNKS,
 )
 from app.graphs.runner import ChatGraphRunner
+from app.models import Conversation
 from app.models.message import COMPLETION_COMPLETE
 from app.services.chat_service import ChatService
 
@@ -20,6 +22,7 @@ from app.services.chat_service import ChatService
 @pytest.fixture(autouse=True)
 def force_mock_llm(monkeypatch):
     monkeypatch.setattr(settings, "openai_api_key", None)
+    monkeypatch.setattr(settings, "tavily_api_key", None)
 
 
 @pytest.fixture(autouse=True)
@@ -58,8 +61,18 @@ def _service_with_mocks() -> tuple[ChatService, MagicMock, uuid.UUID, uuid.UUID]
     service.cancel_cache.get_visible_content = AsyncMock(return_value=None)
     service.cancel_cache.get_visible_length = AsyncMock(return_value=None)
     service.cancel_cache.clear = AsyncMock()
+    conversation = Conversation(
+        id=conversation_id,
+        user_id=user_id,
+        title="t",
+        context_summary=None,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
     service.conversations.touch_activity = AsyncMock()
     service.conversations.invalidate_list_cache = AsyncMock()
+    service.conversations.get_owned_conversation = AsyncMock(return_value=conversation)
+    service.conversations.conversations.get_by_id = AsyncMock(return_value=conversation)
 
     return service, assistant_row, conversation_id, user_id
 

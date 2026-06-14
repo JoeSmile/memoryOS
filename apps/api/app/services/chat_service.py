@@ -8,6 +8,7 @@ from typing import Any
 from langchain_core.messages import AIMessage, HumanMessage
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.background import BackgroundTasks
 from starlette.requests import Request
 
 from app.cache.completion_turn_lock import CompletionTurnLock
@@ -21,6 +22,10 @@ from app.models.message import COMPLETION_COMPLETE, COMPLETION_INTERRUPTED
 from app.repositories import MessageRepository
 from app.schemas.message import TOOL_STEP_SUMMARY_MAX_LEN
 from app.services.conversation_service import ConversationService
+from app.services.memory.summary_service import (
+    run_summary_background,
+    should_schedule_summary,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -59,14 +64,23 @@ class ChatService:
         self.runner = runner if runner is not None else ChatGraphRunner()
 
     @staticmethod
-    def _to_graph_state(user_id: uuid.UUID, history: list[Message]) -> ChatState:
+    def _to_graph_state(
+        user_id: uuid.UUID,
+        history: list[Message],
+        *,
+        context_summary: str | None = None,
+    ) -> ChatState:
         lc_messages: list = []
         for row in history:
             if row.role == "user":
                 lc_messages.append(HumanMessage(content=row.content))
             elif row.role == "assistant":
                 lc_messages.append(AIMessage(content=row.content))
-        return ChatState(messages=lc_messages, user_id=str(user_id))
+        return ChatState(
+            messages=lc_messages,
+            user_id=str(user_id),
+            context_summary=context_summary,
+        )
 
     @staticmethod
     def _assistant_after_user(
@@ -342,7 +356,15 @@ class ChatService:
         history = await self.messages.list_by_conversation_id(
             stream_state.conversation_id,
         )
-        graph_state = self._to_graph_state(stream_state.user_id, history)
+        conversation = await self.conversations.get_owned_conversation(
+            stream_state.conversation_id,
+            stream_state.user_id,
+        )
+        graph_state = self._to_graph_state(
+            stream_state.user_id,
+            history,
+            context_summary=conversation.context_summary,
+        )
 
         await self.cancel_cache.register_active(
             stream_state.stream_id,
@@ -423,9 +445,36 @@ class ChatService:
             )
             yield {"event": "error", "data": {"message": "stream_failed"}}
 
+    async def _maybe_schedule_summary_background(
+        self,
+        conversation_id: uuid.UUID,
+        background_tasks: BackgroundTasks | None,
+    ) -> None:
+        conversation = await self.conversations.conversations.get_by_id(
+            conversation_id,
+        )
+        if conversation is None:
+            return
+
+        messages = await self.messages.list_by_conversation_id(conversation_id)
+        decision = should_schedule_summary(conversation, messages)
+        if not decision.should_schedule:
+            return
+
+        if background_tasks is None:
+            logger.warning(
+                "summary scheduled but BackgroundTasks missing conversation_id=%s",
+                conversation_id,
+            )
+            return
+
+        background_tasks.add_task(run_summary_background, conversation_id)
+
     async def finalize_completion_stream(
         self,
         stream_state: CompletionStreamState,
+        *,
+        background_tasks: BackgroundTasks | None = None,
     ) -> uuid.UUID | None:
         """Always run from router finally — BFF may close before generator postamble."""
         visible_content = await self.cancel_cache.get_visible_content(
@@ -477,4 +526,9 @@ class ChatService:
         await self.db.commit()
         await self.conversations.invalidate_list_cache(stream_state.user_id)
         stream_state.persisted = True
+        if completion_status == COMPLETION_COMPLETE:
+            await self._maybe_schedule_summary_background(
+                stream_state.conversation_id,
+                background_tasks,
+            )
         return assistant.id
