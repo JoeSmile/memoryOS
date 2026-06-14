@@ -9,38 +9,32 @@ from langgraph.graph.message import REMOVE_ALL_MESSAGES
 
 from app.core.config import settings
 from app.graphs.chat_state import ChatState
+from app.graphs.prompts.memory_context import (
+    format_memory_snippets_block_text,
+    format_summary_block_text,
+)
 from app.graphs.prompts.rag_chat import build_rag_system_message
 from app.graphs.prompts.unified_react import build_unified_react_system_message
 from app.schemas.knowledge import KnowledgeChunkHit
 from app.services.memory.short_term import trim_messages
 from app.services.memory.token_counter import count_text_tokens, message_text
 
-_SUMMARY_PREFIX = "[会话摘要]\n"
-_MEMORY_HEADING = "## 用户长期记忆"
 # Retrieve runs after trim; reserve worst-case chunk payload (top_k × estimate).
 _RAG_CHUNK_TOKEN_ESTIMATE = 256
 
 
 def _summary_block_tokens(summary: str, *, model: str) -> int:
-    text = summary.strip()
-    if not text:
+    block = format_summary_block_text(summary)
+    if block is None:
         return 0
-    return count_text_tokens(f"{_SUMMARY_PREFIX}{text}", model=model)
+    return count_text_tokens(block, model=model)
 
 
 def _memory_snippets_tokens(snippets: list[dict[str, Any]], *, model: str) -> int:
-    if not snippets:
+    block = format_memory_snippets_block_text(snippets)
+    if block is None:
         return 0
-    lines: list[str] = [_MEMORY_HEADING]
-    for snippet in snippets:
-        content = str(snippet.get("content", "")).strip()
-        if not content:
-            continue
-        snippet_type = str(snippet.get("type", "memory"))
-        lines.append(f"- ({snippet_type}) {content}")
-    if len(lines) == 1:
-        return 0
-    return count_text_tokens("\n".join(lines), model=model)
+    return count_text_tokens(block, model=model)
 
 
 def _rag_system_reserve_tokens(*, model: str) -> int:

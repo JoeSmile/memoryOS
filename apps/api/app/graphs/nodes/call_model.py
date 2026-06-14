@@ -3,6 +3,10 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from app.core.config import settings
 from app.graphs.chat_state import ChatState
 from app.graphs.nodes.mock_model import mock_invoke
+from app.graphs.prompts.memory_context import (
+    build_context_summary_system_message,
+    build_memory_snippets_system_message,
+)
 from app.graphs.prompts.rag_chat import build_rag_system_message
 from app.graphs.prompts.unified_react import (
     build_unified_react_system_message,
@@ -61,10 +65,33 @@ def _resolve_rag_sufficient(state: ChatState) -> bool:
     )
 
 
+def _memory_context_system_messages(state: ChatState) -> list[BaseMessage]:
+    if not settings.memory_enabled:
+        return []
+
+    system_messages: list[BaseMessage] = []
+    summary_message = build_context_summary_system_message(
+        state.get("context_summary"),
+    )
+    if summary_message is not None:
+        system_messages.append(summary_message)
+
+    if settings.memory_long_term_enabled:
+        snippets_message = build_memory_snippets_system_message(
+            state.get("memory_snippets") or [],
+        )
+        if snippets_message is not None:
+            system_messages.append(snippets_message)
+
+    return system_messages
+
+
 def _messages_with_system(state: ChatState) -> list[BaseMessage]:
     messages = list(state["messages"])
+    prefix_system = _memory_context_system_messages(state)
+
     if not settings.rag_chat_enabled:
-        return messages
+        return [*prefix_system, *messages]
 
     raw_chunks = state.get("retrieved_chunks") or []
     hits = [KnowledgeChunkHit.model_validate(chunk) for chunk in raw_chunks]
@@ -77,7 +104,7 @@ def _messages_with_system(state: ChatState) -> list[BaseMessage]:
         )
     else:
         system = build_rag_system_message(hits)
-    return [system, *messages]
+    return [*prefix_system, system, *messages]
 
 
 async def _invoke_with_tools(messages: list[BaseMessage]) -> AIMessage:

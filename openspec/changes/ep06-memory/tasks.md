@@ -57,7 +57,7 @@ POST /chat/completions
 - [x] 4.1 `load_user_memories` 节点 — embed 最近 human 查询 + TopK；写 `memory_snippets`
   - 预计文件：2 · 层：`graphs/nodes/load_user_memories.py` + `chat_graph.py` 边
 
-- [ ] 4.2 `call_model` 叠加 `context_summary` + `memory_snippets` system 块（与 RAG/ReAct prompt 分层）
+- [x] 4.2 `call_model` 叠加 `context_summary` + `memory_snippets` system 块（与 RAG/ReAct prompt 分层）
   - 预计文件：2 · 层：`nodes/call_model.py` + `prompts/memory_context.py`
 
 ## 5. 会话摘要（Story 6.3）
