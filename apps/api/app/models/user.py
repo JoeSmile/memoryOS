@@ -34,3 +34,7 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    memories: Mapped[list["Memory"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )

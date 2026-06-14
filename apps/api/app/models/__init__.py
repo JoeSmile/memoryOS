@@ -1,6 +1,7 @@
 from app.models.base import Base
 from app.models.conversation import Conversation
 from app.models.knowledge import Document, DocumentChunk, EMBEDDING_DIMENSIONS
+from app.models.memory import Memory
 from app.models.message import Message
 from app.models.user import User
 from app.models.worldcup import (
@@ -31,6 +32,7 @@ __all__ = [
     "User",
     "Conversation",
     "Message",
+    "Memory",
     "Document",
     "DocumentChunk",
     "EMBEDDING_DIMENSIONS",

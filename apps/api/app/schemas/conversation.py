@@ -14,6 +14,8 @@ class ConversationRead(BaseModel):
     id: UUID
     user_id: UUID
     title: str
+    context_summary: str | None = None
+    summary_updated_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 

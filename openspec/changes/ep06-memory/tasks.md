@@ -49,7 +49,7 @@ POST /chat/completions
 - [x] 3.1 Alembic：`memories` 表 + `conversations.context_summary` / `summary_updated_at`；更新 `docs/database.md`
   - 预计文件：2 · 层：`alembic/versions/` + `docs/database.md`
 
-- [ ] 3.2 `Memory` ORM + `MemoryRepository` + Pydantic schemas（`MemoryRead`）
+- [x] 3.2 `Memory` ORM + `MemoryRepository` + Pydantic schemas（`MemoryRead`）
   - 预计文件：3 · 层：`models/memory.py` + `repositories/memory_repository.py` + `schemas/memory.py`
 
 ## 4. LangGraph 记忆加载（Story 6.5）
