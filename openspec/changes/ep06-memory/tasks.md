@@ -78,7 +78,7 @@ POST /chat/completions
 
 ## 7. Memories API（Story 6.4）
 
-- [ ] 7.1 `GET /api/v1/memories` + `DELETE /api/v1/memories/{id}` + `memory_service.py` 薄层
+- [x] 7.1 `GET /api/v1/memories` + `DELETE /api/v1/memories/{id}` + `memory_service.py` 薄层
   - 预计文件：3 · 层：`api/v1/memories.py` + `services/memory_service.py` + `main.py` 注册
 
 - [ ] 7.2 Harness `test_memories_api_contract.py`（list / delete / 403 跨用户）TDD 先写
