@@ -22,6 +22,8 @@ from app.models.message import COMPLETION_COMPLETE, COMPLETION_INTERRUPTED
 from app.repositories import MessageRepository
 from app.schemas.message import TOOL_STEP_SUMMARY_MAX_LEN
 from app.services.conversation_service import ConversationService
+from app.core.config import settings
+from app.services.memory.long_term import run_extract_background
 from app.services.memory.summary_service import (
     run_summary_background,
     should_schedule_summary,
@@ -470,6 +472,24 @@ class ChatService:
 
         background_tasks.add_task(run_summary_background, conversation_id)
 
+    def _maybe_schedule_memory_extract_background(
+        self,
+        conversation_id: uuid.UUID,
+        user_id: uuid.UUID,
+        background_tasks: BackgroundTasks | None,
+    ) -> None:
+        if not settings.memory_enabled or not settings.memory_long_term_enabled:
+            return
+
+        if background_tasks is None:
+            logger.warning(
+                "memory extract scheduled but BackgroundTasks missing conversation_id=%s",
+                conversation_id,
+            )
+            return
+
+        background_tasks.add_task(run_extract_background, conversation_id, user_id)
+
     async def finalize_completion_stream(
         self,
         stream_state: CompletionStreamState,
@@ -527,6 +547,11 @@ class ChatService:
         await self.conversations.invalidate_list_cache(stream_state.user_id)
         stream_state.persisted = True
         if completion_status == COMPLETION_COMPLETE:
+            self._maybe_schedule_memory_extract_background(
+                stream_state.conversation_id,
+                stream_state.user_id,
+                background_tasks,
+            )
             await self._maybe_schedule_summary_background(
                 stream_state.conversation_id,
                 background_tasks,

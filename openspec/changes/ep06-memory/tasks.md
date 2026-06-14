@@ -73,7 +73,7 @@ POST /chat/completions
 - [x] 6.1 `services/memory/long_term.py` — 抽取 JSON、upsert、embed、prune expired/low importance
   - 预计文件：2 · 层：`long_term.py` + `tests/unit/test_long_term.py`
 
-- [ ] 6.2 `chat_service` finalize 后调度 memory extract（与 summary 并列）
+- [x] 6.2 `chat_service` finalize 后调度 memory extract（与 summary 并列）
   - 预计文件：1 · 层：`services/chat_service.py`（与 5.2 可同 task 合并若 diff 仍 ≤150 行）
 
 ## 7. Memories API（Story 6.4）

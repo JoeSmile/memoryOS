@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.models import Conversation, Message
 from app.models.message import COMPLETION_INTERRUPTED
 from app.services.chat_service import ChatService, CompletionStreamState
+from app.services.memory.long_term import run_extract_background
 from app.services.memory.summary_service import run_summary_background
 
 
@@ -146,10 +147,13 @@ async def test_finalize_schedules_summary_background_task_when_triggered(monkeyp
         background_tasks=background_tasks,
     )
 
-    assert len(background_tasks.tasks) == 1
-    task = background_tasks.tasks[0]
-    assert task.func is run_summary_background
-    assert task.args == (conversation_id,)
+    assert len(background_tasks.tasks) == 2
+    extract_task = background_tasks.tasks[0]
+    summary_task = background_tasks.tasks[1]
+    assert extract_task.func is run_extract_background
+    assert extract_task.args == (conversation_id, user_id)
+    assert summary_task.func is run_summary_background
+    assert summary_task.args == (conversation_id,)
 
 
 @pytest.mark.asyncio
@@ -202,7 +206,72 @@ async def test_finalize_skips_summary_schedule_when_below_threshold():
         background_tasks=background_tasks,
     )
 
-    assert background_tasks.tasks == []
+    assert len(background_tasks.tasks) == 1
+    assert background_tasks.tasks[0].func is run_extract_background
+
+
+@pytest.mark.asyncio
+async def test_finalize_skips_extract_when_long_term_disabled(monkeypatch):
+    monkeypatch.setattr(settings, "memory_long_term_enabled", False)
+    monkeypatch.setattr(settings, "summary_trigger_tokens", 512)
+
+    db = AsyncMock()
+    db.commit = AsyncMock()
+    conversation_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+    now = datetime.now(timezone.utc)
+    conversation = Conversation(
+        id=conversation_id,
+        user_id=user_id,
+        title="t",
+        created_at=now,
+        updated_at=now,
+    )
+    messages = [
+        Message(
+            id=uuid.uuid4(),
+            conversation_id=conversation_id,
+            role="user",
+            content="u-" + ("x" * 2000),
+            created_at=now,
+        ),
+        Message(
+            id=uuid.uuid4(),
+            conversation_id=conversation_id,
+            role="assistant",
+            content="a-" + ("y" * 2000),
+            created_at=now,
+        ),
+    ]
+    assistant_row = MagicMock()
+    assistant_row.id = uuid.uuid4()
+
+    service = ChatService(db, redis=None, runner=MagicMock())
+    service.messages.create = AsyncMock(return_value=assistant_row)
+    service.messages.list_by_conversation_id = AsyncMock(return_value=messages)
+    service.conversations.conversations.get_by_id = AsyncMock(return_value=conversation)
+    service.conversations.touch_activity = AsyncMock()
+    service.conversations.invalidate_list_cache = AsyncMock()
+    service.cancel_cache.get_visible_content = AsyncMock(return_value=None)
+    service.cancel_cache.get_visible_length = AsyncMock(return_value=None)
+    service.cancel_cache.clear = AsyncMock()
+    service.stream_cache.delete = AsyncMock()
+
+    stream_state = CompletionStreamState(
+        conversation_id=conversation_id,
+        user_id=user_id,
+    )
+    stream_state.assistant_parts = ["reply"]
+    stream_state.stream_exhausted = True
+
+    background_tasks = BackgroundTasks()
+    await service.finalize_completion_stream(
+        stream_state,
+        background_tasks=background_tasks,
+    )
+
+    assert len(background_tasks.tasks) == 1
+    assert background_tasks.tasks[0].func is run_summary_background
 
 
 @pytest.mark.asyncio
