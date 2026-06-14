@@ -16,6 +16,8 @@
 | 7 | 第 9 周 | EP09 | 性能 / 安全 / Token 成本 | [L07](./learning/L07-optimization.md) |
 | 8 | 第 10-12 周 | EP10 | 打磨 + 面试素材 | [L08](./learning/L08-interview.md) |
 
+**MVP 后（不占上表 12 周）**：见 [post-mvp-roadmap.md](./post-mvp-roadmap.md) — EP11→EP14 按依赖增量交付。
+
 ## 开发原则（摘要）
 
 1. **不裸调**复杂业务流程用大模型 API；对话 / Agent / RAG 编排走 **LangGraph**（及配套生态）。
@@ -40,5 +42,17 @@
 | 10 | EP10 打磨 | 0% | 交互、压测 | 代码清理 | |
 | 11 | EP10 面试 | 0% | 架构图、难点总结 | 题库、话术 | |
 | 12 | 复盘冲刺 | 0% | 演示、模拟面试 | 简历投递 | |
+| — | **MVP 后** | — | EP11 记忆运维 / EP12 记忆评测 | 按需排期 | |
 
 复盘模板 → [weekly-tracker.md](./weekly-tracker.md)
+
+### MVP 后 backlog（不占 12 周主排期）
+
+详见 [post-mvp-roadmap.md](./post-mvp-roadmap.md)。
+
+| 顺序 | 史诗 | 说明 |
+|:-----|:-----|:-----|
+| 1 | [EP11](./epics/EP11-memory-ops.md) | 记忆：队列、溯源、监控 |
+| 2 | [EP12](./epics/EP12-memory-eval.md) | 记忆：评测回归 |
+| 3 | [EP13](./epics/EP13-memory-distributed.md) | Compose 分布式、注册表、Remote Graph 热插拔 |
+| 4 | [EP14](./epics/EP14-k8s-cloud.md) | k3d/Helm、腾讯云 TKE |

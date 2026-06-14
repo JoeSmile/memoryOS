@@ -18,8 +18,8 @@ EP02–EP05 将 **DB 全量历史** 原样注入 LangGraph，长对话会撑爆 
 
 - EP07 可视化工作流 / 简历 Demo
 - 独立 LlamaIndex 微服务或第二套向量库集群
-- Celery/ARQ 队列（首版 `BackgroundTasks` + 可选后续 change）
-- 记忆抽取的用户确认 UI、置信度人工审核流
+- Celery/ARQ 队列（首版 `BackgroundTasks` + 可选后续 change）→ **EP11**
+- 记忆抽取的用户确认 UI、置信度人工审核流 → **EP10 Story 10.6** / **EP12** 数据基础
 - 修改 SSE 帧类型或 BFF Data Stream 协议（内部 context 变化对外透明）
 - Playwright E2E
 

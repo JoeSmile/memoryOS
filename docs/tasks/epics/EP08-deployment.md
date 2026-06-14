@@ -5,6 +5,9 @@
 | **周期** | 第 8 周 |
 | **优先级** | P0 |
 | **学习路线** | [L06-deployment.md](../learning/L06-deployment.md) |
+| **MVP 后** | 分布式 / K8s 见 [post-mvp-roadmap.md](../post-mvp-roadmap.md) · EP13 · EP14 |
+
+> **范围**：单机（或轻量服务器）**Docker Compose 全栈 + Nginx + 腾讯云部署**。不在本史诗做注册中心、Remote Graph 热插拔、K8s（避免挡 MVP 上线）。
 
 ---
 

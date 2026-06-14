@@ -12,12 +12,13 @@
 ```
 infra/
 ├── docker/
-│   ├── docker-compose.yml      # 本地全栈：web + api + postgres + redis
+│   ├── docker-compose.yml      # 本地：pg+redis（EP03）→ 全栈（EP08）→ profile distributed（EP13）
 │   └── ...
+├── k8s/ 或 deploy/helm/        # EP14
 └── nginx/
-    ├── nginx.conf
-    └── conf.d/memoryos.conf
 ```
+
+MVP 后演进：[docs/tasks/post-mvp-roadmap.md](../docs/tasks/post-mvp-roadmap.md)
 
 ## 本地数据库（EP03 已可用）
 
@@ -30,5 +31,11 @@ pnpm db:up    # 仓库根目录；或 cd infra/docker && docker compose up -d
 ## 全栈一键启动（Story 8.2 完成后）
 
 ```bash
-cd infra/docker && docker compose up -d   # 将扩展 web、api、nginx
+cd infra/docker && docker compose up -d   # web + api + nginx + pg + redis
+```
+
+分布式 profile（EP13，MVP 后）：
+
+```bash
+docker compose --profile distributed up -d
 ```

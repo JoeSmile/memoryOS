@@ -8,6 +8,7 @@
 | 类型 | 文档 |
 |:-----|:-----|
 | 12 周总览 | [00-iteration-overview.md](./00-iteration-overview.md) |
+| MVP 后演进 | [post-mvp-roadmap.md](./post-mvp-roadmap.md) |
 | AI 协作栈（Collab） | [EP00](./epics/EP00-ai-collaboration.md) · [L00](./learning/L00-ai-collab-stack.md) · [最佳实践](../tech/ai-collab-best-practices.md) · [团队 onboarding](../team/onboarding.md) |
 | 周度复盘模板 | [weekly-tracker.md](./weekly-tracker.md) |
 | 双轨进度看板 | [progress-dashboard.md](./progress-dashboard.md) |
@@ -31,6 +32,10 @@
 | EP08 | 第 8 周 | [epics/EP08-deployment.md](./epics/EP08-deployment.md) | [L06 部署](./learning/L06-deployment.md) |
 | EP09 | 第 9 周 | [epics/EP09-optimization.md](./epics/EP09-optimization.md) | [L07 优化安全](./learning/L07-optimization.md) |
 | EP10 | 10-12 周 | [epics/EP10-polish.md](./epics/EP10-polish.md) | [L08 面试冲刺](./learning/L08-interview.md) |
+| EP11 | MVP 后 backlog | [epics/EP11-memory-ops.md](./epics/EP11-memory-ops.md) | EP06 企业级补强：队列 / 溯源 / 监控 |
+| EP12 | MVP 后 backlog | [epics/EP12-memory-eval.md](./epics/EP12-memory-eval.md) | EP06 企业级补强：记忆质量评测 |
+| EP13 | MVP 后 backlog | [epics/EP13-memory-distributed.md](./epics/EP13-memory-distributed.md) | [L09 分布式](./learning/L09-distributed-orchestration.md) · Remote 热插拔 |
+| EP14 | MVP 后 backlog | [epics/EP14-k8s-cloud.md](./epics/EP14-k8s-cloud.md) | L09 · K8s / 腾讯云 TKE |
 
 ### 技术文档（随开发沉淀，待你创建）
 
@@ -43,7 +48,11 @@
 | `docs/tech/rag-langchain-vs-llamaindex.md` | 📋 待写 | EP04 |
 | `docs/tech/rag-retrieval-advanced.md` | ✅ 已有 | EP04-03 · sandbox 方法说明 |
 | `docs/tech/agent-langgraph.md` | 📋 待写 | EP05 |
-| `docs/tech/memory-system.md` | 📋 待写 | EP06 |
+| `docs/tech/memory-system.md` | 📋 待写 | EP06 · EP11 运维章节 |
+| `docs/tech/memory-eval.md` | 📋 待写 | EP12 |
+| `docs/tech/distributed-orchestration.md` | 📋 待写 | EP13 |
+| `docs/tech/k8s-tencent-deploy.md` | 📋 待写 | EP14 |
+| `docs/architecture/distributed-hotplug.md` | 📋 待写 | EP13 |
 | `docs/architecture/*.md` | 📋 待写 | EP08 / EP09 |
 
 ---
@@ -123,6 +132,7 @@
 - 学习路线允许 **延后**，但 Build 的 P0 不能跨周堆积超过 2 项。  
 - 连续 2 天卡住 → 缩小范围（例如先裸 SSE，再上 LangGraph）。  
 - EP07（P2）时间不够可整史诗后移，保 EP02 / EP04 / EP08。
+- **分布式 / Remote 热插拔 / K8s**：MVP 后按 [post-mvp-roadmap.md](./post-mvp-roadmap.md) 做 EP11–EP14，**勿在 EP02–EP08 中途改主编排架构**。
 
 ---
 

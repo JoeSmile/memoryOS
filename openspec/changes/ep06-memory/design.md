@@ -132,5 +132,18 @@ trim_stats: NotRequired[dict[str, Any]]  # dropped_turns, token_count — debug/
 ## Open Questions
 
 - [ ] 首版 `MAX_CONTEXT_TOKENS` 默认值是否跟 qwen-turbo 产品上限对齐（人审可改 config 默认）。
-- [ ] 是否在 dev 暴露 `trim_stats` 到 SSE metadata（建议 **否**，留 LangSmith）。
+- [ ] 是否在 dev 暴露 `trim_stats` 到 SSE metadata（建议 **否**，留 LangSmith；生产指标见 **EP11**）。
 - [x] 单会话长聊 summary 频率 → D3 increment + cooldown（已决）
+
+## 后续史诗（MVP 后补全）
+
+企业级差距项不在本 change 落地，已记入 backlog：
+
+| 史诗 | 内容 |
+|:-----|:-----|
+| [EP11 — 记忆运维补强](../tasks/epics/EP11-memory-ops.md) | 异步任务队列、记忆溯源、监控指标 |
+| [EP12 — 记忆质量评测](../tasks/epics/EP12-memory-eval.md) | 离线评测集、摘要/裁剪/抽取回归、可选 LLM-as-judge |
+| [EP13 — 分布式与 Remote 热插拔](../tasks/epics/EP13-memory-distributed.md) | Compose 多容器、注册表、`langgraph` remote |
+| [EP14 — K8s 与腾讯云](../tasks/epics/EP14-k8s-cloud.md) | k3d/Helm、TKE、Ingress+SSE |
+
+总览：[post-mvp-roadmap.md](../tasks/post-mvp-roadmap.md)

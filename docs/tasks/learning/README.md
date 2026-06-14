@@ -38,6 +38,11 @@
 | [L06-deployment.md](./L06-deployment.md) | 8 | EP08 | Docker + CI |
 | [L07-optimization.md](./L07-optimization.md) | 9 | EP09 | 安全 + 成本 |
 | [L08-interview.md](./L08-interview.md) | 10-12 | EP10 | 面试冲刺 |
+| [L09-distributed-orchestration.md](./L09-distributed-orchestration.md) | MVP 后 | EP13 + EP14 | 分布式 · Remote Agent · K8s |
+
+## MVP 后学习
+
+→ [post-mvp-roadmap.md](../post-mvp-roadmap.md) · EP11–EP14 依赖顺序
 
 ## 知识笔记（深读）
 
@@ -56,6 +61,7 @@
 | OpenSpec | https://openspec.dev/ |
 | Superpowers | https://github.com/obra/superpowers |
 | LangGraph | https://langchain-ai.github.io/langgraph/ |
+| LangGraph CLI / Agent Server | https://docs.langchain.com/langsmith/cli |
 | LangSmith | https://docs.smith.langchain.com |
 | LlamaIndex | https://docs.llamaindex.ai |
 | pgvector | https://github.com/pgvector/pgvector |

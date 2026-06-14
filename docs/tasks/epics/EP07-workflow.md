@@ -6,6 +6,7 @@
 | **优先级** | P2（可延后） |
 | **依赖** | EP05 |
 | **学习路线** | [L05-memory-workflow.md](../learning/L05-memory-workflow.md) |
+| **MVP 后** | Remote Graph / `langgraph.json` 与 [EP13](../epics/EP13-memory-distributed.md) 对齐；异步队列优先 [EP11](../epics/EP11-memory-ops.md) |
 
 ---
 
@@ -13,7 +14,7 @@
 
 - [ ] 节点类型：Input、LLM、Tool、Condition、Output
 - [ ] DAG JSON Schema + 状态机
-- [ ] 异步任务队列（与 LangGraph 思想统一）
+- [ ] 异步任务队列（与 LangGraph 思想统一）→ **生产实现见 EP11**；分布式 Worker 见 **EP13**
 
 ## Story 7.2 简历分析 Demo
 

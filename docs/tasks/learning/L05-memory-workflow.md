@@ -97,11 +97,13 @@
 
 # Part B — 工作流（EP07，可选）
 
+> Remote Graph / 子图热插拔见 [L09](./L09-distributed-orchestration.md)、[EP13](../epics/EP13-memory-distributed.md)。队列生产实现见 [EP11](../epics/EP11-memory-ops.md)。
+
 ## 1. 编排概念
 
 - [ ] 📖 DAG vs 状态机；LangGraph 即状态机实现
 - [ ] 📖 节点：解析 → 提取 → 匹配 → 报告
-- [ ] 📖 队列：BackgroundTasks vs Celery/ARQ（量大再上）
+- [ ] 📖 队列：BackgroundTasks vs Celery/ARQ（量大再上）→ **EP11 落地队列，EP13 多 Worker 容器**
 
 ## 2. 简历 Demo
 

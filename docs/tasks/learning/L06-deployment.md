@@ -115,3 +115,10 @@
 - [ ] 新人 30 分钟 Compose 起全栈  
 - [ ] curl SSE 经 Nginx 仍流式  
 - [ ] 说清 standalone 目录结构与启动命令
+
+---
+
+## MVP 后（不占 EP08 范围）
+
+- [ ] 📖 分布式 Compose profile、Remote Graph、注册热插拔 → [L09](./L09-distributed-orchestration.md)
+- [ ] 📖 EP08 单机与 EP14 TKE 如何选型 → [post-mvp-roadmap.md](../post-mvp-roadmap.md)
