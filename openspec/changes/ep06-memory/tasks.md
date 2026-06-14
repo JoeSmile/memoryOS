@@ -62,7 +62,7 @@ POST /chat/completions
 
 ## 5. 会话摘要（Story 6.3）
 
-- [ ] 5.1 `summary_service.py` — `should_schedule_summary()`（首次 / increment / cooldown）+ rolling 合并（旧摘要 + `created_at > summary_updated_at` 的新消息）；mock LLM stub
+- [x] 5.1 `summary_service.py` — `should_schedule_summary()`（首次 / increment / cooldown）+ rolling 合并（旧摘要 + `created_at > summary_updated_at` 的新消息）；mock LLM stub
   - 预计文件：2 · 层：`summary_service.py` + `tests/unit/test_summary_service.py`（含：超 4096 首次触发；cooldown 内跳过；increment 不足跳过；increment+cooldown 满足才触发）
 
 - [ ] 5.2 `chat_service.py` `finalize` 后仅当 `should_schedule_summary()` 为真时 `BackgroundTasks` 调度（不阻塞 SSE）
