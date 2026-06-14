@@ -162,6 +162,18 @@ class Settings(BaseSettings):
         default=True,
         description="Enable long-term memories table and extract (MEMORY_LONG_TERM_ENABLED)",
     )
+    memory_long_term_top_k: int = Field(
+        default=5,
+        ge=1,
+        le=50,
+        description="Max long-term memory snippets retrieved per turn (MEMORY_LONG_TERM_TOP_K)",
+    )
+    memory_min_score: float = Field(
+        default=0.35,
+        ge=0.0,
+        le=1.0,
+        description="Min cosine similarity for injecting a memory snippet (MEMORY_MIN_SCORE)",
+    )
     max_context_tokens: int = Field(
         default=8192,
         ge=512,

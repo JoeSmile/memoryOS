@@ -89,6 +89,8 @@ Prompt 要求：合并为更短摘要，保留用户约束/待办/决策
 | `MEMORY_ENABLED` | true | false → 跳过 trim/load/extract（回滚 EP05 行为） |
 | `MEMORY_SHORT_TERM_ENABLED` | true | 仅关短期裁剪 |
 | `MEMORY_LONG_TERM_ENABLED` | true | 关长期表读写 |
+| `MEMORY_LONG_TERM_TOP_K` | 5 | 每轮长期记忆 TopK |
+| `MEMORY_MIN_SCORE` | 0.35 | 注入记忆的最低相似度（cosine） |
 | `MAX_CONTEXT_TOKENS` | 8192 | 发给 LLM 的上限 |
 | `RESERVE_FOR_REPLY` | 1024 | 预留给生成 |
 | `SUMMARY_TRIGGER_TOKENS` | 4096 | **首次**摘要：全量历史须超此值 |
