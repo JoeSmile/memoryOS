@@ -36,6 +36,12 @@ export function ChatHeader({
             新建分析
           </button>
         ) : null}
+        <Link
+          href="/memories"
+          className="text-sm text-zinc-600 hover:text-emerald-600 hover:underline dark:text-zinc-400"
+        >
+          我的记忆
+        </Link>
         <Link href="/" className="text-sm text-emerald-600 hover:underline">
           首页
         </Link>

@@ -2,6 +2,7 @@ import {
   clearAccessToken,
   getAccessToken,
 } from "@/lib/auth-token";
+import type { MemoryRead } from "@/lib/memory-types";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -68,4 +69,26 @@ export async function apiFetch<T>(
   }
 
   return body;
+}
+
+export async function listMemories(
+  params?: { limit?: number; offset?: number },
+): Promise<MemoryRead[]> {
+  const search = new URLSearchParams();
+  if (params?.limit != null) {
+    search.set("limit", String(params.limit));
+  }
+  if (params?.offset != null) {
+    search.set("offset", String(params.offset));
+  }
+  const query = search.toString();
+  const path = query ? `/api/v1/memories?${query}` : "/api/v1/memories";
+  const res = await apiFetch<MemoryRead[]>(path);
+  return res.data ?? [];
+}
+
+export async function deleteMemory(memoryId: string): Promise<void> {
+  await apiFetch<null>(`/api/v1/memories/${memoryId}`, {
+    method: "DELETE",
+  });
 }

@@ -91,13 +91,13 @@ POST /chat/completions
 
 ## 9. 前端「我的记忆」（与 API 成对）
 
-- [ ] 9.1 `lib/api-client.ts` memories 方法 + types
+- [x] 9.1 `lib/api-client.ts` memories 方法 + types
   - 预计文件：2 · 层：`lib/api-client.ts` + `lib/memory-types.ts`（或合入 `chat-types` 若更简）
 
-- [ ] 9.2 `/memories` 页面：列表 + 删除确认 + 空态
+- [x] 9.2 `/memories` 页面：列表 + 删除确认 + 空态
   - 预计文件：2 · 层：`app/memories/page.tsx` + `components/memories/memory-list.tsx`
 
-- [ ] 9.3 导航入口（`ChatHeader` 或 layout 用户菜单）链到 `/memories`
+- [x] 9.3 导航入口（`ChatHeader` 或 layout 用户菜单）链到 `/memories`
   - 预计文件：1–2 · 层：`components/chat/chat-header.tsx` 或 `app/layout.tsx`
 
 ## 10. Docs & closeout
