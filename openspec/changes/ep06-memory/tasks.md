@@ -86,7 +86,7 @@ POST /chat/completions
 
 ## 8. Harness 长历史（Story 6.1 + 6.5）
 
-- [ ] 8.1 Harness `test_memory_context_contract.py` — 种子 30+ 轮 mock 对话仍 200 + SSE 顺序不变
+- [x] 8.1 Harness `test_memory_context_contract.py` — 种子 30+ 轮 mock 对话仍 200 + SSE 顺序不变
   - 预计文件：1 · 层：`tests/harness/`
 
 ## 9. 前端「我的记忆」（与 API 成对）
