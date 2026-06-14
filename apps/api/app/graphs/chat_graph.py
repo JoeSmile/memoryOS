@@ -7,26 +7,31 @@ from app.graphs.chat_state import ChatState
 from app.graphs.nodes.call_model import call_model
 from app.graphs.nodes.execute_tools import execute_tools, should_continue
 from app.graphs.nodes.retrieve import retrieve_knowledge
+from app.graphs.nodes.trim_history import trim_history
 
 
 def _build_rag_only_graph():
-    """EP04: retrieve → call_model → END (no tool loop)."""
+    """EP04/EP06: trim_history → retrieve → call_model → END (no tool loop)."""
     builder = StateGraph(ChatState)
+    builder.add_node("trim_history", trim_history)
     builder.add_node("retrieve_knowledge", retrieve_knowledge)
     builder.add_node("call_model", call_model)
-    builder.add_edge(START, "retrieve_knowledge")
+    builder.add_edge(START, "trim_history")
+    builder.add_edge("trim_history", "retrieve_knowledge")
     builder.add_edge("retrieve_knowledge", "call_model")
     builder.add_edge("call_model", END)
     return builder.compile()
 
 
 def _build_react_graph():
-    """EP05: retrieve → call_model ↔ execute_tools until no tool_calls."""
+    """EP05/EP06: trim_history → retrieve → call_model ↔ execute_tools until no tool_calls."""
     builder = StateGraph(ChatState)
+    builder.add_node("trim_history", trim_history)
     builder.add_node("retrieve_knowledge", retrieve_knowledge)
     builder.add_node("call_model", call_model)
     builder.add_node("execute_tools", execute_tools)
-    builder.add_edge(START, "retrieve_knowledge")
+    builder.add_edge(START, "trim_history")
+    builder.add_edge("trim_history", "retrieve_knowledge")
     builder.add_edge("retrieve_knowledge", "call_model")
     builder.add_conditional_edges(
         "call_model",

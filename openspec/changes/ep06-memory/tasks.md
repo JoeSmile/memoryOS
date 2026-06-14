@@ -41,7 +41,7 @@ POST /chat/completions
 - [x] 2.1 `services/memory/short_term.py` — `trim_messages()` 滑动窗口 + 预算；保留 system/记忆/RAG 占位接口
   - 预计文件：2 · 层：`short_term.py` + `tests/unit/test_short_term.py`
 
-- [ ] 2.2 `trim_history` 图节点 + `ChatState` 扩展（`context_summary`、`memory_snippets`、`trim_stats`）
+- [x] 2.2 `trim_history` 图节点 + `ChatState` 扩展（`context_summary`、`memory_snippets`、`trim_stats`）
   - 预计文件：3 · 层：`graphs/nodes/trim_history.py` + `chat_state.py` + `chat_graph.py`（`START → trim_history → retrieve`）
 
 ## 3. Schema & repository（Story 6.2 基础）

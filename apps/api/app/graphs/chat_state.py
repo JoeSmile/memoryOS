@@ -11,3 +11,6 @@ class ChatState(TypedDict):
     user_id: str
     retrieved_chunks: NotRequired[list[dict[str, Any]]]
     rag_sufficient: NotRequired[bool]
+    context_summary: NotRequired[str | None]
+    memory_snippets: NotRequired[list[dict[str, Any]]]
+    trim_stats: NotRequired[dict[str, Any]]
