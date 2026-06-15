@@ -1,4 +1,5 @@
 import uuid
+from typing import Any
 
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +19,7 @@ class MessageRepository:
         *,
         client_message_id: uuid.UUID | None = None,
         completion_status: str | None = None,
+        metadata_: dict[str, Any] | None = None,
     ) -> Message:
         message = Message(
             conversation_id=conversation_id,
@@ -25,6 +27,7 @@ class MessageRepository:
             content=content,
             client_message_id=client_message_id,
             completion_status=completion_status,
+            metadata_=metadata_,
         )
         self.db.add(message)
         await self.db.flush()

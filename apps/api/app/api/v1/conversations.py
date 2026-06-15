@@ -10,7 +10,11 @@ from app.core.redis import get_redis
 from app.core.response import success
 from app.models import User
 from app.schemas.conversation import ConversationCreate, ConversationRead
+from app.schemas.demo_analysis import DemoTurnRequest, DemoTurnResponse
 from app.schemas.message import MessageRead
+from app.repositories.message_repository import MessageRepository
+from app.repositories.wc_match_repository import WcMatchRepository
+from app.services.demo_analysis_service import DemoAnalysisService
 from app.services.conversation_service import ConversationService
 
 router = APIRouter(prefix="/conversations", tags=["conversations"])
@@ -65,6 +69,35 @@ async def list_my_conversations(
     items = await service.list_for_user(user.id)
     await db.commit()
     return success(data=[item.model_dump() for item in items])
+
+
+@router.post("/{conversation_id}/demo-turn")
+async def append_demo_analysis_turn(
+    conversation_id: UUID,
+    body: DemoTurnRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    redis: Redis | None = Depends(get_redis),
+):
+    conversations = ConversationService(db, redis=redis)
+    demo = DemoAnalysisService(
+        conversations,
+        MessageRepository(db),
+        WcMatchRepository(db),
+    )
+    user_message, assistant_message = await demo.append_demo_turn(
+        conversation_id=conversation_id,
+        user_id=user.id,
+        match_id=body.match_id,
+        template_id=body.template_id,
+    )
+    await db.commit()
+    return success(
+        data=DemoTurnResponse(
+            user_message_id=str(user_message.id),
+            assistant_message_id=str(assistant_message.id),
+        ).model_dump(),
+    )
 
 
 @router.get("/{conversation_id}/messages")

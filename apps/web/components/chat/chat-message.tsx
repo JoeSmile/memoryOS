@@ -97,10 +97,25 @@ export function ChatMessage({
           isStreaming={isStreaming}
         />
       ) : null}
-      <MessageContent
-        content={text}
-        markdown={!isUser && !isStreaming}
-      />
+      {!isUser && isStreaming && !text.trim() ? (
+        <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+          <span className="inline-flex gap-1" aria-hidden>
+            <span
+              className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500 [animation-delay:-0.3s]"
+            />
+            <span
+              className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500 [animation-delay:-0.15s]"
+            />
+            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500" />
+          </span>
+          <span className="text-sm">思考中…</span>
+        </div>
+      ) : (
+        <MessageContent
+          content={text}
+          markdown={!isUser && !isStreaming}
+        />
+      )}
       {interrupted ? (
         <p className="mt-1 text-xs text-zinc-500" aria-hidden>
           …

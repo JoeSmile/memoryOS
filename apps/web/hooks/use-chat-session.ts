@@ -36,6 +36,8 @@ import {
 import { buildCancelVisiblePayload } from "@/lib/memoryos-upstream";
 import { useChatStore } from "@/stores/chat-store";
 
+const DEMO_SESSION_TITLE = "2022世界杯分析";
+
 export function useChatSession() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -141,8 +143,49 @@ export function useChatSession() {
     setIsSending(false);
   }, []);
 
+  const syncPersistedMessagesRef = useRef<
+    | ((options?: {
+        retryUntilAssistant?: boolean;
+        replaceLocal?: boolean;
+      }) => Promise<void>)
+    | null
+  >(null);
+
+  const { messages, sendMessage, status, stop, setMessages } = useChat({
+    id: conversationId ?? "pending",
+    transport,
+    onFinish: () => {
+      clearSendMeta();
+      void syncPersistedMessagesRef.current?.({
+        retryUntilAssistant: true,
+        replaceLocal: true,
+      });
+    },
+    onError: (err) => {
+      clearSendMeta();
+      if (conversationId) {
+        if (err.name === "AbortError") {
+          void syncPersistedMessagesRef.current?.({
+            retryUntilAssistant: true,
+            replaceLocal: true,
+          });
+        } else {
+          void queryClient.invalidateQueries({
+            queryKey: chatQueryKeys.messages(conversationId),
+          });
+        }
+      }
+      if (err.name !== "AbortError") {
+        setError(err.message);
+      }
+    },
+  });
+
   const syncPersistedMessages = useCallback(
-    async (options?: { retryUntilAssistant?: boolean }) => {
+    async (options?: {
+      retryUntilAssistant?: boolean;
+      replaceLocal?: boolean;
+    }) => {
       if (!conversationId) {
         return;
       }
@@ -171,6 +214,10 @@ export function useChatSession() {
       const rows = queryClient.getQueryData<MessageRead[]>(queryKey) ?? [];
       hydrateHistoryRagSources(rows);
       hydrateHistoryToolSteps(rows);
+      if (options?.replaceLocal) {
+        markPersistedMessagesSynced(messagesFingerprint(rows));
+        setMessages(toUIMessages(rows));
+      }
     },
     [
       conversationId,
@@ -178,32 +225,12 @@ export function useChatSession() {
       resetPersistedSyncFingerprint,
       hydrateHistoryRagSources,
       hydrateHistoryToolSteps,
+      markPersistedMessagesSynced,
+      setMessages,
     ],
   );
 
-  const { messages, sendMessage, status, stop, setMessages } = useChat({
-    id: conversationId ?? "pending",
-    transport,
-    onFinish: () => {
-      clearSendMeta();
-      void syncPersistedMessages({ retryUntilAssistant: true });
-    },
-    onError: (err) => {
-      clearSendMeta();
-      if (conversationId) {
-        if (err.name === "AbortError") {
-          void syncPersistedMessages({ retryUntilAssistant: true });
-        } else {
-          void queryClient.invalidateQueries({
-            queryKey: chatQueryKeys.messages(conversationId),
-          });
-        }
-      }
-      if (err.name !== "AbortError") {
-        setError(err.message);
-      }
-    },
-  });
+  syncPersistedMessagesRef.current = syncPersistedMessages;
 
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
@@ -241,13 +268,25 @@ export function useChatSession() {
         const list = await apiFetch<ConversationRead[]>(
           "/api/v1/conversations/me",
         );
-        const latestId = list.data?.[0]?.id;
-        if (latestId) {
-          router.replace(`/chat?conversation_id=${latestId}`);
+        const demoConvs =
+          list.data?.filter((item) => item.title === DEMO_SESSION_TITLE) ?? [];
+        const demoConv =
+          demoConvs.length === 0
+            ? null
+            : demoConvs.reduce<ConversationRead | null>((latest, item) => {
+                if (!latest) {
+                  return item;
+                }
+                const itemTs = item.updated_at ?? "";
+                const latestTs = latest.updated_at ?? "";
+                return itemTs > latestTs ? item : latest;
+              }, null);
+        if (demoConv) {
+          router.replace(`/chat?conversation_id=${demoConv.id}`);
           return;
         }
 
-        const convId = await createConversationRecord("新对话", user);
+        const convId = await createConversationRecord(DEMO_SESSION_TITLE, user);
         if (convId) {
           router.replace(`/chat?conversation_id=${convId}`);
         } else {
@@ -402,53 +441,55 @@ export function useChatSession() {
     hydrateHistoryToolSteps,
   ]);
 
-  const startNewConversation = useCallback(async () => {
-    if (isStreaming) {
-      return;
-    }
-
-    let activeMe = me;
-    if (!activeMe) {
-      const result = await refetchMe();
-      activeMe = result.data;
-    }
-    if (!activeMe) {
-      setError("登录信息加载失败，请重试或重新登录");
-      return;
-    }
-
-    setBootstrapping(true);
-    setError(null);
-    setMessages([]);
-    resetConversationSync();
-
-    try {
-      const convId = await createConversationRecord("新分析", activeMe);
-      if (convId) {
-        router.replace(`/chat?conversation_id=${convId}`);
-      } else {
-        setError("新建分析失败");
-        setBootstrapping(false);
+  const appendDemoTurn = useCallback(
+    async (matchId: string, templateId: string) => {
+      if (!conversationId || isStreaming || isSending) {
+        return;
       }
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError("新建分析失败");
+
+      setIsSending(true);
+      setError(null);
+      try {
+        await apiFetch(`/api/v1/conversations/${conversationId}/demo-turn`, {
+          method: "POST",
+          body: JSON.stringify({
+            match_id: matchId,
+            template_id: templateId,
+          }),
+        });
+        resetPersistedSyncFingerprint();
+        const rows = await queryClient.fetchQuery({
+          queryKey: chatQueryKeys.messages(conversationId),
+          queryFn: () => fetchConversationMessages(conversationId),
+          staleTime: 0,
+        });
+        hydrateHistoryRagSources(rows);
+        hydrateHistoryToolSteps(rows);
+        markPersistedMessagesSynced(messagesFingerprint(rows));
+        setMessages(toUIMessages(rows));
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setError(err.message);
+        } else {
+          setError("演示分析写入失败");
+        }
+      } finally {
+        setIsSending(false);
       }
-      setBootstrapping(false);
-    }
-  }, [
-    me,
-    isStreaming,
-    refetchMe,
-    setBootstrapping,
-    setError,
-    setMessages,
-    resetConversationSync,
-    createConversationRecord,
-    router,
-  ]);
+    },
+    [
+      conversationId,
+      isStreaming,
+      isSending,
+      setError,
+      queryClient,
+      resetPersistedSyncFingerprint,
+      hydrateHistoryRagSources,
+      hydrateHistoryToolSteps,
+      markPersistedMessagesSynced,
+      setMessages,
+    ],
+  );
 
   const retrySession = useCallback(async () => {
     if (isStreaming || conversationId) {
@@ -528,31 +569,46 @@ export function useChatSession() {
       return;
     }
 
-    const lastUserMessage = [...messages].reverse().find(
-      (message) => message.role === "user",
-    );
-    if (!lastUserMessage) {
-      return;
-    }
-
-    const text = getTextFromUIMessage(lastUserMessage).trim();
-    if (!text) {
-      return;
-    }
-
-    sendMetaRef.current = { clientMessageId: null, regenerate: true };
     setIsSending(true);
     setError(null);
-    flushSync(() => {
-      setMessages((current) => {
-        const last = current.at(-1);
-        if (last?.role === "assistant") {
-          return current.slice(0, -1);
-        }
-        return current;
-      });
-    });
     try {
+      await syncPersistedMessages({ replaceLocal: true });
+
+      const rows =
+        queryClient.getQueryData<MessageRead[]>(
+          chatQueryKeys.messages(conversationId),
+        ) ?? [];
+      const lastRow = rows.at(-1);
+      if (lastRow?.role !== "assistant") {
+        clearSendMeta();
+        return;
+      }
+
+      const lastUserRow = [...rows].reverse().find((row) => row.role === "user");
+      const text = lastUserRow?.content.trim() ?? "";
+      if (!text) {
+        clearSendMeta();
+        return;
+      }
+
+      sendMetaRef.current = { clientMessageId: null, regenerate: true };
+      flushSync(() => {
+        setMessages((current) => {
+          const last = current.at(-1);
+          if (last?.role === "assistant") {
+            return current.slice(0, -1);
+          }
+          return current;
+        });
+      });
+
+      const tail = messagesRef.current.at(-1);
+      if (tail?.role !== "user") {
+        setError("重新生成失败：会话末尾不是用户消息");
+        clearSendMeta();
+        return;
+      }
+
       const pending = sendMessage({ text });
       flushSync(() => {
         setMessages((current) => {
@@ -591,7 +647,7 @@ export function useChatSession() {
     errorMessage: queryErrorMessage ?? error,
     handleSubmit,
     regenerateLatest,
-    startNewConversation,
+    appendDemoTurn,
     retrySession,
     canRetrySession: Boolean(error) && !conversationId && !isStreaming,
     stop: () => {

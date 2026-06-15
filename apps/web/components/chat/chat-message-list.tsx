@@ -2,6 +2,8 @@ import type { UIMessage } from "ai";
 import { useEffect, useMemo, useRef } from "react";
 
 import { ChatMessage } from "@/components/chat/chat-message";
+import { ChatThinkingIndicator } from "@/components/chat/chat-thinking-indicator";
+import { isDemoUIMessage } from "@/lib/chat-types";
 
 const BOTTOM_THRESHOLD_PX = 80;
 
@@ -9,16 +11,20 @@ type ChatMessageListProps = {
   messages: UIMessage[];
   streamingMessageId?: string | null;
   isStreaming?: boolean;
+  isSending?: boolean;
   onRegenerate?: () => void;
   emptyLabel?: string;
+  thinkingLabel?: string;
 };
 
 export function ChatMessageList({
   messages,
   streamingMessageId = null,
   isStreaming = false,
+  isSending = false,
   onRegenerate,
   emptyLabel = "发送一条消息开始分析",
+  thinkingLabel = "思考中…",
 }: ChatMessageListProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -32,6 +38,12 @@ export function ChatMessageList({
     }
     return null;
   }, [messages]);
+
+  const lastMessage = messages.at(-1);
+  const awaitingAssistant =
+    isStreaming && lastMessage?.role !== "assistant";
+  const showThinking =
+    (isSending && !isStreaming) || awaitingAssistant;
 
   function updateNearBottom() {
     const el = scrollRef.current;
@@ -50,7 +62,7 @@ export function ChatMessageList({
     messagesEndRef.current?.scrollIntoView({
       behavior: isStreaming ? "auto" : "smooth",
     });
-  }, [messages, streamingMessageId, isStreaming]);
+  }, [messages, streamingMessageId, isStreaming, showThinking]);
 
   return (
     <div
@@ -78,11 +90,14 @@ export function ChatMessageList({
             !isStreaming &&
             message.role === "assistant" &&
             message.id === latestAssistantId &&
-            Boolean(onRegenerate)
+            Boolean(onRegenerate) &&
+            !isDemoUIMessage(message)
           }
           onRegenerate={onRegenerate}
         />
       ))}
+
+      {showThinking ? <ChatThinkingIndicator label={thinkingLabel} /> : null}
 
       <div ref={messagesEndRef} />
     </div>

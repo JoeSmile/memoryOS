@@ -13,13 +13,14 @@ export function MinimalChat() {
     input,
     setInput,
     isStreaming,
+    isSending,
     loading,
     streamingMessageId,
     loadedMessageCount,
     errorMessage,
     handleSubmit,
     regenerateLatest,
-    startNewConversation,
+    appendDemoTurn,
     retrySession,
     canRetrySession,
     canCompose,
@@ -35,8 +36,10 @@ export function MinimalChat() {
       header={
         <ChatHeader
           loadedMessageCount={loadedMessageCount}
-          onNewConversation={() => void startNewConversation()}
-          newConversationDisabled={isStreaming || loading}
+          pickerDisabled={isStreaming || isSending}
+          onRunDemoAnalysis={(match, templateId) =>
+            void appendDemoTurn(match.id, templateId)
+          }
         />
       }
       footer={
@@ -58,6 +61,9 @@ export function MinimalChat() {
         messages={messages}
         streamingMessageId={streamingMessageId}
         isStreaming={isStreaming}
+        isSending={isSending}
+        thinkingLabel="正在生成分析…"
+        emptyLabel="选择阶段、比赛与分析维度后点击「开始分析」"
         onRegenerate={() => void regenerateLatest()}
       />
     </ChatShell>

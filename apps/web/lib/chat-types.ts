@@ -50,6 +50,10 @@ export type ChatMessageMetadata = {
   completionStatus?: string | null;
   ragSources?: RagSourceItem[];
   toolSteps?: ToolStepItem[];
+  demo?: {
+    match_id?: string;
+    template_id?: string;
+  };
 };
 
 export type ChatUIMessage = UIMessage<
@@ -65,11 +69,16 @@ export type UserRead = {
 export type ConversationRead = {
   id: string;
   title: string;
+  updated_at?: string;
 };
 
 export type MessageMetadataRead = {
   rag_sources?: RagSourceItem[];
   tool_steps?: ToolStepItem[];
+  demo?: {
+    match_id?: string;
+    template_id?: string;
+  };
 };
 
 export type MessageRead = {
@@ -83,6 +92,34 @@ export type MessageRead = {
 };
 
 export const COMPLETION_INTERRUPTED = "interrupted";
+
+function parseDemoFromMetadata(metadata: unknown): ChatMessageMetadata["demo"] {
+  if (typeof metadata !== "object" || metadata === null) {
+    return undefined;
+  }
+  const demo = (metadata as MessageMetadataRead).demo;
+  if (typeof demo !== "object" || demo === null) {
+    return undefined;
+  }
+  return {
+    match_id:
+      typeof demo.match_id === "string" ? demo.match_id : undefined,
+    template_id:
+      typeof demo.template_id === "string" ? demo.template_id : undefined,
+  };
+}
+
+export function isDemoMessageRead(row: MessageRead): boolean {
+  return parseDemoFromMetadata(row.metadata) !== undefined;
+}
+
+export function isDemoUIMessage(message: UIMessage): boolean {
+  const metadata = message.metadata as ChatMessageMetadata | undefined;
+  if (metadata?.demo) {
+    return true;
+  }
+  return parseDemoFromMetadata(metadata) !== undefined;
+}
 
 function isRagSourceItem(value: unknown): value is RagSourceItem {
   if (typeof value !== "object" || value === null) {
@@ -322,6 +359,10 @@ export function toUIMessages(rows: MessageRead[]): ChatUIMessage[] {
     }
     if (toolSteps) {
       metadata.toolSteps = toolSteps;
+    }
+    const demo = parseDemoFromMetadata(row.metadata);
+    if (demo) {
+      metadata.demo = demo;
     }
 
     return {
