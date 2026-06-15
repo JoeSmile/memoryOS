@@ -56,3 +56,59 @@ async def test_embed_texts_matches_query_for_same_string(mock_service: Embedding
 @pytest.mark.asyncio
 async def test_embed_texts_empty_returns_empty(mock_service: EmbeddingService):
     assert await mock_service.embed_texts([]) == []
+
+
+@pytest.mark.asyncio
+async def test_live_uses_embedding_base_url_when_set(monkeypatch):
+    captured: dict[str, object] = {}
+
+    class FakeEmbeddings:
+        def __init__(self, **kwargs: object) -> None:
+            captured.update(kwargs)
+
+        async def aembed_query(self, query: str) -> list[float]:
+            return [0.0] * EMBEDDING_DIMENSIONS
+
+    monkeypatch.setattr(
+        "app.services.embedding_service.OpenAIEmbeddings",
+        FakeEmbeddings,
+    )
+    settings = Settings(
+        openai_api_key="ollama",
+        openai_api_base="http://chat-host:11434/v1",
+        embedding_api_base="http://embed-host:11434/v1",
+        embedding_model="mxbai-embed-large",
+        _env_file=None,
+    )
+    service = EmbeddingService(settings=settings)
+    await service.embed_query("test")
+
+    assert captured["base_url"] == "http://embed-host:11434/v1"
+    assert captured["model"] == "mxbai-embed-large"
+
+
+@pytest.mark.asyncio
+async def test_live_falls_back_to_chat_base_url(monkeypatch):
+    captured: dict[str, object] = {}
+
+    class FakeEmbeddings:
+        def __init__(self, **kwargs: object) -> None:
+            captured.update(kwargs)
+
+        async def aembed_query(self, query: str) -> list[float]:
+            return [0.0] * EMBEDDING_DIMENSIONS
+
+    monkeypatch.setattr(
+        "app.services.embedding_service.OpenAIEmbeddings",
+        FakeEmbeddings,
+    )
+    settings = Settings(
+        openai_api_key="ollama",
+        openai_api_base="http://chat-host:11434/v1",
+        embedding_model="mxbai-embed-large",
+        _env_file=None,
+    )
+    service = EmbeddingService(settings=settings)
+    await service.embed_query("test")
+
+    assert captured["base_url"] == "http://chat-host:11434/v1"

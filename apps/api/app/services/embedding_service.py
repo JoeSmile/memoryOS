@@ -39,8 +39,11 @@ class EmbeddingService:
             }
             if self._settings.openai_api_key:
                 kwargs["api_key"] = self._settings.openai_api_key
-            if self._settings.openai_api_base:
-                kwargs["base_url"] = self._settings.openai_api_base
+            base_url = (
+                self._settings.embedding_api_base or self._settings.openai_api_base
+            )
+            if base_url:
+                kwargs["base_url"] = base_url
             self._live = OpenAIEmbeddings(**kwargs)
 
     @property

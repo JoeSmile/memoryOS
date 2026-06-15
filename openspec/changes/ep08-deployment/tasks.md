@@ -61,10 +61,10 @@
 
 ## 6. LLM Profile + Ollama local（Story 8.5）
 
-- [ ] 6.1 `Settings.embedding_api_base` + `EmbeddingService` + unit test
+- [x] 6.1 `Settings.embedding_api_base` + `EmbeddingService` + unit test
   - 预计文件：3 · 层：`config.py` + `embedding_service.py` + `tests/unit/test_embedding_service.py`
 
-- [ ] 6.2 `.env.deployment.example` + `apps/api/.env.example` — local（Ollama `qwen3:8b`）与 cloud（百炼）注释块；web `API_UPSTREAM_URL` 若需要
+- [x] 6.2 `.env.deployment.example` + `apps/api/.env.example` — local（Ollama `qwen3:8b`）与 cloud（百炼）注释块；web `API_UPSTREAM_URL` 若需要
   - 预计文件：2–3 · 层：example 文件 + 可选 web env
 
 - [ ] 6.3 `docs/tech/ollama-local.md`（**仅 local profile**）+ `deployment.md` 链接

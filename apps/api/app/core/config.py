@@ -15,6 +15,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
+        populate_by_name=True,
     )
 
     app_name: str = "MemoryOS API"
@@ -45,6 +46,11 @@ class Settings(BaseSettings):
     embedding_model: str = Field(
         default="text-embedding-v4",
         description="DashScope/OpenAI-compatible embedding model when API key is set",
+    )
+    embedding_api_base: str | None = Field(
+        default=None,
+        validation_alias="EMBEDDING_BASE_URL",
+        description="OpenAI-compatible embedding API base; falls back to OPENAI_BASE_URL when unset",
     )
 
     rag_chat_enabled: bool = Field(
