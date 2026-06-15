@@ -1,6 +1,11 @@
 # L05 — 记忆 + 工作流（第 7 周）
 
-**对应史诗**：EP06（P1）+ EP07（P2 可裁剪）
+**对应史诗**：[EP06](../epics/EP06-memory.md)（P1，**已落地**）+ [EP07](../epics/EP07-workflow.md)（P2，进行中）
+
+| Part | 史诗 | 状态 | 权威文档 |
+|:-----|:-----|:-----|:---------|
+| A 记忆 | EP06 | ✅ | [memory-system.md](../../tech/memory-system.md) · [ep06-memory-design.md](../../tech/ep06-memory-design.md) |
+| B 工作流 | EP07 | 📋 | [openspec ep07-workflow](../../openspec/changes/ep07-workflow/design.md) · `workflow-engine.md`（task 6.1 待写） |
 
 ---
 
@@ -10,10 +15,10 @@
 
 ### 学什么
 
-- [ ] 📖 模型 context window；input+output 合计限制
-- [ ] 📖 tiktoken 按模型计数；中英混合差异
-- [ ] 📖 预算分配：system + 记忆 + 检索 + 历史 + 用户输入
-- [x] 🔧 配置项：`MAX_CONTEXT_TOKENS`、`RESERVE_FOR_REPLY`（`config.py`）
+- [x] 📖 模型 context window；input + output 合计限制
+- [x] 📖 tiktoken 按模型计数；中英混合差异
+- [x] 📖 预算分配：system + 记忆 + RAG + 历史 + 用户输入
+- [x] 🔧 `MAX_CONTEXT_TOKENS`、`RESERVE_FOR_REPLY`（`config.py`）
 
 ### 面试常问
 
@@ -23,8 +28,8 @@
 
 | 坑 | 现象 | 规避 |
 |:---|:-----|:-----|
-| 只数字符不数 token | 仍超限 API 报错 | 统一 tokenizer |
-| 未给回复留预算 | 生成被截断 | 预留 output tokens |
+| 只数字符不数 token | 仍超限 API 报错 | 统一 `token_counter` |
+| 未给回复留预算 | 生成被截断 | `RESERVE_FOR_REPLY` |
 
 ---
 
@@ -32,29 +37,29 @@
 
 ### 学什么
 
-- [ ] 📖 保留最近 N 轮或最近 M tokens
-- [ ] 📖 与 DB 全量历史关系：DB 存档 ≠ 全部进 prompt
-- [ ] 📖 LangGraph 节点：组装 messages 前裁剪
-- [x] 🔧 `services/memory/short_term.py` + `trim_history`
+- [x] 📖 保留最近 N 轮 / M tokens；从最旧 turn 删起
+- [x] 📖 DB 全量 messages ≠ 进 LLM 的全量（裁剪仅图内）
+- [x] 📖 `trim_history` 只裁 `messages`；`context_summary` 只参与 token 预算
+- [x] 🔧 `services/memory/short_term.py` + `graphs/nodes/trim_history.py`
 
 ### 实战易踩坑
 
 | 坑 | 现象 | 规避 |
 |:---|:-----|:-----|
-| 裁剪把 system 裁掉 | 人设丢失 | system 永不裁 |
-| 多 tab 会话串窗口 | 答非所问 | thread_id 隔离 |
+| 裁剪把 system 裁掉 | 人设丢失 | system / 注入块永不裁 |
+| UI 与模型所见不一致 | 用户以为「忘了」 | Header 提示「后端裁剪」 |
 
 ---
 
-## 3. 长期记忆与画像
+## 3. 长期记忆
 
 ### 学什么
 
-- [ ] 📖 对话后异步抽取：偏好、事实、禁忌（结构化 JSON）
-- [ ] 📖 `memories` 表：type、content、importance、embedding
-- [ ] 📖 LlamaIndex 记忆索引：检索 TopK 注入 system
-- [ ] 📖 矛盾更新：新事实覆盖旧（同 key 冲突策略）
-- [x] 🔧 `services/memory/long_term.py` + 前端 `/memories`
+- [x] 📖 finalize 后异步抽取：preference / fact / constraint
+- [x] 📖 `memories` 表 + pgvector；TopK 按 `user_id` 过滤
+- [x] 📖 与 RAG 世界杯知识库 **读写分离**
+- [x] 📖 同 `memory_key` upsert 覆盖；用户可删
+- [x] 🔧 `long_term.py` + `load_user_memories` + 前端 `/memories`
 
 ### 面试常问
 
@@ -64,63 +69,106 @@
 
 | 坑 | 现象 | 规避 |
 |:---|:-----|:-----|
-| 抽取幻觉当事实 | 错误人设 | 用户确认或置信度阈值 |
-| 记忆无限增长 | 检索噪声 | 定期清理 + importance |
-| 敏感信息进记忆 | 合规问题 | 脱敏 + 用户删除权 |
+| 抽取幻觉当事实 | 错误人设 | 用户删除 + prune |
+| 记忆无限增长 | 检索噪声 | `expires_at` + importance 阈值 |
 
 ---
 
-## 4. 摘要压缩
+## 4. 会话摘要（中期记忆）
 
 ### 学什么
 
-- [ ] 📖 触发条件：历史 token > 阈值
-- [ ] 📖 摘要模型/提示词：保留决策、待办、用户约束
-- [ ] 📖 结构：`[Summary] + [Recent turns]`
-- [x] 🔧 `summary_service` + `BackgroundTasks`（不阻塞 SSE）
+- [x] 📖 `conversations.context_summary`；rolling 合并
+- [x] 📖 节流：首次 `SUMMARY_TRIGGER_TOKENS`；后续 increment + cooldown
+- [x] 📖 摘要 **下一轮** 才注入；`BackgroundTasks` 不阻塞 SSE
+- [x] 🔧 `summary_service.py` + `chat_service` finalize 调度
 
 ### 实战易踩坑
 
 | 坑 | 现象 | 规避 |
 |:---|:-----|:-----|
-| 摘要丢关键约束 | 后续违反用户要求 | 摘要 prompt 强调约束 |
-| 同步摘要做在热路径 | 首 token 慢 | 后台生成 |
+| 摘要丢关键约束 | 后续违反用户要求 | rolling prompt 强调约束 |
+| 每轮都跑 summary | 成本爆炸 | increment + cooldown |
 
 ---
 
-## 5. LangGraph 记忆节点
+## 5. LangGraph 记忆节点（对话图）
 
-- [x] 📖 `trim_history` → `load_user_memories` → `retrieve` → `call_model`；finalize 后 async summary + extract
-- [x] 🔧 [memory-system.md](../../tech/memory-system.md) · [ep06-memory-design.md](../../tech/ep06-memory-design.md)
+- [x] 📖 拓扑：`trim_history` → `load_user_memories` → `retrieve` → `call_model` (± tools)
+- [x] 📖 finalize 后并行：summary + memory extract
+- [x] 🔧 详见 [ep06-memory-design.md §8 Walkthrough](../../tech/ep06-memory-design.md)
+
+### MVP 后
+
+- [ ] 持久队列、溯源、监控 → [EP11](../epics/EP11-memory-ops.md)
+- [ ] 离线评测回归 → [EP12](../epics/EP12-memory-eval.md)
 
 ---
 
 # Part B — 工作流（EP07，可选）
 
-> Remote Graph / 子图热插拔见 [L09](./L09-distributed-orchestration.md)、[EP13](../epics/EP13-memory-distributed.md)。队列生产实现见 [EP11](../epics/EP11-memory-ops.md)。
+> 史诗说明（Trigger、分析模型、与 chat 分工）：[EP07-workflow.md](../epics/EP07-workflow.md) · OpenSpec：[design.md](../../openspec/changes/ep07-workflow/design.md)  
+> Remote Graph → [L09](./L09-distributed-orchestration.md) / [EP13](../epics/EP13-memory-distributed.md)；生产队列 → [EP11](../epics/EP11-memory-ops.md)。
 
 ## 1. 编排概念
 
-- [ ] 📖 DAG vs 状态机；LangGraph 即状态机实现
-- [ ] 📖 节点：解析 → 提取 → 匹配 → 报告
-- [ ] 📖 队列：BackgroundTasks vs Celery/ARQ（量大再上）→ **EP11 落地队列，EP13 多 Worker 容器**
+### 学什么
 
-## 2. 简历 Demo
+- [ ] 📖 DAG vs 状态机；本项用 LangGraph 状态机
+- [ ] 📖 独立图 `graphs/workflows/`，与 `chat_graph` 并列
+- [ ] 📖 **Trigger**：前端按钮 → POST runs → BackgroundTasks → 轮询（**非** Cron、**非** chat 关键字）
+- [ ] 📖 异步 run 状态落 `workflow_runs` / `workflow_run_steps`
 
-- [ ] 🔧 PDF 上传 → 技能 JSON → JD 匹配报告
-- [ ] 🔧 简易进度 API + 前端步骤条
+### 与 /chat 分工
+
+| | `/chat` | `/workflows/match-analysis` |
+|:--|:--------|:----------------------------|
+| 目的 | 自由问答、Agent | 固定报告、可回看 run |
+| 交互 | SSE 流式 | 按钮 + REST 轮询 + 步骤条 |
+| 输入 | 自然语言 | `match_id` + 可选 `analysis_focus` |
+| 数据 | RAG + 记忆 | `wc_*` 事实 + RAG |
+| LLM | 多轮对话/ReAct | ** mainly 最后一步写报告** |
+
+---
+
+## 2. 世界杯对阵分析 Demo
+
+### 学什么
+
+- [ ] 📖 输入：`wc_matches.match_id`（EP04-01 CSV→ETL→DB）；非 PDF / 非简历
+- [ ] 📖 **非全 LLM**：SQL 装 facts → RAG 检索 → LLM grounded 写报告
+- [ ] 📖 `analysis_focus`（如「边路进攻」）**不改 SQL**；影响 RAG query + 报告角度；无数据则声明不足
+- [ ] 🔧 `GET .../matches` + `POST .../runs` + `GET /workflow-runs/{id}`
+- [ ] 🔧 `/workflows/match-analysis`（下拉 + focus +「开始分析」）
 
 ### 实战易踩坑
 
 | 坑 | 现象 | 规避 |
 |:---|:-----|:-----|
-| 与 Agent 图两套标准 | 维护成本高 | 复用 LangGraph 模式 |
-| 长任务无状态 | 刷新丢进度 | job_id + DB 状态 |
+| 与 chat 混一套图 | 维护成本高 | 独立 `match_analysis_graph` |
+| 以为 focus 会算战术统计 | LLM 编造占比 | facts 前置 + prompt 禁止幻觉 |
+| 长任务无持久状态 | 刷新丢进度 | `workflow_runs` + 轮询 |
+| 本地无 `wc_*` 数据 | run 失败 | migration + ETL 或 Harness fixture |
+
+---
+
+## 3. LangGraph 规范（Story 7.4）
+
+- [ ] 📖 工作流节点类型：Input、LLM、Tool（DB/RAG）、Output
+- [ ] 📖 首版 **不做** Condition 分支、拖拽画布
+- [ ] 🔧 OpenSpec：[ep07-workflow/tasks.md](../../openspec/changes/ep07-workflow/tasks.md)
 
 ---
 
 ## 阶段自测
 
-- [ ] 口述：短期 + 摘要 + 长期 如何同时进 prompt  
-- [ ] 3 个记忆相关踩坑 + 对策  
-- [ ] （EP07）Demo 录屏 2 分钟
+**EP06（应能口述）**
+
+- [ ] 短期 + 摘要 + 长期 如何同时进 prompt、`trim_history` 与摘要的关系
+- [ ] 3 个记忆踩坑 + 对策（裁剪、摘要滞后、RAG 与记忆隔离）
+
+**EP07（落地后）**
+
+- [ ] 工作流 **如何触发**（按钮 + API，非 Cron/chat 关键字）
+- [ ] `match_id` vs `analysis_focus`；为何 **不是全 LLM**
+- [ ] Demo 录屏 ~2 分钟：选场次 → 步骤条 → 报告
