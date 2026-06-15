@@ -120,6 +120,49 @@ docker compose exec postgres psql -U memoryos -d memoryos -c "CREATE EXTENSION I
 
 卷 `postgres-data`、`redis-data` 由 Compose 管理。
 
-## 后续（EP08）
+## EP08 — Full profile（部署契约本地验证）
 
-完整栈将扩展 `web`、`api`、`nginx` 等于同一 compose 文件。
+与宿主机 `pnpm dev:stack` **并行**：默认 `docker compose up` 仍 **仅** PG+Redis。
+
+### 1. 构建镜像（与上云同一 Dockerfile）
+
+```bash
+# 仓库根目录
+docker build -f apps/web/Dockerfile \
+  --build-arg NEXT_PUBLIC_API_URL=http://localhost:8080 \
+  -t memoryos-web:local .
+
+docker build -f apps/api/Dockerfile -t memoryos-api:local apps/api
+```
+
+### 2. 部署 env
+
+```bash
+cd infra/docker
+cp .env.deployment.example .env.deployment.local
+# 编辑 JWT、Ollama 等（勿提交 git）
+```
+
+> 文件放在 **`infra/docker/.env.deployment.local`**，不是 `apps/api/`。上云复制为 `.env.deployment.cloud`。
+
+### 3. 启动全栈
+
+```bash
+cd infra/docker
+docker compose --env-file .env.deployment.local --profile full up -d
+docker compose --profile full ps
+```
+
+入口：`http://localhost:8080`（`NGINX_HTTP_PORT` 可改）。反代规则见 [`infra/nginx/default.conf`](../nginx/default.conf)。
+
+### 4. 迁移
+
+```bash
+docker compose --env-file .env.deployment.local --profile full run --rm api alembic upgrade head
+```
+
+### 5. 晋级云
+
+同一 `WEB_IMAGE` / `API_IMAGE` tag push 到 registry → `.env.deployment.cloud` 换托管 PG/Redis 与百炼 Key → 同一 `compose --profile full`。
+
+详见 `docs/tech/deployment.md`（task 5.x）。

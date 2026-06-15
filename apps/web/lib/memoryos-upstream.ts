@@ -13,8 +13,11 @@ import {
   type ToolResultPayload,
 } from "@/lib/sse-frames";
 
+/** Server-side FastAPI base (BFF). Prefer API_UPSTREAM_URL in Docker; browser uses NEXT_PUBLIC_API_URL. */
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  process.env.API_UPSTREAM_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://localhost:8000";
 
 /** Short assistant snapshots may inline full text; longer stops send length only. */
 export const CANCEL_VISIBLE_CONTENT_INLINE_MAX = 256;

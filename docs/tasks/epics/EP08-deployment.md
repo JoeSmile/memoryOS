@@ -1,4 +1,4 @@
-# EP08 — 本地 Docker 全栈
+# EP08 — 部署契约与本地验证
 
 | 属性 | 值 |
 |:-----|:---|
@@ -6,58 +6,58 @@
 | **优先级** | P0 |
 | **学习路线** | [L06-deployment.md](../learning/L06-deployment.md) |
 | **OpenSpec** | [ep08-deployment](../../openspec/changes/ep08-deployment/design.md) |
-| **MVP 后** | 上云 / K8s 见 [post-mvp-roadmap.md](../post-mvp-roadmap.md) · EP13 · EP14 |
+| **MVP 后** | K8s 编排见 [EP14](./EP14-k8s-cloud.md) · [post-mvp-roadmap.md](../post-mvp-roadmap.md) |
 
-> **范围**：**本地** Docker Compose 全栈（web + api + postgres + redis + nginx）跑通与冒烟；SSE 经 Nginx 可用；**本地 Ollama** 接入 LLM + Embedding（无外网 Key 也可演示）。**不上云**——腾讯云 / SSL / 生产 CI 留 **EP14（K8s）**。
-
----
-
-## Story 8.1 Docker
-
-- [ ] `apps/web`、`apps/api` 多阶段 Dockerfile
-- [ ] `.dockerignore`、非 root 用户
-
-## Story 8.2 Docker Compose
-
-- [ ] 本地一键：`docker compose --profile full up`
-- [ ] web、api、postgres、redis、nginx
-- [ ] `.env.docker.full.example`（Compose full 用，无真实密钥）
-
-## Story 8.3 Nginx（本地）
-
-- [ ] SSE：`proxy_buffering off`、长超时
-- [ ] `/` → web、`/api/` → api（HTTP 即可）
-- [ ] 静态资源、CORS（若需要）
-
-## Story 8.4 本地文档与冒烟
-
-- [ ] `docs/tech/deployment.md` — full profile 启动、Alembic migrate、SSE 验证步骤
-- [ ] `infra/docker/README.md` 与 epic / L06 链接同步
-
-## Story 8.5 本地 Ollama（LLM + Embedding）
-
-- [ ] 宿主机安装 Ollama；`ollama pull` 推荐 chat + embed 模型
-- [ ] API：**LLM 与 Embedding 分离 base URL / model**（OpenAI 兼容）；Docker 内通过 `host.docker.internal:11434` 访问宿主机 Ollama
-- [ ] `.env.example` / `.env.docker.full.example` 提供 Ollama 预设块
-- [ ] `docs/tech/ollama-local.md` — 安装、模型、维度与 re-ingest、full stack 冒烟
-- [ ] Harness / CI **仍 mock**（不设 Key 即可，行为不变）
+> **范围**：建立 **local → cloud 共用** 的部署契约（镜像 + env 键 + Nginx 规则）。本地 `compose --profile full` 用于 **验证流程与参数**；通过后 **同一镜像** push registry，换 **cloud profile** 上云。EP14 只做 K8s/Helm，**不重做 Dockerfile**。
 
 ---
 
-## 移出 EP08（→ EP14 / 后续）
+## Story 8.1 Docker（✅ 进行中）
 
-| 原 Story | 去向 |
-|:---------|:-----|
-| 腾讯云 / 安全组 | EP14 |
-| 域名 / SSL / HTTPS | EP14 |
-| dev/staging/prod 环境隔离 | EP14 |
-| GitHub Actions 镜像 build / deploy | EP14 |
+- [x] `apps/web`、`apps/api` 多阶段 Dockerfile
+- [x] `.dockerignore`、非 root 用户
+
+## Story 8.2 Compose + 部署 env
+
+- [ ] `docker compose --profile full`；`WEB_IMAGE` / `API_IMAGE` 可配置
+- [ ] `.env.deployment.example`（**local / cloud 双 profile 注释**）
+- [ ] 本地实测：`.env.deployment.local`（gitignore）
+
+## Story 8.3 Nginx
+
+- [ ] SSE：`proxy_buffering off`；BFF `/api/chat` 与 `/api/v1` 分流
+- [ ] 与云上 Ingress 规则对照文档
+
+## Story 8.4 部署文档（local 验证 + cloud 晋级）
+
+- [ ] `docs/tech/deployment.md` — 本地冒烟清单 + 推镜像上云步骤
+
+## Story 8.5 LLM Profile
+
+- [ ] **local**：Ollama `qwen3:8b` + `mxbai-embed-large`；`EMBEDDING_BASE_URL` 分离
+- [ ] **cloud**：同一 env 键，换百炼/托管 URL（example 中注释）
+- [ ] `docs/tech/ollama-local.md`（仅 local profile）
+
+## Story 8.6 CI 镜像流水线
+
+- [ ] `deploy.yml`：`docker build` web + api（与本地同 Dockerfile）
+- [ ] 可选 push GHCR；文档写 cloud 如何 `pull` 同一 tag
+
+---
+
+## 不在 EP08 实现（→ EP14）
+
+| 项 | 说明 |
+|:---|:-----|
+| Helm / TKE 编排 | 消费 EP08 镜像与 env 键 |
+| 自动 Terraform | 文档手动步骤即可 |
+| Ollama 上云 | cloud profile 用 API Key |
 
 ---
 
 ## 同步学习
 
-- [ ] Docker 多阶段与网络（理解 / 落地）
-- [ ] Nginx SSE 避坑（理解 / 落地）
-- [ ] Compose profiles 与 dev 默认路径共存（理解 / 落地）
-- [ ] Ollama 本地推理、OpenAI 兼容 API、LLM/Embed 分离配置（理解 / 落地）
+- [ ] 部署契约：一套镜像、一套 env 键、profile 换值
+- [ ] Docker Compose full + Nginx SSE
+- [ ] local Ollama vs cloud 百炼选型
+- [ ] CI build 与云上 pull 同一 tag

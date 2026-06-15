@@ -35,7 +35,7 @@
 | [L03-rag-dual-stack.md](./L03-rag-dual-stack.md) | 4-5 | EP04 | 双 RAG |
 | [L04-agent.md](./L04-agent.md) | 6 | EP05 | Agent 工具 |
 | [L05-memory-workflow.md](./L05-memory-workflow.md) | 7 | EP06 + EP07 | 记忆 + 工作流 |
-| [L06 部署](./learning/L06-deployment.md) | 8 | EP08 | 本地 Docker |
+| [L06 部署契约](./learning/L06-deployment.md) | 8 | EP08 | local→cloud |
 | [L07-optimization.md](./L07-optimization.md) | 9 | EP09 | 安全 + 成本 |
 | [L08-interview.md](./L08-interview.md) | 10-12 | EP10 | 面试冲刺 |
 | [L09-distributed-orchestration.md](./L09-distributed-orchestration.md) | MVP 后 | EP13 + EP14 | 分布式 · Remote Agent · K8s |

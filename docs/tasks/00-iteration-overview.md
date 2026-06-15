@@ -12,7 +12,7 @@
 | 3 | 第 4-5 周 | EP04 | LangChain 快 RAG + LlamaIndex 自研 RAG | [L03](./learning/L03-rag-dual-stack.md) |
 | 4 | 第 6 周 | EP05 | LangGraph Agent 全流程 | [L04](./learning/L04-agent.md) |
 | 5 | 第 7 周 | EP06 | 记忆体系 | [L05](./learning/L05-memory-workflow.md) |
-| 6 | 第 8 周 | EP08 | 本地 Docker 全栈 + Ollama | [L06](./learning/L06-deployment.md) |
+| 6 | 第 8 周 | EP08 | 部署契约 + 本地验证 → 云 | [L06](./learning/L06-deployment.md) |
 | 7 | 第 9 周 | EP09 | 性能 / 安全 / Token 成本 | [L07](./learning/L07-optimization.md) |
 | 8 | 第 10-12 周 | EP10 | 打磨 + 面试素材 | [L08](./learning/L08-interview.md) |
 

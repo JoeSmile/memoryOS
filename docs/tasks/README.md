@@ -29,7 +29,7 @@
 | EP05 | 第 6 周 | [epics/EP05-agent.md](./epics/EP05-agent.md) | [L04 Agent](./learning/L04-agent.md) |
 | EP06 | 第 7 周 | [epics/EP06-memory.md](./epics/EP06-memory.md) | [L05 记忆+工作流](./learning/L05-memory-workflow.md) |
 | EP07 | 第 7 周 | [epics/EP07-workflow.md](./epics/EP07-workflow.md)（**已砍掉**） | — |
-| EP08 | 第 8 周 | [epics/EP08-deployment.md](./epics/EP08-deployment.md) | [L06 本地 Docker](./learning/L06-deployment.md) |
+| EP08 | 第 8 周 | [epics/EP08-deployment.md](./epics/EP08-deployment.md) | [L06 部署契约](./learning/L06-deployment.md) |
 | EP09 | 第 9 周 | [epics/EP09-optimization.md](./epics/EP09-optimization.md) | [L07 优化安全](./learning/L07-optimization.md) |
 | EP10 | 10-12 周 | [epics/EP10-polish.md](./epics/EP10-polish.md) | [L08 面试冲刺](./learning/L08-interview.md) |
 | EP11 | MVP 后 backlog | [epics/EP11-memory-ops.md](./epics/EP11-memory-ops.md) | EP06 企业级补强：队列 / 溯源 / 监控 |
@@ -132,7 +132,7 @@
 - 单周 Build 任务不超过 **5 条**「完成定义清晰」项。  
 - 学习路线允许 **延后**，但 Build 的 P0 不能跨周堆积超过 2 项。  
 - 连续 2 天卡住 → 缩小范围（例如先裸 SSE，再上 LangGraph）。  
-- EP07 已砍掉；优先 **EP08 本地 Docker 全栈**（P0）。
+- EP07 已砍掉；优先 **EP08 部署契约**（本地验证参数 → 同一镜像上云）。
 - **上云 / K8s / 分布式**：MVP 后按 [post-mvp-roadmap.md](./post-mvp-roadmap.md) 做 EP11–EP14，**勿在 EP02–EP08 中途改主编排架构**。
 
 ---

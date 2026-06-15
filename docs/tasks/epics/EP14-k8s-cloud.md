@@ -4,12 +4,12 @@
 |:-----|:---|
 | **周期** | EP13 本地 Compose 跑通后 |
 | **优先级** | P2 |
-| **依赖** | EP08（镜像与 Compose 文档）、EP13（分布式架构与 Helm 输入） |
+| **依赖** | EP08（**镜像 + env 契约 + CI build**）、EP13（分布式架构与 Helm 输入） |
 | **学习路线** | [L09 §4–5](../learning/L09-distributed-orchestration.md) |
 | **路线图** | [post-mvp-roadmap.md](../post-mvp-roadmap.md) |
 | **目标文档** | `docs/tech/k8s-tencent-deploy.md` 📋 |
 
-> 将 EP13 验证过的 **多服务 + Remote Graph + Worker** 上到 **本地 k3d/kind**，再迁 **腾讯云 TKE**。EP08 本地 Compose 路径仍保留为最低成本验证方式。
+> EP14 **不重做 Dockerfile**；Helm values 引用 EP08 的 `WEB_IMAGE`/`API_IMAGE` 与 `.env.deployment.example` 的 **cloud** 键。
 
 ---
 
@@ -18,7 +18,7 @@
 - [ ] `infra/k8s/` 或 `deploy/helm/memoryos/` chart 骨架
 - [ ] Values：`local`（资源收紧）、`staging`
 - [ ] Deployment：api、web、worker、langgraph-chat（+ 可选第二子图）
-- [ ] Service、ConfigMap、Secret（对齐 `.env.production.example`）
+- [ ] Service、ConfigMap、Secret（对齐 EP08 `.env.deployment.example` **cloud** 段）
 - [ ] 文档：一键 `k3d cluster create` + `helm install`
 
 **验收**：本机 k3d 内 curl Ingress 可打开 web；chat SSE 流式成功。
@@ -49,7 +49,7 @@
 
 ## Story 14.4 腾讯云 TKE
 
-- [ ] TCR 镜像仓库；CI 推镜像（EP14 新增，非 EP08）
+- [ ] TCR 镜像仓库；CI push（延续 EP08 `deploy.yml`）
 - [ ] TKE 集群（先单节点池）；CLB + Ingress
 - [ ] 数据库：TDSQL-C / 云 PostgreSQL；云 Redis（或初期仍轻量自建）
 - [ ] 安全组、密钥（生产 Secrets 策略）
@@ -70,13 +70,13 @@
 
 ## 与 EP08 关系
 
-| EP08（MVP） | EP14（成长） |
-|:------------|:-------------|
-| 本地 Compose + Nginx 验证 | k3d/kind → TKE + Helm |
-| 镜像 Dockerfile | CI build/push TCR |
-| 本地 SSE 冒烟文档 | Ingress + TLS + 域名 |
+| EP08 | EP14 |
+|:-----|:-----|
+| Dockerfile、env 契约、CI build | Helm、TKE、Ingress TLS |
+| local profile 冒烟 | cloud profile / K8s Secret |
+| VM `compose --profile full` 可先行 | 同一镜像 `helm upgrade` |
 
-**不替换 EP08**：本地演示仍可用 Compose full profile。
+**不替换 EP08**：本地仍用 full profile 调参；云只换 env 与 registry tag。
 
 ---
 

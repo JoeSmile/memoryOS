@@ -1,6 +1,6 @@
 # MVP 后演进路线（记忆企业级 + 分布式编排）
 
-> **原则**：12 周主排期（EP00–EP10）专注 **可演示 MVP**（本地 Docker 全栈验证）；**不**在 EP02–EP08 中途改成微内核/注册中心架构；**上云**留 EP14（K8s）。  
+> **原则**：12 周主排期专注 **可演示 MVP**；EP08 建立 **local→cloud 共用** 镜像与 env 契约，本地 Compose 验证后晋级上云；K8s 编排细节在 EP14。  
 > 分布式与 Remote Agent 热插拔作为 **MVP 后 backlog**，按依赖顺序增量落地。
 
 ## 为什么 MVP 后再改架构？
@@ -13,7 +13,7 @@
 
 | MVP 后增量改 | 收益 |
 |:-------------|:-----|
-| 先 EP06 内嵌图 + EP08 本地 Compose | 产品可演示、面试可讲全链路 |
+| 先 EP06 内嵌图 + EP08 部署契约 | 本地验证参数；同一镜像 push 云 |
 | EP11 队列 → EP13 多容器 → Remote Graph | 每一步有 Harness 门禁 |
 | EP14 TKE | Compose 已验证的镜像与 Helm 直接上移 |
 
@@ -66,7 +66,7 @@ EP11 与 EP13 **可部分并行**：队列 Worker 先落地，再拆 Remote Grap
 | 文档 | 对应史诗 |
 |:-----|:---------|
 | [L09 分布式编排](./learning/L09-distributed-orchestration.md) | EP13 + EP14 |
-| [L06 部署](./learning/L06-deployment.md) | EP08（本地 Docker） |
+| [L06 部署](./learning/L06-deployment.md) | EP08（部署契约 + local→cloud） |
 
 ## 技术文档（待写）
 
@@ -81,6 +81,6 @@ EP11 与 EP13 **可部分并行**：队列 Worker 先落地，再拆 Remote Grap
 | 史诗 | MVP 内 | MVP 后指向 |
 |:-----|:-------|:-----------|
 | EP07 工作流 | P2 可裁剪 | 与 EP13 共用 `langgraph.json`，画布 UI 延后 |
-| EP08 部署 | 本地 Compose + Nginx 验证 | EP14 上 K8s / 腾讯云；**不**在 EP08 做注册中心 |
+| EP08 部署 | 镜像 + env 契约 + 本地 Compose 验证 | EP14 Helm/TKE **复用镜像**，不重做 Dockerfile |
 | EP09 优化 | 限流/降级 | 多副本限流在 EP13 Compose 验证 |
 | EP10 面试 | 架构话术 | 分布式图作为 **加分叙事**，非 MVP 必交付 |

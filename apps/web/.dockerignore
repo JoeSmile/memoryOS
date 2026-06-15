@@ -1,0 +1,20 @@
+# Patterns for web image builds. Effective when copied/symlinked to repo root as
+# `.dockerignore`, or when using selective COPY in apps/web/Dockerfile.
+.git
+.github
+.cursor
+**/.next
+**/node_modules
+**/.env
+**/.env.*
+!**/.env.example
+apps/api
+infra
+openspec
+docs
+scripts
+**/__pycache__
+**/.pytest_cache
+**/.venv
+**/*.md
+!apps/web/README.md

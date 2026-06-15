@@ -1,6 +1,22 @@
-# L06 — 本地 Docker 全栈（第 8 周）
+# L06 — 部署契约与本地验证（第 8 周）
 
 **对应史诗**：EP08
+
+---
+
+## 0. 部署契约（先建立心智模型）
+
+### 学什么
+
+- [ ] 📖 **一套镜像**：`apps/web/Dockerfile`、`apps/api/Dockerfile` — 本地 build = CI build = 云上 pull
+- [ ] 📖 **一套 env 键**：`.env.deployment.example` — `local` / `cloud` **只换值不换键**
+- [ ] 📖 **本地** = staging 仿真：`compose --profile full` + `.env.deployment.local`
+- [ ] 📖 **晋级云**：push 镜像 → cloud env → 同一 compose 或 EP14 Helm
+- [ ] 🔧 `infra/docker/.env.deployment.example`、`docs/tech/deployment.md`
+
+### 面试常问
+
+- 如何避免「本地一套、生产重做」？镜像与配置如何分离？
 
 ---
 
@@ -69,14 +85,13 @@
 
 ---
 
-## 4. 本地冒烟与文档
+## 4. 本地冒烟与 cloud 晋级
 
 ### 学什么
 
-- [ ] 📖 `docker compose --profile full` 启动顺序
-- [ ] 📖 容器内 Alembic migrate
-- [ ] 📖 curl / 浏览器验证 SSE 经 Nginx 仍流式
-- [ ] 🔧 `docs/tech/deployment.md`
+- [ ] 📖 Local：`docker compose --profile full`、migrate、SSE 冒烟
+- [ ] 📖 Cloud：`docker push`、`.env.deployment.cloud`、托管 PG/Redis、换 LLM 为百炼
+- [ ] 🔧 `docs/tech/deployment.md` §Promote to cloud
 
 ---
 
@@ -89,14 +104,16 @@
 - [ ] 📖 **Chat 与 Embed 分离**：`OPENAI_BASE_URL` + `OPENAI_MODEL` vs `EMBEDDING_BASE_URL` + `EMBEDDING_MODEL`
 - [ ] 📖 Docker 容器访问宿主机 Ollama：`host.docker.internal:11434`（Linux 需 `extra_hosts`）
 - [ ] 📖 Embedding 维度须与 `EMBEDDING_DIMENSIONS`（1024）一致；换模型 → re-ingest
-- [ ] 🔧 `docs/tech/ollama-local.md` · `.env.docker.full.example` Ollama 块
+- [ ] 🔧 `docs/tech/ollama-local.md` · `.env.deployment.example` **local** 段
 
-### 推荐模型对（EP08 默认文档）
+### 推荐模型对（local profile）
 
 | 用途 | 模型 | 说明 |
 |:-----|:-----|:-----|
-| Chat | `qwen2.5:7b` | 中文友好；RAM ~8GB 量级 |
+| Chat | `qwen3:8b` | 中文友好；本机 Ollama |
 | Embedding | `mxbai-embed-large` | **1024** 维，与 pgvector migration 一致 |
+
+**cloud profile**：同一 env 键，`OPENAI_MODEL=qwen-turbo` 等，见 deployment example 注释。
 
 `OPENAI_API_KEY=ollama` 为占位符（Ollama 不校验，但 MemoryOS 用它区分 mock/live）。
 
@@ -121,12 +138,19 @@
 - [ ] 新人 30 分钟 Compose 起全栈  
 - [ ] curl SSE 经 Nginx 仍流式  
 - [ ] 说清 standalone 目录结构与启动命令
-- [ ] 宿主机 Ollama + full stack：真实 chat token + RAG 检索（非 mock）
+- [ ] 说清 local vs cloud profile 哪些键要改、哪些不用改
+- [ ] 说清同一镜像如何从本地 push 到云
 
 ---
 
-## MVP 后（不占 EP08 范围）
+## 6. CI 镜像（Story 8.6）
 
-- [ ] 📖 腾讯云、域名、SSL、GitHub Actions 镜像 CI → [EP14](../epics/EP14-k8s-cloud.md)
-- [ ] 📖 分布式 Compose profile、Remote Graph → [L09](./L09-distributed-orchestration.md)
-- [ ] 📖 EP08 本地 Compose 与 EP14 K8s 如何选型 → [post-mvp-roadmap.md](../post-mvp-roadmap.md)
+- [ ] 📖 `deploy.yml` build 与本地同 Dockerfile
+- [ ] 📖 EP14 只换 orchestrator，不换镜像
+
+---
+
+## MVP 后
+
+- [ ] 📖 Helm / TKE 编排 → [EP14](../epics/EP14-k8s-cloud.md)（消费 EP08 镜像）
+- [ ] 📖 分布式 profile → [L09](./L09-distributed-orchestration.md)
