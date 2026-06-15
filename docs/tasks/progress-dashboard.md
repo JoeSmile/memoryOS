@@ -15,8 +15,8 @@
 | EP04 RAG 双架构 |   P0   |  4-5   |  —   | [EP04](./epics/EP04-rag.md)            |
 | EP05 Agent      |   P1   |   6    |  —   | [EP05](./epics/EP05-agent.md)          |
 | EP06 记忆       |   P1   |   7    |  —   | [EP06](./epics/EP06-memory.md)         |
-| EP07 工作流     |   P2   |   7    |  —   | [EP07](./epics/EP07-workflow.md)       |
-| EP08 部署       |   P0   |   8    |  —   | [EP08](./epics/EP08-deployment.md)     |
+| EP07 工作流     |   P2   |   7    |  ⏸ 已砍掉 | [EP07](./epics/EP07-workflow.md)       |
+| EP08 部署       |   P0   |   8    |  🟡  | [EP08](./epics/EP08-deployment.md)     |
 | EP09 优化安全   |   P1   |   9    |  —   | [EP09](./epics/EP09-optimization.md)   |
 | EP10 打磨面试   |   P0   | 10-12  |  —   | [EP10](./epics/EP10-polish.md)         |
 

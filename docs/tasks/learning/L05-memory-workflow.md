@@ -1,11 +1,10 @@
 # L05 — 记忆 + 工作流（第 7 周）
 
-**对应史诗**：[EP06](../epics/EP06-memory.md)（P1，**已落地**）+ [EP07](../epics/EP07-workflow.md)（P2，进行中）
+**对应史诗**：[EP06](../epics/EP06-memory.md)（P1，**已落地**）· ~~EP07 工作流~~（**已砍掉**，见 [EP07](../epics/EP07-workflow.md)）
 
 | Part | 史诗 | 状态 | 权威文档 |
 |:-----|:-----|:-----|:---------|
 | A 记忆 | EP06 | ✅ | [memory-system.md](../../tech/memory-system.md) · [ep06-memory-design.md](../../tech/ep06-memory-design.md) |
-| B 工作流 | EP07 | 📋 | [openspec ep07-workflow](../../openspec/changes/ep07-workflow/design.md) · `workflow-engine.md`（task 6.1 待写） |
 
 ---
 
@@ -105,58 +104,9 @@
 
 ---
 
-# Part B — 工作流（EP07，可选）
+# ~~Part B — 工作流（EP07）~~
 
-> 史诗说明（Trigger、分析模型、与 chat 分工）：[EP07-workflow.md](../epics/EP07-workflow.md) · OpenSpec：[design.md](../../openspec/changes/ep07-workflow/design.md)  
-> Remote Graph → [L09](./L09-distributed-orchestration.md) / [EP13](../epics/EP13-memory-distributed.md)；生产队列 → [EP11](../epics/EP11-memory-ops.md)。
-
-## 1. 编排概念
-
-### 学什么
-
-- [ ] 📖 DAG vs 状态机；本项用 LangGraph 状态机
-- [ ] 📖 独立图 `graphs/workflows/`，与 `chat_graph` 并列
-- [ ] 📖 **Trigger**：前端按钮 → POST runs → BackgroundTasks → 轮询（**非** Cron、**非** chat 关键字）
-- [ ] 📖 异步 run 状态落 `workflow_runs` / `workflow_run_steps`
-
-### 与 /chat 分工
-
-| | `/chat` | `/workflows/match-analysis` |
-|:--|:--------|:----------------------------|
-| 目的 | 自由问答、Agent | 固定报告、可回看 run |
-| 交互 | SSE 流式 | 按钮 + REST 轮询 + 步骤条 |
-| 输入 | 自然语言 | `match_id` + 可选 `analysis_focus` |
-| 数据 | RAG + 记忆 | `wc_*` 事实 + RAG |
-| LLM | 多轮对话/ReAct | ** mainly 最后一步写报告** |
-
----
-
-## 2. 世界杯对阵分析 Demo
-
-### 学什么
-
-- [ ] 📖 输入：`wc_matches.match_id`（EP04-01 CSV→ETL→DB）；非 PDF / 非简历
-- [ ] 📖 **非全 LLM**：SQL 装 facts → RAG 检索 → LLM grounded 写报告
-- [ ] 📖 `analysis_focus`（如「边路进攻」）**不改 SQL**；影响 RAG query + 报告角度；无数据则声明不足
-- [ ] 🔧 `GET .../matches` + `POST .../runs` + `GET /workflow-runs/{id}`
-- [ ] 🔧 `/workflows/match-analysis`（下拉 + focus +「开始分析」）
-
-### 实战易踩坑
-
-| 坑 | 现象 | 规避 |
-|:---|:-----|:-----|
-| 与 chat 混一套图 | 维护成本高 | 独立 `match_analysis_graph` |
-| 以为 focus 会算战术统计 | LLM 编造占比 | facts 前置 + prompt 禁止幻觉 |
-| 长任务无持久状态 | 刷新丢进度 | `workflow_runs` + 轮询 |
-| 本地无 `wc_*` 数据 | run 失败 | migration + ETL 或 Harness fixture |
-
----
-
-## 3. LangGraph 规范（Story 7.4）
-
-- [ ] 📖 工作流节点类型：Input、LLM、Tool（DB/RAG）、Output
-- [ ] 📖 首版 **不做** Condition 分支、拖拽画布
-- [ ] 🔧 OpenSpec：[ep07-workflow/tasks.md](../../openspec/changes/ep07-workflow/tasks.md)
+> **已砍掉**，不实施。部署与上线见 [L06 部署](./L06-deployment.md) · [EP08](../epics/EP08-deployment.md)。
 
 ---
 
@@ -167,8 +117,4 @@
 - [ ] 短期 + 摘要 + 长期 如何同时进 prompt、`trim_history` 与摘要的关系
 - [ ] 3 个记忆踩坑 + 对策（裁剪、摘要滞后、RAG 与记忆隔离）
 
-**EP07（落地后）**
-
-- [ ] 工作流 **如何触发**（按钮 + API，非 Cron/chat 关键字）
-- [ ] `match_id` vs `analysis_focus`；为何 **不是全 LLM**
-- [ ] Demo 录屏 ~2 分钟：选场次 → 步骤条 → 报告
+部署上线 → [L06](./L06-deployment.md) · [EP08](../epics/EP08-deployment.md)。

@@ -4,12 +4,12 @@
 |:-----|:---|
 | **周期** | EP13 本地 Compose 跑通后 |
 | **优先级** | P2 |
-| **依赖** | EP08（镜像与 CI）、EP13（分布式架构与 Helm 输入） |
+| **依赖** | EP08（镜像与 Compose 文档）、EP13（分布式架构与 Helm 输入） |
 | **学习路线** | [L09 §4–5](../learning/L09-distributed-orchestration.md) |
 | **路线图** | [post-mvp-roadmap.md](../post-mvp-roadmap.md) |
 | **目标文档** | `docs/tech/k8s-tencent-deploy.md` 📋 |
 
-> 将 EP13 验证过的 **多服务 + Remote Graph + Worker** 上到 **本地 k3d/kind**，再迁 **腾讯云 TKE**。EP08 轻量单机仍保留为成本最低路径。
+> 将 EP13 验证过的 **多服务 + Remote Graph + Worker** 上到 **本地 k3d/kind**，再迁 **腾讯云 TKE**。EP08 本地 Compose 路径仍保留为最低成本验证方式。
 
 ---
 
@@ -49,13 +49,13 @@
 
 ## Story 14.4 腾讯云 TKE
 
-- [ ] TCR 镜像仓库；CI 推镜像（延续 EP08 Actions）
+- [ ] TCR 镜像仓库；CI 推镜像（EP14 新增，非 EP08）
 - [ ] TKE 集群（先单节点池）；CLB + Ingress
 - [ ] 数据库：TDSQL-C / 云 PostgreSQL；云 Redis（或初期仍轻量自建）
-- [ ] 安全组、密钥（与 EP08 Secrets 策略一致）
+- [ ] 安全组、密钥（生产 Secrets 策略）
 - [ ] 可选：注册中心仍用 PG 表；成长后再迁 Nacos 托管
 
-**验收**：与 EP08 同域名或 staging 域名可访问；核心 Harness smoke 对 staging 绿。
+**验收**：staging 域名可访问；核心 Harness smoke 对 staging 绿。
 
 ---
 
@@ -64,7 +64,7 @@
 - [ ] 云监控 / 日志采集钩子
 - [ ] EP11 记忆 metrics 在 K8s 环境可采集
 - [ ] LangSmith 生产采样（衔接 EP09 Story 9.7）
-- [ ] 单节点池成本说明 vs 轻量 Docker（EP08）
+- [ ] 单节点池成本说明 vs 本地 Docker Compose（EP08）
 
 ---
 
@@ -72,16 +72,16 @@
 
 | EP08（MVP） | EP14（成长） |
 |:------------|:-------------|
-| 轻量服务器 + Docker Compose | TKE + Helm |
-| 单机 nginx + SSE | Ingress + 多副本策略 |
-| GitHub Actions deploy | 推 TCR + helm upgrade |
+| 本地 Compose + Nginx 验证 | k3d/kind → TKE + Helm |
+| 镜像 Dockerfile | CI build/push TCR |
+| 本地 SSE 冒烟文档 | Ingress + TLS + 域名 |
 
-**不替换 EP08**：小企业/演示仍可用单机路径。
+**不替换 EP08**：本地演示仍可用 Compose full profile。
 
 ---
 
 ## 同步学习
 
 - [ ] Helm values 与环境分离（理解 / 落地）
-- [ ] TKE 与轻量 Docker 选型（理解）
+- [ ] TKE 与本地 Docker Compose 选型（理解）
 - [ ] K8s 下 SSE 与 HPA 限制（理解）

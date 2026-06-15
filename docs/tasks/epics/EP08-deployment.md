@@ -1,13 +1,14 @@
-# EP08 — 工程化与腾讯云部署
+# EP08 — 本地 Docker 全栈
 
 | 属性 | 值 |
 |:-----|:---|
 | **周期** | 第 8 周 |
 | **优先级** | P0 |
 | **学习路线** | [L06-deployment.md](../learning/L06-deployment.md) |
-| **MVP 后** | 分布式 / K8s 见 [post-mvp-roadmap.md](../post-mvp-roadmap.md) · EP13 · EP14 |
+| **OpenSpec** | [ep08-deployment](../../openspec/changes/ep08-deployment/design.md) |
+| **MVP 后** | 上云 / K8s 见 [post-mvp-roadmap.md](../post-mvp-roadmap.md) · EP13 · EP14 |
 
-> **范围**：单机（或轻量服务器）**Docker Compose 全栈 + Nginx + 腾讯云部署**。不在本史诗做注册中心、Remote Graph 热插拔、K8s（避免挡 MVP 上线）。
+> **范围**：**本地** Docker Compose 全栈（web + api + postgres + redis + nginx）跑通与冒烟；SSE 经 Nginx 可用；**本地 Ollama** 接入 LLM + Embedding（无外网 Key 也可演示）。**不上云**——腾讯云 / SSL / 生产 CI 留 **EP14（K8s）**。
 
 ---
 
@@ -18,31 +19,39 @@
 
 ## Story 8.2 Docker Compose
 
-- [ ] 本地一键：web、api、postgres、redis、nginx
-- [ ] `.env.production.example`
+- [ ] 本地一键：`docker compose --profile full up`
+- [ ] web、api、postgres、redis、nginx
+- [ ] `.env.docker.full.example`（Compose full 用，无真实密钥）
 
-## Story 8.3 Nginx
+## Story 8.3 Nginx（本地）
 
-- [ ] SSE：`proxy_buffering off`、超时
-- [ ] HTTPS、静态资源、CORS
+- [ ] SSE：`proxy_buffering off`、长超时
+- [ ] `/` → web、`/api/` → api（HTTP 即可）
+- [ ] 静态资源、CORS（若需要）
 
-## Story 8.4 腾讯云
+## Story 8.4 本地文档与冒烟
 
-- [ ] 轻量服务器、Docker、安全组
+- [ ] `docs/tech/deployment.md` — full profile 启动、Alembic migrate、SSE 验证步骤
+- [ ] `infra/docker/README.md` 与 epic / L06 链接同步
 
-## Story 8.5 线上数据
+## Story 8.5 本地 Ollama（LLM + Embedding）
 
-- [ ] 生产 PG + Redis、Alembic 迁移
-- [ ] dev / staging / prod 环境隔离
+- [ ] 宿主机安装 Ollama；`ollama pull` 推荐 chat + embed 模型
+- [ ] API：**LLM 与 Embedding 分离 base URL / model**（OpenAI 兼容）；Docker 内通过 `host.docker.internal:11434` 访问宿主机 Ollama
+- [ ] `.env.example` / `.env.docker.full.example` 提供 Ollama 预设块
+- [ ] `docs/tech/ollama-local.md` — 安装、模型、维度与 re-ingest、full stack 冒烟
+- [ ] Harness / CI **仍 mock**（不设 Key 即可，行为不变）
 
-## Story 8.6 域名与 SSL
+---
 
-- [ ] 解析、证书、全站 HTTPS
+## 移出 EP08（→ EP14 / 后续）
 
-## Story 8.7 CI/CD
-
-- [ ] GitHub Actions：lint → build → deploy
-- [ ] Secrets 管理
+| 原 Story | 去向 |
+|:---------|:-----|
+| 腾讯云 / 安全组 | EP14 |
+| 域名 / SSL / HTTPS | EP14 |
+| dev/staging/prod 环境隔离 | EP14 |
+| GitHub Actions 镜像 build / deploy | EP14 |
 
 ---
 
@@ -50,5 +59,5 @@
 
 - [ ] Docker 多阶段与网络（理解 / 落地）
 - [ ] Nginx SSE 避坑（理解 / 落地）
-- [ ] 云服务器运维（理解 / 落地）
-- [ ] CI/CD 与密钥安全（理解 / 落地）
+- [ ] Compose profiles 与 dev 默认路径共存（理解 / 落地）
+- [ ] Ollama 本地推理、OpenAI 兼容 API、LLM/Embed 分离配置（理解 / 落地）
