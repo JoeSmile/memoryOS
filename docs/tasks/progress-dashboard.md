@@ -51,5 +51,6 @@
 | langgraph-chat.md              |   3    |  📋  |
 | rag-langchain-vs-llamaindex.md |   5    |  📋  |
 | agent-langgraph.md             |   6    |  📋  |
-| memory-system.md               |   7    |  📋  |
+| [memory-system.md](../tech/memory-system.md) | 7 | ✅ |
+| [ep06-memory-design.md](../tech/ep06-memory-design.md) | 7 | ✅ |
 | 架构图（3 张）                 |   9    |  📋  |

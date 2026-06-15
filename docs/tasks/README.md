@@ -48,7 +48,8 @@
 | `docs/tech/rag-langchain-vs-llamaindex.md` | 📋 待写 | EP04 |
 | `docs/tech/rag-retrieval-advanced.md` | ✅ 已有 | EP04-03 · sandbox 方法说明 |
 | `docs/tech/agent-langgraph.md` | 📋 待写 | EP05 |
-| `docs/tech/memory-system.md` | 📋 待写 | EP06 · EP11 运维章节 |
+| [memory-system.md](../tech/memory-system.md) | ✅ 已有 | EP06 · EP11 运维章节 |
+| [ep06-memory-design.md](../tech/ep06-memory-design.md) | ✅ 已有 | EP06 设计与时序 |
 | `docs/tech/memory-eval.md` | 📋 待写 | EP12 |
 | `docs/tech/distributed-orchestration.md` | 📋 待写 | EP13 |
 | `docs/tech/k8s-tencent-deploy.md` | 📋 待写 | EP14 |

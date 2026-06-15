@@ -102,8 +102,11 @@ POST /chat/completions
 
 ## 10. Docs & closeout
 
-- [ ] 10.1 `docs/tech/memory-system.md` — 三层记忆、图拓扑、配置、与 RAG 边界
+- [x] 10.1 `docs/tech/memory-system.md` — 三层记忆、图拓扑、配置、与 RAG 边界
   - 预计文件：1 · 层：`docs/tech/`
 
-- [ ] 10.2 `pnpm test:api:harness` 全绿；勾选 `docs/tasks/epics/EP06-memory.md` + L05 相关项
+- [x] 10.2 `pnpm test:api:harness` 全绿；勾选 `docs/tasks/epics/EP06-memory.md` + L05 相关项
   - 预计文件：epic/learning 勾选
+
+- [x] 10.3 `docs/tech/ep06-memory-design.md` — EP06 设计细节、决策逻辑、时序图（与 OpenSpec design 对齐）
+  - 预计文件：1 · 层：`docs/tech/ep06-memory-design.md`

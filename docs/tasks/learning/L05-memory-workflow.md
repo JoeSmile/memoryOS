@@ -13,7 +13,7 @@
 - [ ] 📖 模型 context window；input+output 合计限制
 - [ ] 📖 tiktoken 按模型计数；中英混合差异
 - [ ] 📖 预算分配：system + 记忆 + 检索 + 历史 + 用户输入
-- [ ] 🔧 配置项：`MAX_CONTEXT_TOKENS`、`RESERVE_FOR_REPLY`
+- [x] 🔧 配置项：`MAX_CONTEXT_TOKENS`、`RESERVE_FOR_REPLY`（`config.py`）
 
 ### 面试常问
 
@@ -35,7 +35,7 @@
 - [ ] 📖 保留最近 N 轮或最近 M tokens
 - [ ] 📖 与 DB 全量历史关系：DB 存档 ≠ 全部进 prompt
 - [ ] 📖 LangGraph 节点：组装 messages 前裁剪
-- [ ] 🔧 `services/memory/short_term.py`
+- [x] 🔧 `services/memory/short_term.py` + `trim_history`
 
 ### 实战易踩坑
 
@@ -54,7 +54,7 @@
 - [ ] 📖 `memories` 表：type、content、importance、embedding
 - [ ] 📖 LlamaIndex 记忆索引：检索 TopK 注入 system
 - [ ] 📖 矛盾更新：新事实覆盖旧（同 key 冲突策略）
-- [ ] 🔧 `services/memory/long_term.py` + 前端「我的记忆」页
+- [x] 🔧 `services/memory/long_term.py` + 前端 `/memories`
 
 ### 面试常问
 
@@ -77,7 +77,7 @@
 - [ ] 📖 触发条件：历史 token > 阈值
 - [ ] 📖 摘要模型/提示词：保留决策、待办、用户约束
 - [ ] 📖 结构：`[Summary] + [Recent turns]`
-- [ ] 🔧 异步任务，不阻塞用户发消息
+- [x] 🔧 `summary_service` + `BackgroundTasks`（不阻塞 SSE）
 
 ### 实战易踩坑
 
@@ -90,8 +90,8 @@
 
 ## 5. LangGraph 记忆节点
 
-- [ ] 📖 `load_memory` → `chat` → `extract_memory`（async）
-- [ ] 🔧 `docs/tech/memory-system.md`
+- [x] 📖 `trim_history` → `load_user_memories` → `retrieve` → `call_model`；finalize 后 async summary + extract
+- [x] 🔧 [memory-system.md](../../tech/memory-system.md) · [ep06-memory-design.md](../../tech/ep06-memory-design.md)
 
 ---
 
