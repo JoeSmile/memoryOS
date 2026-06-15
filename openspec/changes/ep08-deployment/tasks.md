@@ -67,7 +67,7 @@
 - [x] 6.2 `.env.deployment.example` + `apps/api/.env.example` — local（Ollama `qwen3:8b`）与 cloud（百炼）注释块；web `API_UPSTREAM_URL` 若需要
   - 预计文件：2–3 · 层：example 文件 + 可选 web env
 
-- [ ] 6.3 `docs/tech/ollama-local.md`（**仅 local profile**）+ `deployment.md` 链接
+- [x] 6.3 `docs/tech/ollama-local.md`（**仅 local profile**）+ `deployment.md` 链接
   - 预计文件：2 · 层：`ollama-local.md` + `deployment.md`
 
 - [ ] 6.4 `rag-embedding-chunking.md` §3.8 + L06 §5 更新

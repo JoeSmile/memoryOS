@@ -6,7 +6,7 @@
 
 - Compose 与 env 模板：[`infra/docker/README.md`](../../infra/docker/README.md)
 - Nginx / Ingress 对照：[`infra/nginx/README.md`](../../infra/nginx/README.md)
-- Ollama（仅 local）：本文 §3.2；详文档见 Story 8.5 / `ollama-local.md`（待 task 6.3）
+- Ollama（仅 local）：[`ollama-local.md`](./ollama-local.md) · 全栈步骤见本文 §3.2
 - 学习路线：[`L06-deployment.md`](../tasks/learning/L06-deployment.md)
 
 ---
@@ -67,6 +67,8 @@ cp .env.deployment.example .env.deployment.local
 > env 文件路径必须是 **`infra/docker/.env.deployment.local`**，不是 `apps/api/`。
 
 ### 3.2 启动 Ollama（宿主机）
+
+详述见 [`ollama-local.md`](./ollama-local.md)（安装、env、re-ingest、排错）。
 
 ```bash
 # Mac：打开 Ollama 应用，或
