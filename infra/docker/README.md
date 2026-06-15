@@ -165,4 +165,4 @@ docker compose --env-file .env.deployment.local --profile full run --rm api alem
 
 同一 `WEB_IMAGE` / `API_IMAGE` tag push 到 registry → `.env.deployment.cloud` 换托管 PG/Redis 与百炼 Key → 同一 `compose --profile full`。
 
-详见 `docs/tech/deployment.md`（task 5.x）。
+详见 [`docs/tech/deployment.md`](../../docs/tech/deployment.md)。

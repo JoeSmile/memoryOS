@@ -53,7 +53,7 @@
 
 ## 5. 部署文档（Story 8.4）
 
-- [ ] 5.1 `docs/tech/deployment.md` — §Local smoke + §Promote to cloud（push 镜像、cloud env、migrate）
+- [x] 5.1 `docs/tech/deployment.md` — §Local smoke + §Promote to cloud（push 镜像、cloud env、migrate）
   - 预计文件：1 · 层：`docs/tech/deployment.md`
 
 - [ ] 5.2 更新 epic + [`L06`](../learning/L06-deployment.md) 部署契约与晋级路径
