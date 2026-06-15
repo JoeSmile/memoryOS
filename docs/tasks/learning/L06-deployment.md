@@ -1,6 +1,6 @@
 # L06 — 部署契约与本地验证（第 8 周）
 
-**对应史诗**：EP08
+**对应史诗**：[EP08](../epics/EP08-deployment.md) · **实操指南**：[deployment.md](../../tech/deployment.md)
 
 ---
 
@@ -8,11 +8,11 @@
 
 ### 学什么
 
-- [ ] 📖 **一套镜像**：`apps/web/Dockerfile`、`apps/api/Dockerfile` — 本地 build = CI build = 云上 pull
-- [ ] 📖 **一套 env 键**：`.env.deployment.example` — `local` / `cloud` **只换值不换键**
-- [ ] 📖 **本地** = staging 仿真：`compose --profile full` + `.env.deployment.local`
-- [ ] 📖 **晋级云**：push 镜像 → cloud env → 同一 compose 或 EP14 Helm
-- [ ] 🔧 `infra/docker/.env.deployment.example`、`docs/tech/deployment.md`
+- [x] 📖 **一套镜像**：`apps/web/Dockerfile`、`apps/api/Dockerfile` — 本地 build = CI build = 云上 pull
+- [x] 📖 **一套 env 键**：`.env.deployment.example` — `local` / `cloud` **只换值不换键**
+- [x] 📖 **本地** = staging 仿真：`compose --profile full` + `.env.deployment.local`
+- [x] 📖 **晋级云**：push 镜像 → cloud env → 同一 compose 或 EP14 Helm
+- [x] 🔧 [`infra/docker/.env.deployment.example`](../../../infra/docker/.env.deployment.example)、[`docs/tech/deployment.md`](../../tech/deployment.md)
 
 ### 面试常问
 
@@ -24,10 +24,10 @@
 
 ### 学什么
 
-- [ ] 📖 阶段：deps install → build → runtime（alpine/slim）
-- [ ] 📖 Next `output: "standalone"` 拷贝 static/public
-- [ ] 📖 非 root 用户、`.dockerignore`、层缓存（先 COPY package.json）
-- [ ] 🔧 `apps/web/Dockerfile`、`apps/api/Dockerfile`
+- [x] 📖 阶段：deps install → build → runtime（alpine/slim）
+- [x] 📖 Next `output: "standalone"` 拷贝 static/public
+- [x] 📖 非 root 用户、`.dockerignore`、层缓存（先 COPY package.json）
+- [x] 🔧 `apps/web/Dockerfile`、`apps/api/Dockerfile`
 
 ### 面试常问
 
@@ -47,11 +47,11 @@
 
 ### 学什么
 
-- [ ] 📖 服务：web、api、postgres、redis、nginx
-- [ ] 📖 网络：服务名 DNS、`depends_on` + healthcheck
-- [ ] 📖 卷：pg 数据持久化
-- [ ] 📖 profiles：默认仅 PG+Redis；`--profile full` 起应用栈
-- [ ] 🔧 `infra/docker/docker-compose.yml` 一键 `up`
+- [x] 📖 服务：web、api、postgres、redis、nginx
+- [x] 📖 网络：服务名 DNS、`depends_on` + healthcheck
+- [x] 📖 卷：pg 数据持久化
+- [x] 📖 profiles：默认仅 PG+Redis；`--profile full` 起应用栈
+- [x] 🔧 `infra/docker/docker-compose.yml` 一键 `up` — 命令见 [deployment.md §3.4](../../tech/deployment.md#34-启动全栈)
 
 ### 实战易踩坑
 
@@ -67,9 +67,9 @@
 
 ### 学什么
 
-- [ ] 📖 `proxy_pass` upstream；`client_max_body_size` 上传
-- [ ] 📖 SSE：`proxy_buffering off`、`proxy_cache off`、读超时 ↑
-- [ ] 🔧 `infra/nginx/default.conf`
+- [x] 📖 `proxy_pass` upstream；`client_max_body_size` 上传
+- [x] 📖 SSE：`proxy_buffering off`、`proxy_cache off`、读超时 ↑
+- [x] 🔧 `infra/nginx/default.conf` · Ingress 对照 [`infra/nginx/README.md`](../../../infra/nginx/README.md)
 
 ### 面试常问
 
@@ -89,13 +89,19 @@
 
 ### 学什么
 
-- [ ] 📖 Local：`docker compose --profile full`、migrate、SSE 冒烟
-- [ ] 📖 Cloud：`docker push`、`.env.deployment.cloud`、托管 PG/Redis、换 LLM 为百炼
-- [ ] 🔧 `docs/tech/deployment.md` §Promote to cloud
+- [x] 📖 Local：`docker compose --profile full`、migrate、SSE 冒烟 — [deployment.md §3](../../tech/deployment.md#3-local-smoke本地全栈验证)
+- [x] 📖 Cloud：`docker push`、`.env.deployment.cloud`、托管 PG/Redis、换 LLM 为百炼 — [deployment.md §4](../../tech/deployment.md#4-promote-to-cloud晋级上云)
+- [x] 🔧 环境对照速查：[deployment.md §5](../../tech/deployment.md#5-环境对照速查)
+
+### 面试常问
+
+- local profile 与 cloud profile 哪些键必改、哪些可不变？
 
 ---
 
 ## 5. Ollama 本地 LLM + Embedding
+
+> 冒烟步骤见 [deployment.md §3.2](../../tech/deployment.md#32-启动-ollama宿主机)；专文 `ollama-local.md` 见 EP08 Story 8.5。
 
 ### 学什么
 
@@ -113,7 +119,7 @@
 | Chat | `qwen3:8b` | 中文友好；本机 Ollama |
 | Embedding | `mxbai-embed-large` | **1024** 维，与 pgvector migration 一致 |
 
-**cloud profile**：同一 env 键，`OPENAI_MODEL=qwen-turbo` 等，见 deployment example 注释。
+**cloud profile**：同一 env 键，`OPENAI_MODEL=qwen-turbo` 等，见 deployment example 注释与 [deployment.md §4.2](../../tech/deployment.md#42-cloud-env)。
 
 `OPENAI_API_KEY=ollama` 为占位符（Ollama 不校验，但 MemoryOS 用它区分 mock/live）。
 
@@ -135,11 +141,11 @@
 
 ## 阶段自测
 
-- [ ] 新人 30 分钟 Compose 起全栈  
-- [ ] curl SSE 经 Nginx 仍流式  
+- [ ] 新人 30 分钟 Compose 起全栈 — 跟 [deployment.md §3](../../tech/deployment.md#3-local-smoke本地全栈验证)
+- [ ] curl SSE 经 Nginx 仍流式
 - [ ] 说清 standalone 目录结构与启动命令
-- [ ] 说清 local vs cloud profile 哪些键要改、哪些不用改
-- [ ] 说清同一镜像如何从本地 push 到云
+- [ ] 说清 local vs cloud profile 哪些键要改、哪些不用改 — [deployment.md §5](../../tech/deployment.md#5-环境对照速查)
+- [ ] 说清同一镜像如何从本地 push 到云 — [deployment.md §4.1](../../tech/deployment.md#41-构建并推送示例-ghcr)
 
 ---
 

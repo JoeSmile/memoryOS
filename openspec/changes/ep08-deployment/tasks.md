@@ -56,7 +56,7 @@
 - [x] 5.1 `docs/tech/deployment.md` — §Local smoke + §Promote to cloud（push 镜像、cloud env、migrate）
   - 预计文件：1 · 层：`docs/tech/deployment.md`
 
-- [ ] 5.2 更新 epic + [`L06`](../learning/L06-deployment.md) 部署契约与晋级路径
+- [x] 5.2 更新 epic + [`L06`](../learning/L06-deployment.md) 部署契约与晋级路径
   - 预计文件：2 · 层：epic + L06
 
 ## 6. LLM Profile + Ollama local（Story 8.5）

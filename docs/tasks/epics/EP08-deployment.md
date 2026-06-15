@@ -5,6 +5,7 @@
 | **周期** | 第 8 周 |
 | **优先级** | P0 |
 | **学习路线** | [L06-deployment.md](../learning/L06-deployment.md) |
+| **部署指南** | [deployment.md](../../tech/deployment.md) |
 | **OpenSpec** | [ep08-deployment](../../openspec/changes/ep08-deployment/design.md) |
 | **MVP 后** | K8s 编排见 [EP14](./EP14-k8s-cloud.md) · [post-mvp-roadmap.md](../post-mvp-roadmap.md) |
 
@@ -12,25 +13,25 @@
 
 ---
 
-## Story 8.1 Docker（✅ 进行中）
+## Story 8.1 Docker（✅ 完成）
 
 - [x] `apps/web`、`apps/api` 多阶段 Dockerfile
 - [x] `.dockerignore`、非 root 用户
 
-## Story 8.2 Compose + 部署 env
+## Story 8.2 Compose + 部署 env（✅ 完成）
 
-- [ ] `docker compose --profile full`；`WEB_IMAGE` / `API_IMAGE` 可配置
-- [ ] `.env.deployment.example`（**local / cloud 双 profile 注释**）
-- [ ] 本地实测：`.env.deployment.local`（gitignore）
+- [x] `docker compose --profile full`；`WEB_IMAGE` / `API_IMAGE` 可配置
+- [x] `.env.deployment.example`（**local / cloud 双 profile 注释**）
+- [x] 本地实测：`.env.deployment.local`（gitignore）— 步骤见 [deployment.md §3](../../tech/deployment.md#3-local-smoke本地全栈验证)
 
-## Story 8.3 Nginx
+## Story 8.3 Nginx（✅ 完成）
 
-- [ ] SSE：`proxy_buffering off`；BFF `/api/chat` 与 `/api/v1` 分流
-- [ ] 与云上 Ingress 规则对照文档
+- [x] SSE：`proxy_buffering off`；BFF `/api/chat` 与 `/api/v1` 分流
+- [x] 与云上 Ingress 规则对照文档 — [`infra/nginx/README.md`](../../../infra/nginx/README.md)
 
-## Story 8.4 部署文档（local 验证 + cloud 晋级）
+## Story 8.4 部署文档（local 验证 + cloud 晋级）（✅ 完成）
 
-- [ ] `docs/tech/deployment.md` — 本地冒烟清单 + 推镜像上云步骤
+- [x] [`docs/tech/deployment.md`](../../tech/deployment.md) — 本地冒烟清单 + 推镜像上云步骤（§3 Local smoke · §4 Promote to cloud）
 
 ## Story 8.5 LLM Profile
 
@@ -57,7 +58,7 @@
 
 ## 同步学习
 
-- [ ] 部署契约：一套镜像、一套 env 键、profile 换值
-- [ ] Docker Compose full + Nginx SSE
-- [ ] local Ollama vs cloud 百炼选型
+- [x] 部署契约：一套镜像、一套 env 键、profile 换值 — [L06 §0](../learning/L06-deployment.md#0-部署契约先建立心智模型) · [deployment.md §1–§5](../../tech/deployment.md)
+- [x] Docker Compose full + Nginx SSE
+- [ ] local Ollama vs cloud 百炼选型（代码分离见 Story 8.5）
 - [ ] CI build 与云上 pull 同一 tag
