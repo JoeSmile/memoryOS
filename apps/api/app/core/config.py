@@ -114,6 +114,16 @@ class Settings(BaseSettings):
         le=100_000,
         description="Max sanitized RAG chunk length for ETL and retrieve (RAG_CHUNK_MAX_CHARS)",
     )
+    llm_guard_enabled: bool = Field(
+        default=False,
+        description="LLM Guard PromptInjection + InvisibleText on user input (LLM_GUARD_ENABLED)",
+    )
+    llm_guard_prompt_injection_threshold: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="PromptInjection scanner threshold (LLM_GUARD_PROMPT_INJECTION_THRESHOLD)",
+    )
 
     openai_api_key: str | None = Field(
         default=None,

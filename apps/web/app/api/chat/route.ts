@@ -6,6 +6,7 @@ import {
   fetchMemoryosChatCompletion,
   memoryosSseResponseToDataStream,
 } from "@/lib/memoryos-upstream";
+import { evaluateBffPromptGuard } from "@/lib/prompt-guard";
 
 export const maxDuration = 60;
 
@@ -72,6 +73,18 @@ export async function POST(req: Request) {
   if (!content) {
     return Response.json(
       { code: 422, message: "content_required", data: null },
+      { status: 422 },
+    );
+  }
+
+  const guardResult = evaluateBffPromptGuard(content);
+  if (guardResult.action === "reject") {
+    return Response.json(
+      {
+        code: guardResult.code,
+        message: guardResult.message,
+        data: null,
+      },
       { status: 422 },
     );
   }

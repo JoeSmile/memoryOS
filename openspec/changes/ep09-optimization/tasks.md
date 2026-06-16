@@ -64,11 +64,11 @@
   - 预计文件：1 · 层：`docs/tech/chat-security.md`（已完成）
   - Harness：`test_chat_security_contract.py` 在 2.1–2.2 实现时补全
 
-- [ ] 2.8 `UserInputGuard` 协议 + BFF `llm-prompt-guard` adapter（`BFF_PROMPT_GUARD_ENABLED`）
+- [x] 2.8 `UserInputGuard` 协议 + BFF `llm-prompt-guard` adapter（`BFF_PROMPT_GUARD_ENABLED`）
   - 预计文件：2 · 层：`apps/web/lib/prompt-guard.ts` + BFF chat route
   - 模式：`tag` 或 `quarantine`；API 仍为权威校验
 
-- [ ] 2.9 LLM Guard adapter（`LLM_GUARD_ENABLED`）：`PromptInjection` + `InvisibleText`
+- [x] 2.9 LLM Guard adapter（`LLM_GUARD_ENABLED`）：`PromptInjection` + `InvisibleText`
   - 预计文件：2 · 层：`services/security/llm_guard_adapter.py` + chat prepare 钩子
   - Harness 默认关；benchmark 记录 p50 延迟
 

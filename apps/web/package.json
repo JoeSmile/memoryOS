@@ -18,6 +18,7 @@
     "@tanstack/react-query": "^5.101.0",
     "ai": "^6.0.197",
     "highlight.js": "^11.11.1",
+    "llm-prompt-guard": "^2.0.1",
     "next": "15.5.18",
     "react": "19.1.0",
     "react-dom": "19.1.0",
