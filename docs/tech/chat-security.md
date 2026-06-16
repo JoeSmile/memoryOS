@@ -110,7 +110,7 @@ flowchart TD
 |:-----|:-----|:-----|
 | L0 用户输入 | **2.1–2.2 ✅** | 长度 + EN/ZH 启发式；regenerate 校验 DB 末条 user |
 | L0' ML 输入 | 2.9 规划 | 跨语言 PromptInjection；Harness 默认关 |
-| L1 RAG 清洗 | **2.3 ✅** · 2.4–2.5 规划 | ETL + retrieve 双点 `rag_sanitizer` |
+| L1 RAG 清洗 | **2.3–2.4 ✅** · 2.5 规划 | ETL + retrieve 双点 `rag_sanitizer` |
 | L2 Prompt 结构 | 2.6 规划 | POLICY 声明 docs/user 不可执行 |
 | BFF 早反馈 | 2.8 规划 | API 仍为权威 |
 | 红队回归 | 2.12 规划 | Garak nightly，不替代运行时 |

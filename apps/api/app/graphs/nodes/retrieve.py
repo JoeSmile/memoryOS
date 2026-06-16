@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.graphs.chat_state import ChatState
 from app.services.knowledge_search_service import KnowledgeSearchService
+from app.services.security.rag_sanitizer import sanitize_knowledge_chunk
 
 
 def _last_human_message_text(messages: list[BaseMessage]) -> str | None:
@@ -44,5 +45,7 @@ async def retrieve_knowledge(state: ChatState, config: RunnableConfig) -> dict:
     min_score = settings.rag_chat_min_score
     filtered = [hit for hit in result.chunks if hit.score >= min_score]
     return {
-        "retrieved_chunks": [hit.model_dump(mode="json") for hit in filtered],
+        "retrieved_chunks": [
+            sanitize_knowledge_chunk(hit).model_dump(mode="json") for hit in filtered
+        ],
     }

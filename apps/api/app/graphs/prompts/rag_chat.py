@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from langchain_core.messages import SystemMessage
 
 from app.schemas.knowledge import KnowledgeChunkHit
+from app.services.security.rag_sanitizer import sanitize_chunk
 
 _REFERENCE_HEADING = "## 参考来源"
 
@@ -21,12 +22,13 @@ def build_rag_system_message(chunks: Sequence[KnowledgeChunkHit]) -> SystemMessa
 def _build_grounded_prompt(chunks: Sequence[KnowledgeChunkHit]) -> str:
     blocks: list[str] = []
     for index, chunk in enumerate(chunks, start=1):
+        safe_content = sanitize_chunk(chunk.content).strip()
         blocks.append(
             "\n".join(
                 [
                     f"[{index}] external_id={chunk.external_id} "
                     f"collection={chunk.collection} score={chunk.score:.4f}",
-                    chunk.content.strip(),
+                    safe_content,
                     "---",
                 ]
             )

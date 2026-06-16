@@ -48,7 +48,7 @@
   - **无 FastAPI 依赖**；ETL / worker / EP13 子图可 import 同一模块
   - 不引入 npm `rag-poison-guard`（Node 栈）；EntropyShield 走 2.10 adapter 链，非硬依赖
 
-- [ ] 2.4 retrieve 后接入 `rag_sanitizer`，再进 `build_rag_system_message`
+- [x] 2.4 retrieve 后接入 `rag_sanitizer`，再进 `build_rag_system_message`
   - 预计文件：2 · 层：`graphs/nodes/retrieve.py` + `prompts/rag_chat.py`（仅清洗调用点）
   - Unit：毒 chunk 不进 prompt 原文
 

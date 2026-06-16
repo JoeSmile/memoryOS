@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from app.core.config import settings
+from app.schemas.knowledge import KnowledgeChunkHit
 from app.services.security.injection_patterns import neutralize_override_phrases
 
 # Keep newlines/tabs for readable fact-card text; strip other C0 controls.
@@ -37,6 +38,11 @@ def sanitize_chunk(
     if len(cleaned) > limit:
         cleaned = cleaned[:limit]
     return cleaned
+
+
+def sanitize_knowledge_chunk(hit: KnowledgeChunkHit) -> KnowledgeChunkHit:
+    """Sanitize a retrieve hit before graph state or prompt assembly."""
+    return hit.model_copy(update={"content": sanitize_chunk(hit.content)})
 
 
 @dataclass(frozen=True)
