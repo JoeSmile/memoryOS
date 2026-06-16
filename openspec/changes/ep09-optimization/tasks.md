@@ -52,8 +52,8 @@
   - 预计文件：2 · 层：`graphs/nodes/retrieve.py` + `prompts/rag_chat.py`（仅清洗调用点）
   - Unit：毒 chunk 不进 prompt 原文
 
-- [ ] 2.5 World Cup ETL ingest 前调用同一 `rag_sanitizer`（纵深）
-  - 预计文件：1–2 · 层：`scripts/etl/worldcup/` 入库路径
+- [x] 2.5 World Cup ETL ingest 前调用同一 `rag_sanitizer`（纵深）
+  - 预计文件：1–2 · 层：`knowledge_ingest_service.py`（`ingest_worldcup.py` CLI 共用）
   - 验收：带注入短语的源文本入库后检索不到 raw override
 
 - [ ] 2.6 分层 system prompt：`<POLICY>` + `<DOCS>` + `<TOOL_POLICY>`；用户 **仅** `HumanMessage`

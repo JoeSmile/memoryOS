@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Ingest World Cup Gold fact cards into pgvector (documents / document_chunks)."""
+"""Ingest World Cup Gold fact cards into pgvector (documents / document_chunks).
+
+Text is sanitized via ``KnowledgeIngestService.prepare_ingest_text`` (rag_sanitizer)
+before hash, embed, and persist.
+"""
 
 from __future__ import annotations
 

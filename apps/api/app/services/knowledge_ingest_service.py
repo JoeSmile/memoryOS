@@ -17,6 +17,7 @@ from app.cache.ingest_lock import WorldcupIngestLock
 from app.repositories.document_chunk_repository import DocumentChunkRepository
 from app.repositories.document_repository import DocumentRepository
 from app.services.embedding_service import EmbeddingService
+from app.services.security.rag_sanitizer import sanitize_chunk
 
 logger = logging.getLogger(__name__)
 
@@ -127,6 +128,11 @@ def can_skip_unchanged(
     )
 
 
+def prepare_ingest_text(text: str) -> str:
+    """Sanitize fact-card text before hash, embed, and document_chunks persist."""
+    return sanitize_chunk(text)
+
+
 class KnowledgeIngestService:
     def __init__(
         self,
@@ -221,19 +227,20 @@ class KnowledgeIngestService:
         skipped = 0
 
         for row in rows:
+            text = prepare_ingest_text(row["text"])
             existing = await self.documents.get_by_collection_external_id(
                 collection,
                 row["id"],
             )
             if existing is not None and can_skip_unchanged(
                 existing.metadata_,
-                text=row["text"],
+                text=text,
                 embedding_model=embedding_model,
                 embedding_dimensions=embedding_dimensions,
             ):
                 skipped += 1
                 continue
-            pending.append(row)
+            pending.append({**row, "text": text})
 
         if not pending:
             return 0, 0, skipped
