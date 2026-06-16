@@ -128,12 +128,14 @@ brainstorm → 写计划（小任务）→ TDD（红绿重构）→ code review 
 apps/api/tests/
 ├── unit/           # 普通 pytest
 └── harness/        # Agent / API 契约与评测
-    ├── fixtures/
-    ├── test_health_contract.py
-    └── README.md
+    ├── test_*_contract.py   # L1（当前已用）
+    ├── cases/*.yaml         # L2（规划中）
+    └── README.md            # 当前用法 + 局限与弥补；L2/L3 后全文修订
 ```
 
-EP02 起为 `chat`、`rag`、`agent` 各加 `cases/*.yaml` + 运行脚本。
+**当前细节**（运行方式、13 个契约文件、Mock 约定、局限与弥补）：[`apps/api/tests/harness/README.md`](../../apps/api/tests/harness/README.md)。
+
+EP02 起为 `chat`、`rag`、`agent` 各加 `cases/*.yaml` + 运行脚本（L2，待建）。
 
 ---
 

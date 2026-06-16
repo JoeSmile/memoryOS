@@ -94,6 +94,7 @@
 - [ ] 📖 tool simulator：测试不调真 OpenAI、真 DB
 - [x] 🔧 `apps/api/tests/harness/` + health / conversations 契约测试
 - [x] 🔧 根目录 `pnpm test:api:harness`
+- [ ] 📖 当前用法与局限：[`harness/README.md`](../../apps/api/tests/harness/README.md)（L2/L3 落地后再全文总结）
 
 ### 面试 / 带队常问
 
