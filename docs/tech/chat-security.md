@@ -70,6 +70,51 @@
 └────────────────────────────────────────────────────────────────┘
 ```
 
+### 2.1 聊天请求安全流程（EP09）
+
+下图：**实线 = 已实现（2.1–2.2）**；**虚线 = 规划中（2.3+）**。北向校验均在 API `prepare_completion_turn` 完成，进 LangGraph 前快失败。
+
+```mermaid
+flowchart TD
+    U["用户 Chat / Regenerate"] --> BFF["BFF llm-prompt-guard<br/>(2.8 可选)"]
+    BFF --> API["POST /api/v1/chat/completions"]
+    API --> AUTH["JWT + 会话 owner"]
+    AUTH --> PREP["prepare_completion_turn"]
+
+    PREP --> LEN["2.1 长度校验 ✅<br/>CHAT_MAX_CONTENT_CHARS"]
+    LEN -->|超长| E1["422 content_too_long"]
+    LEN --> INJ["2.2 prompt_security ✅<br/>EN/ZH override 短语"]
+    INJ -->|命中| E2["422 prompt_injection_detected"]
+    INJ --> ML["2.9 LLM Guard PI<br/>(可选, 默认关)"]
+    ML -.->|fail| E2
+    ML --> LOCK["turn lock / 落库 user"]
+    LOCK --> GRAPH["LangGraph runner"]
+
+    GRAPH --> ETL["2.5 ETL sanitizer<br/>(入库纵深)"]
+    ETL -.-> VDB[(向量库)]
+    GRAPH --> RET["retrieve 节点"]
+    VDB --> RET
+    RET --> SAN["2.4 rag_sanitizer<br/>(retrieve 后)"]
+    SAN -.-> ENT["2.10 EntropyShield<br/>(可选链)"]
+    SAN --> PROMPT["2.6 组装 prompt<br/>&lt;POLICY&gt; + &lt;DOCS&gt;"]
+    ENT -.-> PROMPT
+    PROMPT --> LLM["LLM / Tools"]
+    LLM -.-> OUT["2.9 输出扫描<br/>(可选)"]
+
+    REG["regenerate=true"] --> PREP
+    PREP --> DBCHK["校验 DB 末条 user<br/>(长度 + 2.2 同规则)"]
+    DBCHK --> LOCK
+```
+
+| 阶段 | 状态 | 说明 |
+|:-----|:-----|:-----|
+| L0 用户输入 | **2.1–2.2 ✅** | 长度 + EN/ZH 启发式；regenerate 校验 DB 末条 user |
+| L0' ML 输入 | 2.9 规划 | 跨语言 PromptInjection；Harness 默认关 |
+| L1 RAG 清洗 | 2.3–2.5 规划 | ETL + retrieve 双点 `rag_sanitizer` |
+| L2 Prompt 结构 | 2.6 规划 | POLICY 声明 docs/user 不可执行 |
+| BFF 早反馈 | 2.8 规划 | API 仍为权威 |
+| 红队回归 | 2.12 规划 | Garak nightly，不替代运行时 |
+
 ---
 
 ## 3. 自研核心（必做底座）

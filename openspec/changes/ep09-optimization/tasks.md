@@ -36,9 +36,10 @@
   - 接入：`prepare_completion_turn`（含 regenerate 校验 DB 末条 user）、`demo_analysis_service`
   - Demo 默认 **200** 字符；env 可覆盖
 
-- [ ] 2.2 用户输入 Prompt 注入启发式 + `PROMPT_INJECTION_FILTER_ENABLED`
+- [x] 2.2 用户输入 Prompt 注入启发式 + `PROMPT_INJECTION_FILTER_ENABLED`
   - 预计文件：2 · 层：`services/security/prompt_security.py` + chat prepare 钩子
   - Harness：足球正例通过、override 短语 422
+  - **范围**：EN/ZH 高置信 override 短语（L0）；非 EN/ZH、间接越狱由 2.3–2.6、2.9 补强
   - **EP13**：进 Remote Graph 前在 API 完成；不依赖子图进程
 
 - [ ] 2.3 自研 `rag_sanitizer` 核心 + `ChunkSanitizer` 协议（Unicode、控制字符、override 短语、chunk 长度上限）

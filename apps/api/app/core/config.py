@@ -104,6 +104,10 @@ class Settings(BaseSettings):
         le=100_000,
         description="Max user message length for chat and demo-turn (CHAT_MAX_CONTENT_CHARS); demo default 200",
     )
+    prompt_injection_filter_enabled: bool = Field(
+        default=True,
+        description="Heuristic user-input injection filter (PROMPT_INJECTION_FILTER_ENABLED)",
+    )
 
     openai_api_key: str | None = Field(
         default=None,
