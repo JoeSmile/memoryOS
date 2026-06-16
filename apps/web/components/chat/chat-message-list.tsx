@@ -3,26 +3,10 @@ import { useEffect, useMemo, useRef } from "react";
 
 import { ChatMessage } from "@/components/chat/chat-message";
 import { ChatThinkingIndicator } from "@/components/chat/chat-thinking-indicator";
+import { shouldShowListThinking } from "@/lib/chat-thinking-state";
 import { isDemoUIMessage } from "@/lib/chat-types";
 
 const BOTTOM_THRESHOLD_PX = 80;
-
-/**
- * List-level thinking bubble (not the in-assistant placeholder).
- * - Demo / pre-stream: isSending && !isStreaming
- * - LLM SSE: streaming but assistant row not yet materialized
- * When the streaming assistant bubble exists (even empty), only in-bubble ThinkingPulse shows.
- */
-function shouldShowListThinking(
-  isSending: boolean,
-  isStreaming: boolean,
-  lastMessageRole: UIMessage["role"] | undefined,
-): boolean {
-  if (isSending && !isStreaming) {
-    return true;
-  }
-  return isStreaming && lastMessageRole !== "assistant";
-}
 
 type ChatMessageListProps = {
   messages: UIMessage[];

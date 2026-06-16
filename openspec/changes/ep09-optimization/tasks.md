@@ -26,8 +26,8 @@
 - [x] 1.2 Composer：`Stop` 仅绑 `isStreaming`；`isSending` 走 disabled 发送
   - 预计文件：1–2 · 层：`minimal-chat.tsx` + `chat-composer.tsx`（`isSending` 显式 prop）
 
-- [ ] 1.3 Web 单测或 storybook 快照：thinking 显示/隐藏条件
-  - 预计文件：1 · 层：`apps/web/tests/unit/`（新建）
+- [x] 1.3 Web 单测或 storybook 快照：thinking 显示/隐藏条件
+  - 预计文件：2 · 层：`lib/chat-thinking-state.ts` + `tests/unit/test_chat_thinking_state.test.ts`
 
 ## 2. Story 9.1 — 安全（chat-security）
 
