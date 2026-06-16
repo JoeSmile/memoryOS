@@ -11,6 +11,7 @@ from app.repositories.wc_match_repository import WcMatchRepository
 from app.schemas.demo_analysis import DemoAnalysisTemplateRead, DemoTurnResponse
 from app.schemas.worldcup import WcMatchBrief
 from app.services.conversation_service import ConversationService
+from app.services.security.content_validator import assert_chat_content_length
 from app.services.worldcup_match_service import WC_2022_TOURNAMENT_ID
 
 from app.models.message import COMPLETION_COMPLETE
@@ -83,6 +84,7 @@ class DemoAnalysisService:
         )
 
         user_content = template.build_user_prompt(brief)
+        assert_chat_content_length(user_content)
         assistant_content = template.build_assistant_reply(brief)
         preview = brief.name[:120]
         rag_metadata = {

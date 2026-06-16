@@ -31,10 +31,10 @@
 
 ## 2. Story 9.1 — 安全（chat-security）
 
-- [ ] 2.1 `CHAT_MAX_CONTENT_CHARS` + chat/demo-turn 长度校验
+- [x] 2.1 `CHAT_MAX_CONTENT_CHARS` + chat/demo-turn 长度校验
   - 预计文件：2 · 层：`core/config.py` + `services/security/content_validator.py`
-  - Harness：`test_chat_security_contract.py`（超长 422）
-  - **快失败**：不调 LLM 即 422；**北向** API 路由 / prepare，非 graph 节点
+  - 接入：`prepare_completion_turn`（含 regenerate 校验 DB 末条 user）、`demo_analysis_service`
+  - Demo 默认 **200** 字符；env 可覆盖
 
 - [ ] 2.2 用户输入 Prompt 注入启发式 + `PROMPT_INJECTION_FILTER_ENABLED`
   - 预计文件：2 · 层：`services/security/prompt_security.py` + chat prepare 钩子

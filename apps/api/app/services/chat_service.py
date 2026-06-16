@@ -22,6 +22,7 @@ from app.models.message import COMPLETION_COMPLETE, COMPLETION_INTERRUPTED
 from app.repositories import MessageRepository
 from app.schemas.message import TOOL_STEP_SUMMARY_MAX_LEN
 from app.services.conversation_service import ConversationService
+from app.services.security.content_validator import assert_chat_content_length
 from app.core.config import settings
 from app.services.memory.long_term import run_extract_background
 from app.services.memory.summary_service import (
@@ -120,6 +121,10 @@ class ChatService:
                     message="regenerate_requires_user_message",
                     status_code=422,
                 )
+            for row in reversed(history):
+                if row.role == "user":
+                    assert_chat_content_length(row.content)
+                    break
             await self._remove_last_assistant_if_any(history)
             await self.conversations.touch_activity(conversation_id)
             await self.db.commit()
@@ -167,6 +172,8 @@ class ChatService:
         regenerate: bool = False,
     ) -> None:
         await self.conversations.get_owned_conversation(conversation_id, user_id)
+        if not regenerate:
+            assert_chat_content_length(content)
         await self._prepare_user_turn(
             conversation_id=conversation_id,
             user_id=user_id,

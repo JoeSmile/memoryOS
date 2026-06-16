@@ -98,6 +98,13 @@ class Settings(BaseSettings):
     password_min_length: int = Field(default=8)
     password_max_length: int = Field(default=128)
 
+    chat_max_content_chars: int = Field(
+        default=200,
+        ge=1,
+        le=100_000,
+        description="Max user message length for chat and demo-turn (CHAT_MAX_CONTENT_CHARS); demo default 200",
+    )
+
     openai_api_key: str | None = Field(
         default=None,
         description="OpenAI API key — unset enables mock LLM in ep02-langgraph",

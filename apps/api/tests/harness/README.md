@@ -89,7 +89,7 @@ pytest tests/harness -q
 | `test_memories_api_contract.py` | 记忆 API |
 | `test_memory_context_contract.py` | 长上下文 / memory 注入 |
 
-**规划中（EP09 等）**：`test_chat_security_contract.py`、`test_rate_limit_contract.py`、`test_usage_contract.py`、`test_chat_phase_contract.py` 等。
+**规划中（EP09 等）**：`test_rate_limit_contract.py`、`test_usage_contract.py`、`test_chat_phase_contract.py` 等。
 
 ### 3.4 与 Web 测试分工
 
