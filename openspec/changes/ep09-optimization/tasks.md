@@ -23,8 +23,8 @@
   - 预计文件：2 · 层：`chat-message-list.tsx` + `chat-message.tsx`（仅 polish）
   - 验收：demo 点击「开始分析」≤300ms 出现占位；LLM 流式无底部重复 indicator
 
-- [ ] 1.2 Composer：`Stop` 仅绑 `isStreaming`；`isSending` 走 disabled 发送
-  - 预计文件：1 · 层：`minimal-chat.tsx`
+- [x] 1.2 Composer：`Stop` 仅绑 `isStreaming`；`isSending` 走 disabled 发送
+  - 预计文件：1–2 · 层：`minimal-chat.tsx` + `chat-composer.tsx`（`isSending` 显式 prop）
 
 - [ ] 1.3 Web 单测或 storybook 快照：thinking 显示/隐藏条件
   - 预计文件：1 · 层：`apps/web/tests/unit/`（新建）

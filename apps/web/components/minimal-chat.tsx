@@ -48,8 +48,9 @@ export function MinimalChat() {
           onInputChange={setInput}
           onSubmit={handleSubmit}
           isStreaming={isStreaming}
+          isSending={isSending}
           onStop={() => stop()}
-          disabled={!canCompose}
+          disabled={!canCompose && !isSending && !isStreaming}
           errorMessage={errorMessage}
           onRetry={
             canRetrySession ? () => void retrySession() : undefined
