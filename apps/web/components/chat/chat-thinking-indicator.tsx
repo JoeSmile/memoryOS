@@ -1,3 +1,21 @@
+type ThinkingPulseProps = {
+  label?: string;
+};
+
+/** Shared bounce dots + label (list footer vs in-bubble streaming placeholder). */
+export function ThinkingPulse({ label = "思考中…" }: ThinkingPulseProps) {
+  return (
+    <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+      <span className="inline-flex gap-1" aria-hidden>
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500 [animation-delay:-0.3s]" />
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500 [animation-delay:-0.15s]" />
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500" />
+      </span>
+      <span className="text-sm">{label}</span>
+    </div>
+  );
+}
+
 type ChatThinkingIndicatorProps = {
   label?: string;
 };
@@ -15,18 +33,7 @@ export function ChatThinkingIndicator({
       <p className="mb-1 text-xs font-medium uppercase tracking-wide opacity-60">
         助手
       </p>
-      <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
-        <span className="inline-flex gap-1" aria-hidden>
-          <span
-            className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500 [animation-delay:-0.3s]"
-          />
-          <span
-            className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500 [animation-delay:-0.15s]"
-          />
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500" />
-        </span>
-        <span className="text-sm">{label}</span>
-      </div>
+      <ThinkingPulse label={label} />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 > propose 完成后 **必须停在这里**等人审；未勾选前 **禁止**写业务代码。
 
-- [ ] **Tasks reviewed by human** — 人审通过后再 `/opsx:apply`、`/work-next` 或说「继续实现」
+- [x] **Tasks reviewed by human** — 人审通过后再 `/opsx:apply`、`/work-next` 或说「继续实现」
 
 ### Review checklist
 
@@ -19,7 +19,7 @@
 
 ## 1. Story 9.8 L1 — Thinking 占位验收（brownfield）
 
-- [ ] 1.1 验收现有 `ChatThinkingIndicator`：`isSending && !isStreaming`、流式空 assistant 文案
+- [x] 1.1 验收现有 `ChatThinkingIndicator`：`isSending && !isStreaming`、流式空 assistant 文案
   - 预计文件：2 · 层：`chat-message-list.tsx` + `chat-message.tsx`（仅 polish）
   - 验收：demo 点击「开始分析」≤300ms 出现占位；LLM 流式无底部重复 indicator
 

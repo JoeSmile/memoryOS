@@ -3,6 +3,7 @@
 import type { UIMessage } from "ai";
 
 import { MessageContent } from "@/components/chat/message-content";
+import { ThinkingPulse } from "@/components/chat/chat-thinking-indicator";
 import { RagSourceChipList } from "@/components/chat/rag-source-chip";
 import { ToolTimeline } from "@/components/chat/tool-timeline";
 import {
@@ -17,6 +18,7 @@ import { useChatStore } from "@/stores/chat-store";
 type ChatMessageProps = {
   message: UIMessage;
   isStreaming?: boolean;
+  streamingPlaceholderLabel?: string;
   showRegenerate?: boolean;
   onRegenerate?: () => void;
 };
@@ -24,6 +26,7 @@ type ChatMessageProps = {
 export function ChatMessage({
   message,
   isStreaming = false,
+  streamingPlaceholderLabel = "思考中…",
   showRegenerate = false,
   onRegenerate,
 }: ChatMessageProps) {
@@ -98,18 +101,7 @@ export function ChatMessage({
         />
       ) : null}
       {!isUser && isStreaming && !text.trim() ? (
-        <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
-          <span className="inline-flex gap-1" aria-hidden>
-            <span
-              className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500 [animation-delay:-0.3s]"
-            />
-            <span
-              className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500 [animation-delay:-0.15s]"
-            />
-            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500" />
-          </span>
-          <span className="text-sm">思考中…</span>
-        </div>
+        <ThinkingPulse label={streamingPlaceholderLabel} />
       ) : (
         <MessageContent
           content={text}
