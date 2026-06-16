@@ -32,6 +32,18 @@ def test_build_rag_system_message_neutralizes_poison_chunk():
     body = message.content.lower()
     assert "ignore previous instructions" not in body
     assert "[redacted]" in message.content
+    assert "<POLICY>" in message.content
+    assert "<DOCS>" in message.content
+    assert message.content.index("<POLICY>") < message.content.index("<DOCS>")
+    assert "<USER_QUERY>" not in message.content
+
+
+def test_build_rag_system_message_no_hit_is_policy_only():
+    message = build_rag_system_message([])
+    assert message.content.startswith("<POLICY>")
+    assert message.content.endswith("</POLICY>")
+    assert "</DOCS>" not in message.content
+    assert "<USER_QUERY>" not in message.content
 
 
 @pytest.mark.asyncio

@@ -140,5 +140,12 @@ def build_unified_react_system_message(
     """RAG grounding text plus ReAct / tavily_search guidance."""
     base = build_rag_system_message(chunks)
     suffix = _SUFFICIENT_SUFFIX if rag_sufficient else _WEAK_SUFFIX
-    content = f"{base.content}\n\n{_TIME_CONTEXT}\n\n{_TOOL_GUIDANCE}\n\n{suffix}"
+    tool_policy = (
+        "<TOOL_POLICY>\n"
+        f"{_TIME_CONTEXT}\n\n"
+        f"{_TOOL_GUIDANCE}\n\n"
+        f"{suffix}\n"
+        "</TOOL_POLICY>"
+    )
+    content = f"{base.content}\n\n{tool_policy}"
     return SystemMessage(content=content)

@@ -56,7 +56,7 @@
   - 预计文件：1–2 · 层：`knowledge_ingest_service.py`（`ingest_worldcup.py` CLI 共用）
   - 验收：带注入短语的源文本入库后检索不到 raw override
 
-- [ ] 2.6 分层 system prompt：`<POLICY>` + `<DOCS>` + `<TOOL_POLICY>`；用户 **仅** `HumanMessage`
+- [x] 2.6 分层 system prompt：`<POLICY>` + `<DOCS>` + `<TOOL_POLICY>`；用户 **仅** `HumanMessage`
   - 预计文件：2 · 层：`prompts/rag_chat.py` + `prompts/unified_react.py`
   - 禁止 system 内嵌 `<USER_QUERY>` 重复用户输入
 

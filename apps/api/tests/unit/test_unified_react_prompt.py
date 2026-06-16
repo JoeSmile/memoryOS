@@ -171,13 +171,16 @@ def test_compute_rag_sufficient_jintian_same_as_implicit_now():
 
 def test_build_unified_react_system_message_includes_time_context():
     message = build_unified_react_system_message(chunks=[], rag_sufficient=False)
+    assert "<TOOL_POLICY>" in message.content
     assert "时间语境" in message.content
     assert "今年" in message.content
     assert "今日" in message.content
+    assert "<USER_QUERY>" not in message.content
 
 
 def test_build_unified_react_system_message_weak_mentions_tavily():
     message = build_unified_react_system_message(chunks=[], rag_sufficient=False)
+    assert message.content.index("<POLICY>") < message.content.index("<TOOL_POLICY>")
     assert "tavily_search" in message.content
     assert "不足" in message.content
 
@@ -194,6 +197,8 @@ def test_build_unified_react_system_message_sufficient_mentions_priority():
         ),
     ]
     message = build_unified_react_system_message(chunks=chunks, rag_sufficient=True)
+    assert "<DOCS>" in message.content
+    assert "<TOOL_POLICY>" in message.content
+    assert message.content.index("<DOCS>") < message.content.index("<TOOL_POLICY>")
     assert "tavily_search" in message.content
     assert "可能足够" in message.content
-    assert "参考资料" in message.content
