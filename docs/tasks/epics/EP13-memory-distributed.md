@@ -9,7 +9,8 @@
 | **路线图** | [post-mvp-roadmap.md](../post-mvp-roadmap.md) |
 | **目标文档** | `docs/tech/distributed-orchestration.md` · `docs/architecture/distributed-hotplug.md` 📋 |
 
-> 在本地 Docker 模拟 **多容器、Worker 分离、Remote Graph 注册与热插拔**；不上 K8s（见 EP14）。对外 SSE / BFF 契约 **不变**。
+> 在本地 Docker 模拟 **多容器、Worker 分离、Remote Graph 注册与热插拔**；不上 K8s（见 EP14）。对外 SSE / BFF 契约 **不变**。  
+> **北向治理**（422/429/audit/配额）留在 API 主编排，见 [`rate-limit-audit.md` §12](../../tech/rate-limit-audit.md)。
 
 ---
 

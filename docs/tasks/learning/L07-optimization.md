@@ -12,6 +12,7 @@
 - [ ] 📖 防护：system 边界、输入长度限制、敏感词、输出过滤（按需）
 - [ ] 📖 RAG：检索内容当不可信输入处理
 - [ ] 🔧 中间件 + prompt 模板加固
+- [ ] 📖 项目落地：[`docs/tech/chat-security.md`](../../tech/chat-security.md)（纵深防御 + 包对比 + 试用计划）
 
 ### 面试常问
 
@@ -69,9 +70,10 @@
 
 ## 4. 限流与审计
 
+- [ ] 📖 项目落地：[`docs/tech/rate-limit-audit.md`](../../tech/rate-limit-audit.md)（限流逻辑、审计、企业差距）
 - [ ] 📖 Redis 滑动窗口：IP + userId
-- [ ] 📖 登录、发消息、上传单独限流
-- [ ] 📖 审计：删库、删会话、改配置写日志
+- [ ] 📖 登录、发消息、demo-turn 单独限流；与 Token 配额（42901 vs 42902）分工
+- [ ] 📖 审计：敏感操作写 `audit_log`，非全量 chat
 - [ ] 🔧 中间件 + 管理查询接口（可选）
 
 ### 实战易踩坑

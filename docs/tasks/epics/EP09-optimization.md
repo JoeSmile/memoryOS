@@ -10,8 +10,12 @@
 
 ## Story 9.1 安全
 
-- [ ] Prompt 注入检测与过滤
-- [ ] RAG 检索内容清洗、输入长度限制
+> 设计文档：[`docs/tech/chat-security.md`](../../tech/chat-security.md)
+
+- [ ] Prompt 注入检测与过滤（用户输入 422 + 自研 `rag_sanitizer` + POLICY/DOCS 分层 prompt）
+- [ ] RAG 检索内容清洗（ETL 入库前 + retrieve 后双点调用同一 sanitizer）
+- [ ] 输入长度限制
+- [ ] 第三方包 adapter 试用（默认关）：`llm-prompt-guard` · LLM Guard · EntropyShield · `llm-injection-guard` · Garak CI
 
 ## Story 9.2 性能
 
@@ -27,8 +31,11 @@
 
 ## Story 9.4 限流与审计
 
-- [ ] Redis 滑动窗口限流、防刷
-- [ ] 操作审计日志
+> 设计文档：[`docs/tech/rate-limit-audit.md`](../../tech/rate-limit-audit.md)（含 §12 与 EP13/14 分布式边界）
+
+- [ ] Redis 滑动窗口限流、防刷（多 API Pod 共享 Redis）
+- [ ] 操作审计日志（北向 API handler）
+- [ ] `UsageRecorder` 协议预留 remote usage 回传（Story 9.3 衔接）
 
 ## Story 9.5 降级
 
