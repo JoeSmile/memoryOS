@@ -9,6 +9,7 @@ from app.core.database import engine
 from app.core.exceptions import register_exception_handlers
 from app.core.redis import close_redis
 from app.core.response import success
+from app.middleware.injection_guard import InjectionGuardMiddleware
 from app.services.health_service import build_health_data
 
 
@@ -34,6 +35,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(InjectionGuardMiddleware)
 
 register_exception_handlers(app)
 

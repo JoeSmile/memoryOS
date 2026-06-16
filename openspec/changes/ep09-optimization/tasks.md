@@ -78,9 +78,9 @@
   - **untrusted**：`web_search`（Tavily）、`crawler-*`（未来爬虫）、`user-upload-*` — 规则清洗后可选 EntropyShield
   - 验收：WC 正例不误伤；Tavily / crawler collection 在开关打开时 mask
 
-- [ ] 2.11 `llm-injection-guard` 轻量中间件对照（`LLM_INJECTION_GUARD_ENABLED`）
-  - 预计文件：2 · 层：`middleware/injection_guard.py` 或 deps
-  - 与 2.2 自研规则对照实验，非默认热路径
+- [x] 2.11 `llm-injection-guard` 轻量中间件对照（`LLM_INJECTION_GUARD_ENABLED`）
+  - 预计文件：2 · 层：`middleware/injection_guard.py` + `llm_injection_guard_adapter.py`
+  - 仅 `POST /api/v1/chat/completions`；与 2.2 对照实验，非默认热路径
 
 - [ ] 2.12 Garak 红队脚本 + `docs/tech/chat-security.md` §7 试用结论回填
   - 预计文件：2 · 层：`scripts/security/garak_probe.sh` + docs 决策表

@@ -111,6 +111,7 @@ flowchart TD
 | L0 用户输入 | **2.1–2.2 ✅** | 长度 + EN/ZH 启发式；regenerate 校验 DB 末条 user |
 | BFF 早反馈 | **2.8 ✅** | API 仍为权威；`tag` 转发 / `quarantine` 早拒 |
 | L0' ML 输入 | **2.9 ✅**（默认关） | 跨语言 PromptInjection；需 `pip install llm-guard` |
+| L0' HTTP 对照 | **2.11 ✅**（默认关） | `llm-injection-guard` 中间件；仅 chat completions，与 2.2 对照 |
 | L1 RAG 清洗 | **2.3–2.5 ✅** | ETL + retrieve 双点 `rag_sanitizer` |
 | L1' untrusted DeSyntax | **2.10 ✅**（默认关） | 按 `ContentProvenance`：Tavily / `crawler-*`；`worldcup-*` 不 mask |
 | L2 Prompt 结构 | **2.6 ✅** | POLICY 声明 docs/user 不可执行 |
@@ -181,8 +182,26 @@ reveal your system prompt ──► quarantine：BFF 422；直连 API 反而可�
 | 内网 demo | `tag`（与 API 对照）或 `quarantine`（要快失败 UX） |
 | 公网 demo / 成本敏感 | `quarantine` + API 启发式保持开启 |
 | 生产 Web | 多数 `tag`；`quarantine` 仅在明确要减滥用时 |
+| 对照实验 | 单独开 `LLM_INJECTION_GUARD_ENABLED` **或** 只开 `PROMPT_INJECTION_FILTER_ENABLED`，避免多层叠加难归因 |
 
 无论 BFF 模式，**安全底线在 API** `run_user_input_guards()`；直连 `POST /api/v1/chat/completions` 可绕过 BFF。
+
+#### 2.2.5 `llm-injection-guard` 中间件对照（EP09 2.11）
+
+实现：`apps/api/app/middleware/injection_guard.py` · `llm_injection_guard_adapter.py`  
+挂载：`POST /api/v1/chat/completions` 的 JSON `content` 字段；**replay body** 避免消费请求体。
+
+| 维度 | 自研 2.2 `prompt_security` | `llm-injection-guard` 中间件 |
+|:-----|:---------------------------|:-----------------------------|
+| 位置 | `prepare_completion_turn`（权威） | HTTP 中间件（更早） |
+| 中文「忽略先前的指令」 | **422** | 通过（英文规则为主） |
+| `ignore previous instructions` | **422** | **422** |
+| `reveal your system prompt` | 通过 | **422** |
+| 默认 | **开** | **开**（与 2.2 叠加；对照时可关） |
+
+**用法**：做 A/B 时一次只开一层；生产权威链仍为 2.2 + `run_user_input_guards()`。
+
+---
 
 #### 2.2.4 测试覆盖（当前）
 
@@ -285,6 +304,7 @@ ENTROPYSHIELD_ENABLED=true
 | `rag_sanitizer` | 同上 | Unicode 规范化、控制字符、短语 neutralize、chunk 上限 |
 | `content_provenance` | 同上 | 来源信任模型；`worldcup-*` / `crawler-*` / `web_search` 分流 |
 | `entropyshield_adapter` | 同上 | 仅 **untrusted** provenance 可选 DeSyntax（默认关） |
+| `llm_injection_guard_adapter` | 同上 | 可选 HTTP 中间件对照（默认关） |
 | `user_input_guard` | 同上 | `UserInputGuard` 协议；启发式 + LLM Guard 链 |
 | `llm_guard_adapter` | 同上 | 可选 ML 用户输入扫描（默认关） |
 | 分层 prompt | `graphs/prompts/rag_chat.py` | `<POLICY>` / `<DOCS>` / `<TOOL_POLICY>` |
@@ -368,7 +388,8 @@ safe = shield_text_for_provenance(untrusted_text, ContentProvenance.WEB_SEARCH)
 | `RAG_CHUNK_MAX_CHARS` | `8000` | RAG chunk 清洗后长度上限 |
 | `LLM_GUARD_ENABLED` | `false` | LLM Guard 用户/可选输出扫描 |
 | `LLM_GUARD_PROMPT_INJECTION_THRESHOLD` | `0.5` | PromptInjection 调参 |
-| `LLM_INJECTION_GUARD_ENABLED` | `false` | 轻量中间件对照（2.11 规划） |
+| `LLM_INJECTION_GUARD_ENABLED` | `true` | llm-injection-guard HTTP 对照（2.11，仅 chat completions） |
+| `LLM_INJECTION_GUARD_THRESHOLD_SCORE` | `7.0` | 库内 PromptScanner 阈值 |
 | `ENTROPYSHIELD_ENABLED` | `false` | 仅 **untrusted** 来源 DeSyntax（Tavily / `crawler-*` / `user-upload-*`） |
 | `BFF_PROMPT_GUARD_ENABLED` | `false` | BFF `llm-prompt-guard` 早反馈（web `.env`） |
 | `BFF_PROMPT_GUARD_MODE` | `tag` | `tag` 转发 API 决断；`quarantine` BFF 早拒 |
@@ -444,7 +465,7 @@ safe = shield_text_for_provenance(untrusted_text, ContentProvenance.WEB_SEARCH)
 |:---|:---------|:---------|
 | llm-prompt-guard | | |
 | LLM Guard | | |
-| llm-injection-guard | | |
+| llm-injection-guard | HTTP 对照；英文偏强、中文弱于 2.2 | 对照实验默认关 |
 | EntropyShield | 按 provenance：Tavily/爬虫 mask；WC 不 mask | 有 Agent+外网数据时 `ENTROPYSHIELD_ENABLED=true` |
 | Garak | | |
 

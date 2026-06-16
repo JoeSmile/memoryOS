@@ -132,6 +132,18 @@ class Settings(BaseSettings):
             "(ENTROPYSHIELD_ENABLED)"
         ),
     )
+    llm_injection_guard_enabled: bool = Field(
+        default=True,
+        description=(
+            "llm-injection-guard HTTP middleware on chat completions "
+            "(LLM_INJECTION_GUARD_ENABLED); lightweight dep in requirements.txt"
+        ),
+    )
+    llm_injection_guard_threshold_score: float = Field(
+        default=7.0,
+        ge=0.0,
+        description="llm-injection-guard PromptScanner threshold (LLM_INJECTION_GUARD_THRESHOLD_SCORE)",
+    )
 
     openai_api_key: str | None = Field(
         default=None,
