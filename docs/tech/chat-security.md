@@ -110,7 +110,7 @@ flowchart TD
 |:-----|:-----|:-----|
 | L0 用户输入 | **2.1–2.2 ✅** | 长度 + EN/ZH 启发式；regenerate 校验 DB 末条 user |
 | L0' ML 输入 | 2.9 规划 | 跨语言 PromptInjection；Harness 默认关 |
-| L1 RAG 清洗 | 2.3–2.5 规划 | ETL + retrieve 双点 `rag_sanitizer` |
+| L1 RAG 清洗 | **2.3 ✅** · 2.4–2.5 规划 | ETL + retrieve 双点 `rag_sanitizer` |
 | L2 Prompt 结构 | 2.6 规划 | POLICY 声明 docs/user 不可执行 |
 | BFF 早反馈 | 2.8 规划 | API 仍为权威 |
 | 红队回归 | 2.12 规划 | Garak nightly，不替代运行时 |
@@ -123,6 +123,7 @@ flowchart TD
 |:-----|:-------------|:-----|
 | `content_validator` | `apps/api/app/services/security/` | 长度、空内容 |
 | `prompt_security` | 同上 | 用户消息 override 短语启发式 → 422 |
+| `injection_patterns` | 同上 | EN/ZH override 短语表（`prompt_security` + `rag_sanitizer` 共用） |
 | `rag_sanitizer` | 同上 | Unicode 规范化、控制字符、短语 neutralize、chunk 上限 |
 | 分层 prompt | `graphs/prompts/rag_chat.py` | `<POLICY>` / `<DOCS>` / `<TOOL_POLICY>` |
 
@@ -201,6 +202,7 @@ def sanitize_chunk(text: str) -> str:
 |:-----|:-----|:-----|
 | `CHAT_MAX_CONTENT_CHARS` | `8000` | 用户内容上限 |
 | `PROMPT_INJECTION_FILTER_ENABLED` | `true` | 自研规则用户输入过滤 |
+| `RAG_CHUNK_MAX_CHARS` | `8000` | RAG chunk 清洗后长度上限 |
 | `LLM_GUARD_ENABLED` | `false` | LLM Guard 用户/可选输出扫描 |
 | `LLM_INJECTION_GUARD_ENABLED` | `false` | 轻量中间件对照 |
 | `ENTROPYSHIELD_ENABLED` | `false` | chunk DeSyntax 链 |

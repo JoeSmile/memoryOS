@@ -108,6 +108,12 @@ class Settings(BaseSettings):
         default=True,
         description="Heuristic user-input injection filter (PROMPT_INJECTION_FILTER_ENABLED)",
     )
+    rag_chunk_max_chars: int = Field(
+        default=8000,
+        ge=1,
+        le=100_000,
+        description="Max sanitized RAG chunk length for ETL and retrieve (RAG_CHUNK_MAX_CHARS)",
+    )
 
     openai_api_key: str | None = Field(
         default=None,

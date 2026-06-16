@@ -1,0 +1,53 @@
+"""RAG chunk sanitization — shared by ETL ingest and retrieve (no FastAPI imports)."""
+
+import unicodedata
+from dataclasses import dataclass
+from typing import Protocol
+
+from app.core.config import settings
+from app.services.security.injection_patterns import neutralize_override_phrases
+
+# Keep newlines/tabs for readable fact-card text; strip other C0 controls.
+_ALLOWED_WHITESPACE = frozenset("\n\t\r")
+
+
+class ChunkSanitizer(Protocol):
+    def sanitize(self, text: str) -> str:
+        """Return text safe to embed or inject into `<DOCS>`."""
+        ...
+
+
+def _strip_control_chars(text: str) -> str:
+    return "".join(
+        ch
+        for ch in text
+        if ch in _ALLOWED_WHITESPACE or unicodedata.category(ch) != "Cc"
+    )
+
+
+def sanitize_chunk(
+    text: str,
+    *,
+    max_chars: int | None = None,
+) -> str:
+    """Normalize, strip controls, neutralize override phrases, enforce length."""
+    limit = settings.rag_chunk_max_chars if max_chars is None else max_chars
+    cleaned = _strip_control_chars(text)
+    cleaned = neutralize_override_phrases(cleaned)
+    if len(cleaned) > limit:
+        cleaned = cleaned[:limit]
+    return cleaned
+
+
+@dataclass(frozen=True)
+class RuleBasedChunkSanitizer:
+    """Default L1 sanitizer; optional adapters (e.g. EntropyShield) wrap this."""
+
+    max_chars: int | None = None
+
+    def sanitize(self, text: str) -> str:
+        return sanitize_chunk(text, max_chars=self.max_chars)
+
+
+def default_chunk_sanitizer() -> RuleBasedChunkSanitizer:
+    return RuleBasedChunkSanitizer()

@@ -42,8 +42,9 @@
   - **范围**：EN/ZH 高置信 override 短语（L0）；非 EN/ZH、间接越狱由 2.3–2.6、2.9 补强
   - **EP13**：进 Remote Graph 前在 API 完成；不依赖子图进程
 
-- [ ] 2.3 自研 `rag_sanitizer` 核心 + `ChunkSanitizer` 协议（Unicode、控制字符、override 短语、chunk 长度上限）
+- [x] 2.3 自研 `rag_sanitizer` 核心 + `ChunkSanitizer` 协议（Unicode、控制字符、override 短语、chunk 长度上限）
   - 预计文件：2 · 层：`services/security/rag_sanitizer.py` + `tests/unit/test_rag_sanitizer.py`
+  - 共享规则：`injection_patterns.py`（与 2.2 `prompt_security` 同源短语表）
   - **无 FastAPI 依赖**；ETL / worker / EP13 子图可 import 同一模块
   - 不引入 npm `rag-poison-guard`（Node 栈）；EntropyShield 走 2.10 adapter 链，非硬依赖
 
