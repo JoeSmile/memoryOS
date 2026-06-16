@@ -1,0 +1,20 @@
+{
+  "rest": {
+    "RestGenerator": {
+      "name": "memoryos-chat",
+      "uri": "http://127.0.0.1:8000/api/v1/chat/completions",
+      "method": "post",
+      "headers": {
+        "Authorization": "Bearer $KEY",
+        "Content-Type": "application/json"
+      },
+      "key_env_var": "GARAK_REST_API_KEY",
+      "req_template_json_object": {
+        "conversation_id": "00000000-0000-0000-0000-000000000001",
+        "content": "$INPUT"
+      },
+      "response_json": false,
+      "request_timeout": 120
+    }
+  }
+}

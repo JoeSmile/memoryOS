@@ -82,9 +82,9 @@
   - 预计文件：2 · 层：`middleware/injection_guard.py` + `llm_injection_guard_adapter.py`
   - 仅 `POST /api/v1/chat/completions`；与 2.2 对照实验，非默认热路径
 
-- [ ] 2.12 Garak 红队脚本 + `docs/tech/chat-security.md` §7 试用结论回填
-  - 预计文件：2 · 层：`scripts/security/garak_probe.sh` + docs 决策表
-  - CI：nightly 非阻塞；Harness 正/反例仍为 PR 门禁
+- [x] 2.12 Garak 红队脚本 + `docs/tech/chat-security.md` §7.4
+  - 预计文件：2 · 层：`scripts/security/garak_probe.sh` + `garak_memoryos.yaml`
+  - `GARAK_PROBE_ENABLED` 默认 false；`pnpm security:garak`；CI nightly 非阻塞
 
 ## 3. Story 9.4 — 限流与审计（rate-limit-audit）
 

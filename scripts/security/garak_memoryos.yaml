@@ -1,0 +1,14 @@
+# MemoryOS Garak profile (EP09 2.12)
+# Default run uses --target_type mock (offline smoke).
+# Live API: GARAK_TARGET_TYPE=rest GARAK_GENERATOR_OPTIONS=scripts/security/garak_rest_chat.json
+---
+system:
+  verbose: 1
+  parallel_requests: 1
+
+run:
+  generations: 1
+
+plugins:
+  # Narrow probe set for chat prompt-injection regression (expand after baseline).
+  probe_spec: promptinject

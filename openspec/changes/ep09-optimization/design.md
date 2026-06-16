@@ -46,7 +46,7 @@
 | `llm-guard` | API 输入/可选输出 | `LLM_GUARD_ENABLED` | off |
 | `llm-injection-guard` | API 中间件对照 | `LLM_INJECTION_GUARD_ENABLED` | on（requirements 内置） |
 | `entropyshield` | untrusted 边界（Tavily / crawler-*） | `ENTROPYSHIELD_ENABLED` | off（开则仅 untrusted） |
-| Garak | CI 红队 | — | nightly 非阻塞 |
+| Garak | CI 红队 | `GARAK_PROBE_ENABLED` | off（`pnpm security:garak`） |
 
 - **不引入** npm `rag-poison-guard`（Node 与 Python ETL 栈不一致；能力吸收进自研 sanitizer）。
 - BFF guard 仅为 UX 早反馈；**权威校验仍在 FastAPI**。

@@ -115,7 +115,7 @@ flowchart TD
 | L1 RAG 清洗 | **2.3–2.5 ✅** | ETL + retrieve 双点 `rag_sanitizer` |
 | L1' untrusted DeSyntax | **2.10 ✅**（默认关） | 按 `ContentProvenance`：Tavily / `crawler-*`；`worldcup-*` 不 mask |
 | L2 Prompt 结构 | **2.6 ✅** | POLICY 声明 docs/user 不可执行 |
-| 红队回归 | 2.12 规划 | Garak nightly，不替代运行时 |
+| 红队回归 | **2.12 ✅**（默认关） | Garak 探针脚本；nightly 非阻塞，不替代运行时 |
 
 ### 2.2 BFF `tag` 与 `quarantine`（EP09 2.8）
 
@@ -393,7 +393,9 @@ safe = shield_text_for_provenance(untrusted_text, ContentProvenance.WEB_SEARCH)
 | `ENTROPYSHIELD_ENABLED` | `false` | 仅 **untrusted** 来源 DeSyntax（Tavily / `crawler-*` / `user-upload-*`） |
 | `BFF_PROMPT_GUARD_ENABLED` | `false` | BFF `llm-prompt-guard` 早反馈（web `.env`） |
 | `BFF_PROMPT_GUARD_MODE` | `tag` | `tag` 转发 API 决断；`quarantine` BFF 早拒 |
-| `BFF_CHAT_MAX_CONTENT_CHARS` | `200` | BFF guard 长度上限（对齐 API demo） |
+| `GARAK_PROBE_ENABLED` | `false` | Garak 红队脚本（`scripts/security/garak_probe.sh`）；nightly 非阻塞 |
+| `GARAK_TARGET_TYPE` | `mock` | `mock` 离线冒烟；`rest` + `garak_rest_chat.json` 打 live API |
+| `GARAK_REPORT_DIR` | `.garak/reports` | Garak 报告输出目录 |
 
 **Harness / 本地无 GPU**：`LLM_GUARD_ENABLED=false`，保证 `pnpm test:api:harness` 不依赖 HuggingFace 模型下载。
 
@@ -467,7 +469,37 @@ safe = shield_text_for_provenance(untrusted_text, ContentProvenance.WEB_SEARCH)
 | LLM Guard | | |
 | llm-injection-guard | HTTP 对照；英文偏强、中文弱于 2.2 | 对照实验默认关 |
 | EntropyShield | 按 provenance：Tavily/爬虫 mask；WC 不 mask | 有 Agent+外网数据时 `ENTROPYSHIELD_ENABLED=true` |
-| Garak | | |
+| Garak | 脚本 + `promptinject` 探针；mock 离线 / REST 打 API（SSE 对接待完善） | **关**（`GARAK_PROBE_ENABLED=false`） |
+
+### 7.4 Garak 红队层（EP09 2.12）
+
+**定位**：离线 / CI **回归探针**，补充 Harness 契约；**不替代**运行时 L0–L2 防线。
+
+```text
+Harness (PR 门禁)          Garak (nightly / 手动, 默认关)
+test_chat_security_contract   scripts/security/garak_probe.sh
+正/反例固定                    promptinject 探针集（可扩展）
+必绿                          失败不阻塞 PR；人审报告
+```
+
+```text
+                    ┌─ 运行时（热路径）──────────────────────┐
+                    │ BFF → API L0/L1 → LangGraph → LLM      │
+                    └────────────────────────────────────────┘
+                    ┌─ 离线红队（冷路径, GARAK_PROBE_ENABLED) ─┐
+                    │ pnpm security:garak                      │
+                    │  → garak --config garak_memoryos.yaml    │
+                    │  → 报告 .garak/reports/                  │
+                    └────────────────────────────────────────┘
+```
+
+| 项 | 说明 |
+|:---|:-----|
+| 脚本 | `scripts/security/garak_probe.sh` |
+| 配置 | `scripts/security/garak_memoryos.yaml` |
+| Live API 模板 | `scripts/security/garak_rest_chat.json`（需 `GARAK_REST_API_KEY` + 会话 id） |
+| 启用 | `GARAK_PROBE_ENABLED=true pnpm security:garak` |
+| 默认 | 跳过（exit 0），不影响日常开发 / Harness |
 
 ---
 
@@ -480,7 +512,7 @@ safe = shield_text_for_provenance(untrusted_text, ContentProvenance.WEB_SEARCH)
 | §2.3 Ingress 策略技术债 | EP13 多 Agent / 分布式（待立项） |
 | §2.4 Content provenance / EntropyShield | task 2.10 |
 | §4 第三方 adapter | tasks 2.8–2.12 |
-| §7 Harness | tasks 2.7、2.12 |
+| §7 Harness + Garak | tasks 2.7、2.12 |
 | 限流 / 配额 / 审计 | [`rate-limit-audit.md`](./rate-limit-audit.md) §12（EP13/14 分布式）· Story 9.3、9.4 |
 
 ---
