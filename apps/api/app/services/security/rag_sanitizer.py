@@ -6,6 +6,10 @@ from typing import Protocol
 
 from app.core.config import settings
 from app.schemas.knowledge import KnowledgeChunkHit
+from app.services.security.content_provenance import (
+    provenance_for_collection,
+    shield_text_for_provenance,
+)
 from app.services.security.injection_patterns import neutralize_override_phrases
 
 # Keep newlines/tabs for readable fact-card text; strip other C0 controls.
@@ -43,6 +47,14 @@ def sanitize_chunk(
 def sanitize_knowledge_chunk(hit: KnowledgeChunkHit) -> KnowledgeChunkHit:
     """Sanitize a retrieve hit before graph state or prompt assembly."""
     return hit.model_copy(update={"content": sanitize_chunk(hit.content)})
+
+
+def sanitize_retrieved_knowledge_chunk(hit: KnowledgeChunkHit) -> KnowledgeChunkHit:
+    """Retrieve path: rule-based L1, then EntropyShield only for untrusted collections."""
+    provenance = provenance_for_collection(hit.collection)
+    content = sanitize_chunk(hit.content)
+    content = shield_text_for_provenance(content, provenance)
+    return hit.model_copy(update={"content": content})
 
 
 @dataclass(frozen=True)

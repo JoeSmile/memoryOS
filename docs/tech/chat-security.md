@@ -29,7 +29,7 @@
 |:-----|:-----|:-----|:---------|
 | 直接注入 | `HumanMessage` | 偏离人设、泄露 system、越权 | 长度限制、用户输入 guard、POLICY |
 | 间接注入 | `<DOCS>` chunk | 模型执行文档内指令 | ETL + retrieve **双点** `rag_sanitizer` |
-| 工具链滥用 | `tavily_search` | 成本、外泄 query | 限流、Token 配额、tool 参数校验 |
+| 工具链滥用 / 间接注入 | `tavily_search`、未来爬虫 | 成本、外泄 query、网页投毒 | 限流、tool 参数校验、**untrusted EntropyShield** |
 | DoS / 烧钱 | API 滥用 | 延迟、账单 | 限流（9.4）、配额（9.3） |
 | 日志泄露 | LangSmith / 应用日志 | 隐私 | 脱敏、采样（9.7） |
 
@@ -112,6 +112,7 @@ flowchart TD
 | BFF 早反馈 | **2.8 ✅** | API 仍为权威；`tag` 转发 / `quarantine` 早拒 |
 | L0' ML 输入 | **2.9 ✅**（默认关） | 跨语言 PromptInjection；需 `pip install llm-guard` |
 | L1 RAG 清洗 | **2.3–2.5 ✅** | ETL + retrieve 双点 `rag_sanitizer` |
+| L1' untrusted DeSyntax | **2.10 ✅**（默认关） | 按 `ContentProvenance`：Tavily / `crawler-*`；`worldcup-*` 不 mask |
 | L2 Prompt 结构 | **2.6 ✅** | POLICY 声明 docs/user 不可执行 |
 | 红队回归 | 2.12 规划 | Garak nightly，不替代运行时 |
 
@@ -208,6 +209,70 @@ reveal your system prompt ──► quarantine：BFF 422；直连 API 反而可�
 
 **债务规模**：中等偏大——涉及 BFF 路由、API prepare 钩子、配置源、观测与 Harness 契约扩展；与 EP13 子图 / 多入口一并设计成本更低。
 
+### 2.4 内容来源信任与 EntropyShield 挂载（EP09 2.10）
+
+EntropyShield **不判断**文档好坏；系统用 **`ContentProvenance`**（来源标签）决定是否在进 LLM 前做 DeSyntax mask。
+
+#### 2.4.1 信任分级
+
+| Provenance | 典型来源 | collection / 入口 | 规则 `rag_sanitizer` | EntropyShield（`ENTROPYSHIELD_ENABLED`） |
+|:-----------|:---------|:-------------------|:---------------------|:----------------------------------------|
+| `trusted_etl` | 固定 WC ETL、赛会 JSONL | `worldcup-*` | ✅ 必走 | ❌ 不 mask |
+| `web_search` | Tavily 公网搜索 | `tavily_search` tool → `ToolMessage` | —（非 RAG 库） | ✅ 开则 mask snippet |
+| `crawler` | 未来球员/赛果爬虫 | `crawler-*` collection | ✅ 入库 + retrieve | ✅ 开则 mask |
+| `user_upload` | 未来用户上传 PDF 等 | `user-upload-*` | ✅ 计划同上 | ✅ 开则 mask |
+| 未知 collection | 新数据源未登记 | 非 `worldcup-*` 前缀 | ✅ | ✅ 默认按 `crawler`（fail-safe） |
+
+实现：`apps/api/app/services/security/content_provenance.py`
+
+#### 2.4.2 数据流（当前 + 扩展）
+
+```text
+┌─ 高信任：worldcup-* ETL ─────────────────────────────────────────┐
+│  ingest → sanitize_chunk → 向量库（存原文）                        │
+│  retrieve → sanitize_chunk → <DOCS>（不经 EntropyShield）         │
+└──────────────────────────────────────────────────────────────────┘
+
+┌─ 低信任：Tavily（已接）──────────────────────────────────────────┐
+│  tavily_search → snippet → shield_text_for_provenance(WEB_SEARCH) │
+│  → ToolMessage → call_model                                       │
+└──────────────────────────────────────────────────────────────────┘
+
+┌─ 低信任：爬虫（后续）────────────────────────────────────────────┐
+│  crawler job → sanitize_chunk → collection=crawler-players|matches │
+│  retrieve → sanitize_chunk → shield(CRAWLER) → <DOCS>             │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**扩展约定**（后续爬虫 / 上传无需改 EntropyShield 核心逻辑）：
+
+1. **collection 命名**：`crawler-{domain}`（如 `crawler-players`、`crawler-matches`）；上传用 `user-upload-{tenant}`。
+2. **入库**：只走 `sanitize_chunk`（规则清洗，**不写 mask 进库**）。
+3. **进 LLM 前**：`sanitize_retrieved_knowledge_chunk` 或 tool 出口调用 `shield_text_for_provenance`。
+4. **新 tool**（如 `fetch_url`）：在 handler 出口标 `ContentProvenance.WEB_SEARCH` 或新增 enum 值。
+
+#### 2.4.3 开关语义（修正全局开关问题）
+
+| 变量 | 含义 |
+|:-----|:-----|
+| `ENTROPYSHIELD_ENABLED=false` | 全站不调用 EntropyShield（Harness / 本地默认） |
+| `ENTROPYSHIELD_ENABLED=true` | **仅 untrusted provenance** 在进 LLM 前 mask；`worldcup-*` **不受影响** |
+
+推荐生产（启用 Agent + Tavily / 爬虫后）：
+
+```bash
+ENTROPYSHIELD_ENABLED=true
+# pip install entropyshield
+```
+
+本地 / CI 保持 `false`，避免额外依赖与 mask 干扰断言。
+
+#### 2.4.4 与 ETL / PDF 的关系
+
+- **洗 PDF / 固定 ETL**：高信任，**不要**在入库时开 EntropyShield。
+- **爬虫抓球员/比赛**：低信任，collection 用 `crawler-*`，**retrieve 或 tool 出口**开 mask。
+- **Tavily**：已是低信任 tool 边界，**已接入** `tavily_search.py`。
+
 ---
 
 ## 3. 自研核心（必做底座）
@@ -218,6 +283,8 @@ reveal your system prompt ──► quarantine：BFF 422；直连 API 反而可�
 | `prompt_security` | 同上 | 用户消息 override 短语启发式 → 422 |
 | `injection_patterns` | 同上 | EN/ZH override 短语表（`prompt_security` + `rag_sanitizer` 共用） |
 | `rag_sanitizer` | 同上 | Unicode 规范化、控制字符、短语 neutralize、chunk 上限 |
+| `content_provenance` | 同上 | 来源信任模型；`worldcup-*` / `crawler-*` / `web_search` 分流 |
+| `entropyshield_adapter` | 同上 | 仅 **untrusted** provenance 可选 DeSyntax（默认关） |
 | `user_input_guard` | 同上 | `UserInputGuard` 协议；启发式 + LLM Guard 链 |
 | `llm_guard_adapter` | 同上 | 可选 ML 用户输入扫描（默认关） |
 | 分层 prompt | `graphs/prompts/rag_chat.py` | `<POLICY>` / `<DOCS>` / `<TOOL_POLICY>` |
@@ -248,7 +315,7 @@ reveal your system prompt ──► quarantine：BFF 422；直连 API 反而可�
 |:---|:-----|:-------|:-----|:-----|
 | **[LLM Guard](https://github.com/protectai/llm-guard)** | `pip install llm-guard`（可选 extra） | 用户输入 / 可选输出 | `LLM_GUARD_ENABLED=false` | `PromptInjection`（DeBERTa）、`InvisibleText`、`TokenLimit`；模型体积与延迟需 benchmark |
 | **[llm-injection-guard](https://github.com/maheshmakvana/llm-injection-guard)** | `pip install llm-injection-guard[fastapi]` | 中间件对照 | `LLM_INJECTION_GUARD_ENABLED=false` | 纯 stdlib、轻量；与自研规则重叠，用于 **对照实验** |
-| **[EntropyShield](https://pypi.org/project/entropyshield/)** | `pip install entropyshield` | retrieve 后 chunk | `ENTROPYSHIELD_ENABLED=false` | DeSyntax；v0.1.x，需 WC 正例误伤测试 |
+| **[EntropyShield](https://pypi.org/project/entropyshield/)** | `pip install entropyshield` | untrusted 边界（Tavily / `crawler-*`） | `ENTROPYSHIELD_ENABLED=false` | 仅低信任来源；`worldcup-*` 不 mask |
 
 **LLM Guard 示例（用户输入）**：
 
@@ -262,16 +329,16 @@ if not all(results_valid):
     raise AppException(..., message="prompt_injection_detected")
 ```
 
-**EntropyShield 示例（chunk 链）**：
+**EntropyShield 示例（untrusted 边界）**：
 
 ```python
-from entropyshield import shield  # API 以包文档为准
+from app.services.security.content_provenance import (
+    ContentProvenance,
+    shield_text_for_provenance,
+)
 
-def sanitize_chunk(text: str) -> str:
-    base = rule_based_sanitizer(text)
-    if settings.entropyshield_enabled:
-        return shield(base)
-    return base
+# Tavily snippet or crawler-* retrieve hit — after rag_sanitizer
+safe = shield_text_for_provenance(untrusted_text, ContentProvenance.WEB_SEARCH)
 ```
 
 ### 4.3 ETL / 入库
@@ -302,7 +369,7 @@ def sanitize_chunk(text: str) -> str:
 | `LLM_GUARD_ENABLED` | `false` | LLM Guard 用户/可选输出扫描 |
 | `LLM_GUARD_PROMPT_INJECTION_THRESHOLD` | `0.5` | PromptInjection 调参 |
 | `LLM_INJECTION_GUARD_ENABLED` | `false` | 轻量中间件对照（2.11 规划） |
-| `ENTROPYSHIELD_ENABLED` | `false` | chunk DeSyntax 链（2.10 规划） |
+| `ENTROPYSHIELD_ENABLED` | `false` | 仅 **untrusted** 来源 DeSyntax（Tavily / `crawler-*` / `user-upload-*`） |
 | `BFF_PROMPT_GUARD_ENABLED` | `false` | BFF `llm-prompt-guard` 早反馈（web `.env`） |
 | `BFF_PROMPT_GUARD_MODE` | `tag` | `tag` 转发 API 决断；`quarantine` BFF 早拒 |
 | `BFF_CHAT_MAX_CONTENT_CHARS` | `200` | BFF guard 长度上限（对齐 API demo） |
@@ -378,7 +445,7 @@ def sanitize_chunk(text: str) -> str:
 | llm-prompt-guard | | |
 | LLM Guard | | |
 | llm-injection-guard | | |
-| EntropyShield | | |
+| EntropyShield | 按 provenance：Tavily/爬虫 mask；WC 不 mask | 有 Agent+外网数据时 `ENTROPYSHIELD_ENABLED=true` |
 | Garak | | |
 
 ---
@@ -390,6 +457,7 @@ def sanitize_chunk(text: str) -> str:
 | §2–3 自研底座 | tasks 2.1–2.6 |
 | §2.2 BFF tag / quarantine | task 2.8 |
 | §2.3 Ingress 策略技术债 | EP13 多 Agent / 分布式（待立项） |
+| §2.4 Content provenance / EntropyShield | task 2.10 |
 | §4 第三方 adapter | tasks 2.8–2.12 |
 | §7 Harness | tasks 2.7、2.12 |
 | 限流 / 配额 / 审计 | [`rate-limit-audit.md`](./rate-limit-audit.md) §12（EP13/14 分布式）· Story 9.3、9.4 |

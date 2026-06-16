@@ -45,7 +45,7 @@
 | `llm-prompt-guard` | BFF | `BFF_PROMPT_GUARD_ENABLED` | off |
 | `llm-guard` | API 输入/可选输出 | `LLM_GUARD_ENABLED` | off |
 | `llm-injection-guard` | API 中间件对照 | `LLM_INJECTION_GUARD_ENABLED` | off |
-| `entropyshield` | chunk 链 | `ENTROPYSHIELD_ENABLED` | off |
+| `entropyshield` | untrusted 边界（Tavily / crawler-*） | `ENTROPYSHIELD_ENABLED` | off（开则仅 untrusted） |
 | Garak | CI 红队 | — | nightly 非阻塞 |
 
 - **不引入** npm `rag-poison-guard`（Node 与 Python ETL 栈不一致；能力吸收进自研 sanitizer）。

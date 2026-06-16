@@ -124,6 +124,14 @@ class Settings(BaseSettings):
         le=1.0,
         description="PromptInjection scanner threshold (LLM_GUARD_PROMPT_INJECTION_THRESHOLD)",
     )
+    entropyshield_enabled: bool = Field(
+        default=False,
+        description=(
+            "EntropyShield DeSyntax on untrusted ingress only "
+            "(web_search / crawler / user_upload); trusted worldcup-* ETL unchanged "
+            "(ENTROPYSHIELD_ENABLED)"
+        ),
+    )
 
     openai_api_key: str | None = Field(
         default=None,

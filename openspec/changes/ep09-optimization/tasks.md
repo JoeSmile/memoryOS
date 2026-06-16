@@ -72,9 +72,11 @@
   - 预计文件：2 · 层：`services/security/llm_guard_adapter.py` + chat prepare 钩子
   - Harness 默认关；benchmark 记录 p50 延迟
 
-- [ ] 2.10 EntropyShield adapter（`ENTROPYSHIELD_ENABLED`）挂 `ChunkSanitizer` 链
-  - 预计文件：2 · 层：`services/security/entropyshield_adapter.py` + retrieve 调用点
-  - 验收：WC 足球正例误伤率可接受
+- [x] 2.10 EntropyShield adapter（`ENTROPYSHIELD_ENABLED`）按 `ContentProvenance` 挂 **untrusted** 边界
+  - 预计文件：3 · 层：`content_provenance.py` + `entropyshield_adapter.py` + Tavily / retrieve 调用点
+  - **trusted**：`worldcup-*` 固定 ETL — 仅 `rag_sanitizer`
+  - **untrusted**：`web_search`（Tavily）、`crawler-*`（未来爬虫）、`user-upload-*` — 规则清洗后可选 EntropyShield
+  - 验收：WC 正例不误伤；Tavily / crawler collection 在开关打开时 mask
 
 - [ ] 2.11 `llm-injection-guard` 轻量中间件对照（`LLM_INJECTION_GUARD_ENABLED`）
   - 预计文件：2 · 层：`middleware/injection_guard.py` 或 deps

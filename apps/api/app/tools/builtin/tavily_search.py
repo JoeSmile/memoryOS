@@ -3,6 +3,10 @@ from typing import Any
 import httpx
 
 from app.core.config import settings
+from app.services.security.content_provenance import (
+    ContentProvenance,
+    shield_text_for_provenance,
+)
 from app.tools.definitions import ToolContext, ToolDefinition
 from app.tools.registry import ToolRegistry
 
@@ -79,7 +83,10 @@ def _mock_response(query: str) -> dict[str, Any]:
             {
                 "title": item["title"],
                 "url": item["url"],
-                "snippet": item["snippet"],
+                "snippet": shield_text_for_provenance(
+                    item["snippet"],
+                    ContentProvenance.WEB_SEARCH,
+                ),
             }
             for item in _MOCK_RESULTS
         ],
@@ -102,6 +109,7 @@ def _format_tavily_response(query: str, data: dict[str, Any]) -> dict[str, Any]:
         snippet = content
         if len(snippet) > _SNIPPET_MAX_LEN:
             snippet = f"{snippet[:_SNIPPET_MAX_LEN]}…"
+        snippet = shield_text_for_provenance(snippet, ContentProvenance.WEB_SEARCH)
         if not title and not url and not snippet:
             continue
         results.append({"title": title, "url": url, "snippet": snippet})
