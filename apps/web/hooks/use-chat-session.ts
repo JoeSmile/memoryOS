@@ -20,6 +20,7 @@ import {
 } from "@/hooks/use-conversation-messages";
 import { useMe } from "@/hooks/use-me";
 import { ApiError, apiFetch } from "@/lib/api-client";
+import { resolveApiErrorMessage } from "@/lib/api-error-messages";
 import { getAccessToken } from "@/lib/auth-token";
 import { chatQueryKeys } from "@/lib/chat-query-keys";
 import {
@@ -37,6 +38,16 @@ import { buildCancelVisiblePayload } from "@/lib/memoryos-upstream";
 import { useChatStore } from "@/stores/chat-store";
 
 const DEMO_SESSION_TITLE = "2022世界杯分析";
+
+function formatClientError(err: unknown): string {
+  if (err instanceof ApiError) {
+    return resolveApiErrorMessage(err.code, err.message, err.data);
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return "请求失败";
+}
 
 export function useChatSession() {
   const router = useRouter();
@@ -156,6 +167,7 @@ export function useChatSession() {
     transport,
     onFinish: () => {
       clearSendMeta();
+      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.myUsage });
       void syncPersistedMessagesRef.current?.({
         retryUntilAssistant: true,
         replaceLocal: true,
@@ -176,7 +188,7 @@ export function useChatSession() {
         }
       }
       if (err.name !== "AbortError") {
-        setError(err.message);
+        setError(formatClientError(err));
       }
     },
   });
@@ -295,7 +307,7 @@ export function useChatSession() {
         }
       } catch (err) {
         if (err instanceof ApiError) {
-          setError(err.message);
+          setError(formatClientError(err));
         } else {
           setError("加载失败");
         }
@@ -469,7 +481,7 @@ export function useChatSession() {
         setMessages(toUIMessages(rows));
       } catch (err) {
         if (err instanceof ApiError) {
-          setError(err.message);
+          setError(formatClientError(err));
         } else {
           setError("演示分析写入失败");
         }

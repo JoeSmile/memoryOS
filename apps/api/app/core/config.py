@@ -191,6 +191,17 @@ class Settings(BaseSettings):
         description="Max Tavily results returned to the model (TAVILY_MAX_RESULTS)",
     )
 
+    token_quota_enabled: bool = Field(
+        default=False,
+        description="Enforce per-user daily token quota on chat (TOKEN_QUOTA_ENABLED)",
+    )
+    user_daily_token_quota: int = Field(
+        default=100_000,
+        ge=1,
+        le=100_000_000,
+        description="Max total tokens per user per UTC day (USER_DAILY_TOKEN_QUOTA)",
+    )
+
     memory_enabled: bool = Field(
         default=True,
         description="Enable memory trim, summary, and extract (MEMORY_ENABLED)",

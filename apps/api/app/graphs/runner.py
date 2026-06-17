@@ -14,6 +14,11 @@ from app.graphs.chat_graph import build_chat_graph
 from app.graphs.chat_state import ChatState
 from app.graphs.nodes import mock_model
 from app.graphs.nodes.retrieve import retrieve_knowledge
+from app.graphs.usage_collector import reset_pending_round_usage
+from app.services.token_quota_service import (
+    TokenUsageSnapshot,
+    usage_snapshot_from_ai_message,
+)
 
 _DISCONNECT_POLL_SECONDS = 0.25
 
@@ -124,12 +129,50 @@ def _events_from_execute_tools_output(output: dict[str, Any]) -> list[RunnerStre
     return events
 
 
+def _usage_from_ai_message(message: AIMessage | None) -> TokenUsageSnapshot | None:
+    if message is None:
+        return None
+    return usage_snapshot_from_ai_message(message)
+
+
+def _usage_from_call_model_output(output: dict[str, Any]) -> TokenUsageSnapshot | None:
+    raw = output.get("completion_usage")
+    if isinstance(raw, dict):
+        snap = TokenUsageSnapshot.from_mapping(raw)
+        if snap is not None:
+            return snap
+    total: TokenUsageSnapshot | None = None
+    for message in output.get("messages") or []:
+        if not isinstance(message, AIMessage):
+            continue
+        usage = _usage_from_ai_message(message)
+        if usage is not None:
+            total = usage if total is None else total.merged_with(usage)
+    return total
+
+
 class ChatGraphRunner:
     """Stream graph output as SSE-ready events (tokens + ReAct tool rounds)."""
 
     def __init__(self, graph: Any | None = None) -> None:
         self._graph = graph if graph is not None else build_chat_graph()
         self._last_retrieved_chunks: list[dict[str, Any]] = []
+        self._completion_usage: TokenUsageSnapshot | None = None
+
+    @property
+    def last_completion_usage(self) -> TokenUsageSnapshot | None:
+        return self._completion_usage
+
+    def _reset_completion_usage(self) -> None:
+        self._completion_usage = None
+
+    def _add_completion_usage(self, usage: TokenUsageSnapshot | None) -> None:
+        if usage is None:
+            return
+        if self._completion_usage is None:
+            self._completion_usage = usage
+            return
+        self._completion_usage = self._completion_usage.merged_with(usage)
 
     @property
     def last_retrieved_chunks(self) -> list[dict[str, Any]]:
@@ -192,7 +235,10 @@ class ChatGraphRunner:
         db: AsyncSession | None,
         thread_id: str | None,
     ) -> dict[str, Any]:
-        config = self._graph_config(db=db, thread_id=thread_id)
+        config = self._graph_config(
+            db=db,
+            thread_id=thread_id,
+        )
         if settings.agent_tools_enabled:
             recursion_limit = settings.agent_max_iterations
             if settings.memory_enabled:
@@ -227,8 +273,49 @@ class ChatGraphRunner:
     ) -> AsyncIterator[RunnerStreamEvent]:
         """EP04 mock path when AGENT_TOOLS_ENABLED=false."""
         await self._retrieve_for_mock_stream(state, db=db)
+        self._add_completion_usage(
+            TokenUsageSnapshot.from_mapping(mock_model.MOCK_TOKEN_USAGE)
+        )
         async for token in mock_model.mock_stream_tokens():
             yield {"type": "token", "content": token}
+
+    async def _iter_graph_update_events(
+        self,
+        state: ChatState,
+        *,
+        thread_id: str | None,
+        db: AsyncSession | None,
+    ) -> AsyncIterator[RunnerStreamEvent]:
+        """ReAct path: astream(updates) preserves completion_usage (astream_events does not)."""
+        self._last_retrieved_chunks = []
+        config = self._run_config(db=db, thread_id=thread_id)
+
+        async for chunk in self._graph.astream(
+            state,
+            config=config,
+            stream_mode="updates",
+        ):
+            if not isinstance(chunk, dict):
+                continue
+            if "retrieve_knowledge" in chunk:
+                update = chunk["retrieve_knowledge"]
+                if isinstance(update, dict):
+                    self._last_retrieved_chunks = update.get("retrieved_chunks") or []
+                continue
+            if "call_model" in chunk:
+                update = chunk["call_model"]
+                if not isinstance(update, dict):
+                    continue
+                self._add_completion_usage(_usage_from_call_model_output(update))
+                for item in _events_from_call_model_output(update):
+                    yield item
+                continue
+            if "execute_tools" in chunk:
+                update = chunk["execute_tools"]
+                if not isinstance(update, dict):
+                    continue
+                for item in _events_from_execute_tools_output(update):
+                    yield item
 
     async def _iter_graph_stream_events(
         self,
@@ -244,7 +331,15 @@ class ChatGraphRunner:
             self._graph.astream_events(state, config=config, version="v2")
         ) as event_stream:
             async for event in event_stream:
-                if event.get("event") == "on_chain_end":
+                event_name = event.get("event")
+                if event_name == "on_chat_model_end":
+                    if not settings.agent_tools_enabled:
+                        output = event.get("data", {}).get("output")
+                        if isinstance(output, AIMessage):
+                            self._add_completion_usage(_usage_from_ai_message(output))
+                    continue
+
+                if event_name == "on_chain_end":
                     node_name = event.get("name")
                     output = event.get("data", {}).get("output") or {}
                     if not isinstance(output, dict):
@@ -252,9 +347,8 @@ class ChatGraphRunner:
                     if node_name == "retrieve_knowledge":
                         self._last_retrieved_chunks = output.get("retrieved_chunks") or []
                         continue
-                    if node_name == "call_model" and settings.agent_tools_enabled:
-                        for item in _events_from_call_model_output(output):
-                            yield item
+                    if node_name == "call_model":
+                        self._add_completion_usage(_usage_from_call_model_output(output))
                         continue
                     if node_name == "execute_tools":
                         for item in _events_from_execute_tools_output(output):
@@ -264,7 +358,7 @@ class ChatGraphRunner:
                 if settings.agent_tools_enabled:
                     continue
 
-                if event.get("event") != "on_chat_model_stream":
+                if event_name != "on_chat_model_stream":
                     continue
                 chunk = event.get("data", {}).get("chunk")
                 if chunk is None:
@@ -282,6 +376,15 @@ class ChatGraphRunner:
     ) -> AsyncIterator[RunnerStreamEvent]:
         if settings.use_mock_llm and not settings.agent_tools_enabled:
             async for event in self._iter_legacy_mock_tokens(state, db=db):
+                yield event
+            return
+
+        if settings.agent_tools_enabled:
+            async for event in self._iter_graph_update_events(
+                state,
+                thread_id=thread_id,
+                db=db,
+            ):
                 yield event
             return
 
@@ -340,6 +443,8 @@ class ChatGraphRunner:
         stream_id: str | None = None,
         cancel_cache: StreamCancelCache | None = None,
     ) -> AsyncIterator[RunnerStreamEvent]:
+        self._reset_completion_usage()
+        reset_pending_round_usage()
         agen = self._iter_stream_events(
             state,
             thread_id=thread_id,

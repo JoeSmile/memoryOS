@@ -9,6 +9,17 @@ MOCK_ASSISTANT_TEXT = "".join(MOCK_TOKEN_CHUNKS)
 MOCK_AFTER_TOOL_CHUNKS: list[str] = ["联", "网", "答", "案"]
 MOCK_AFTER_TOOL_TEXT = "".join(MOCK_AFTER_TOOL_CHUNKS)
 
+MOCK_TOKEN_USAGE: dict[str, int] = {
+    "prompt_tokens": 48,
+    "completion_tokens": len(MOCK_ASSISTANT_TEXT),
+    "total_tokens": 48 + len(MOCK_ASSISTANT_TEXT),
+}
+MOCK_AFTER_TOOL_TOKEN_USAGE: dict[str, int] = {
+    "prompt_tokens": 64,
+    "completion_tokens": len(MOCK_AFTER_TOOL_TEXT),
+    "total_tokens": 64 + len(MOCK_AFTER_TOOL_TEXT),
+}
+
 _MOCK_TAVILY_CALL_ID = "mock_call_tavily"
 
 
@@ -24,13 +35,20 @@ async def mock_invoke(
 ) -> AIMessage:
     """Deterministic mock: sufficient RAG → text only; weak RAG → tool then text."""
     if not agent_tools_enabled or rag_sufficient:
-        return AIMessage(content=MOCK_ASSISTANT_TEXT)
+        return AIMessage(
+            content=MOCK_ASSISTANT_TEXT,
+            response_metadata={"token_usage": dict(MOCK_TOKEN_USAGE)},
+        )
 
     if _after_tool_round(messages):
-        return AIMessage(content=MOCK_AFTER_TOOL_TEXT)
+        return AIMessage(
+            content=MOCK_AFTER_TOOL_TEXT,
+            response_metadata={"token_usage": dict(MOCK_AFTER_TOOL_TOKEN_USAGE)},
+        )
 
     return AIMessage(
         content="",
+        response_metadata={"token_usage": dict(MOCK_TOKEN_USAGE)},
         tool_calls=[
             {
                 "name": "tavily_search",

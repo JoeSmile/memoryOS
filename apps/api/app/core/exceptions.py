@@ -7,10 +7,17 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 class AppException(Exception):
     """业务异常：在路由/Service 中主动抛出。"""
 
-    def __init__(self, code: int, message: str, status_code: int = 400):
+    def __init__(
+        self,
+        code: int,
+        message: str,
+        status_code: int = 400,
+        data: object = None,
+    ):
         self.code = code
         self.message = message
         self.status_code = status_code
+        self.data = data
         super().__init__(message)
 
 
@@ -22,7 +29,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             content={
                 "code": exc.code,
                 "message": exc.message,
-                "data": None,
+                "data": exc.data,
             },
         )
 

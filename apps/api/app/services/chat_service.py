@@ -30,6 +30,11 @@ from app.services.memory.summary_service import (
     run_summary_background,
     should_schedule_summary,
 )
+from app.services.token_quota_service import (
+    TokenQuotaService,
+    TokenUsageSnapshot,
+    record_completion_usage_safe,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +55,8 @@ class CompletionStreamState:
     disconnected: bool = False
     terminal_error: bool = False
     persisted: bool = False
+    usage_recorded: bool = False
+    usage: TokenUsageSnapshot | None = None
 
 
 class ChatService:
@@ -174,6 +181,7 @@ class ChatService:
         regenerate: bool = False,
     ) -> None:
         await self.conversations.get_owned_conversation(conversation_id, user_id)
+        await TokenQuotaService(self.db).assert_under_daily_quota(user_id)
         if not regenerate:
             assert_chat_content_length(content)
             run_user_input_guards(content)
@@ -456,6 +464,7 @@ class ChatService:
                 stream_state.stream_id,
             )
             yield {"event": "error", "data": {"message": "stream_failed"}}
+        stream_state.usage = self.runner.last_completion_usage
 
     async def _maybe_schedule_summary_background(
         self,
@@ -500,6 +509,23 @@ class ChatService:
 
         background_tasks.add_task(run_extract_background, conversation_id, user_id)
 
+    async def _record_completion_usage_for_turn(
+        self,
+        stream_state: CompletionStreamState,
+        *,
+        message_id: uuid.UUID | None = None,
+    ) -> None:
+        if stream_state.usage_recorded or stream_state.usage is None:
+            return
+        await record_completion_usage_safe(
+            self.db,
+            user_id=stream_state.user_id,
+            conversation_id=stream_state.conversation_id,
+            usage=stream_state.usage,
+            message_id=message_id,
+        )
+        stream_state.usage_recorded = True
+
     async def finalize_completion_stream(
         self,
         stream_state: CompletionStreamState,
@@ -518,45 +544,60 @@ class ChatService:
             stream_state.conversation_id,
             stream_state.stream_id,
         )
-        if stream_state.persisted or stream_state.terminal_error:
+        if stream_state.persisted:
             return None
 
-        has_assistant_text = bool(stream_state.assistant_parts)
-        has_tool_steps = bool(stream_state.tool_steps)
-        if not has_assistant_text and not has_tool_steps:
+        assistant_id: uuid.UUID | None = None
+        completion_status = COMPLETION_INTERRUPTED
+
+        if not stream_state.terminal_error:
+            has_assistant_text = bool(stream_state.assistant_parts)
+            has_tool_steps = bool(stream_state.tool_steps)
+            if has_assistant_text or has_tool_steps:
+                completion_status = (
+                    COMPLETION_COMPLETE
+                    if stream_state.stream_exhausted and not stream_state.disconnected
+                    else COMPLETION_INTERRUPTED
+                )
+                full_content = "".join(stream_state.assistant_parts)
+                content = self._interrupted_content(
+                    full_content,
+                    visible_content,
+                    visible_length,
+                )
+                if content or has_tool_steps:
+                    assistant = await self.messages.create(
+                        stream_state.conversation_id,
+                        "assistant",
+                        content,
+                        completion_status=completion_status,
+                    )
+                    assistant_id = assistant.id
+                    metadata: dict[str, Any] = {}
+                    if stream_state.rag_source_items:
+                        metadata["rag_sources"] = stream_state.rag_source_items
+                    if stream_state.tool_steps:
+                        metadata["tool_steps"] = stream_state.tool_steps
+                    if metadata:
+                        assistant.metadata_ = metadata
+
+        await self._record_completion_usage_for_turn(
+            stream_state,
+            message_id=assistant_id,
+        )
+
+        if assistant_id is None and not stream_state.usage_recorded:
             return None
 
-        completion_status = (
-            COMPLETION_COMPLETE
-            if stream_state.stream_exhausted and not stream_state.disconnected
-            else COMPLETION_INTERRUPTED
-        )
-        full_content = "".join(stream_state.assistant_parts)
-        content = self._interrupted_content(
-            full_content,
-            visible_content,
-            visible_length,
-        )
-        if not content and not has_tool_steps:
-            return None
-        assistant = await self.messages.create(
-            stream_state.conversation_id,
-            "assistant",
-            content,
-            completion_status=completion_status,
-        )
-        metadata: dict[str, Any] = {}
-        if stream_state.rag_source_items:
-            metadata["rag_sources"] = stream_state.rag_source_items
-        if stream_state.tool_steps:
-            metadata["tool_steps"] = stream_state.tool_steps
-        if metadata:
-            assistant.metadata_ = metadata
-        await self.conversations.touch_activity(stream_state.conversation_id)
+        if assistant_id is not None:
+            await self.conversations.touch_activity(stream_state.conversation_id)
         await self.db.commit()
         await self.conversations.invalidate_list_cache(stream_state.user_id)
         stream_state.persisted = True
-        if completion_status == COMPLETION_COMPLETE:
+        if (
+            assistant_id is not None
+            and completion_status == COMPLETION_COMPLETE
+        ):
             self._maybe_schedule_memory_extract_background(
                 stream_state.conversation_id,
                 stream_state.user_id,
@@ -566,4 +607,4 @@ class ChatService:
                 stream_state.conversation_id,
                 background_tasks,
             )
-        return assistant.id
+        return assistant_id

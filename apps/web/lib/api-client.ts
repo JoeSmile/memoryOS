@@ -3,6 +3,7 @@ import {
   getAccessToken,
 } from "@/lib/auth-token";
 import type { MemoryRead } from "@/lib/memory-types";
+import type { MyUsageRead } from "@/lib/usage-types";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -18,6 +19,7 @@ export class ApiError extends Error {
     public readonly code: number,
     message: string,
     public readonly httpStatus: number,
+    public readonly data: unknown = null,
   ) {
     super(message);
     this.name = "ApiError";
@@ -65,6 +67,7 @@ export async function apiFetch<T>(
       body.code ?? res.status,
       body.message ?? "request_failed",
       res.status,
+      body.data,
     );
   }
 
@@ -91,4 +94,12 @@ export async function deleteMemory(memoryId: string): Promise<void> {
   await apiFetch<null>(`/api/v1/memories/${memoryId}`, {
     method: "DELETE",
   });
+}
+
+export async function fetchMyUsage(): Promise<MyUsageRead> {
+  const res = await apiFetch<MyUsageRead>("/api/v1/usage/me");
+  if (!res.data) {
+    throw new Error("usage_not_found");
+  }
+  return res.data;
 }
