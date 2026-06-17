@@ -112,3 +112,106 @@ async def test_live_falls_back_to_chat_base_url(monkeypatch):
     await service.embed_query("test")
 
     assert captured["base_url"] == "http://chat-host:11434/v1"
+
+
+@pytest.fixture
+def memory_redis():
+    store: dict[str, str] = {}
+
+    class FakeRedis:
+        async def get(self, key: str) -> str | None:
+            return store.get(key)
+
+        async def setex(self, key: str, ttl: int, value: str) -> None:
+            store[key] = value
+
+    return FakeRedis(), store
+
+
+@pytest.mark.asyncio
+async def test_embed_query_cache_hit_skips_provider(memory_redis):
+    fake_redis, _store = memory_redis
+    call_count = 0
+
+    class FakeEmbeddings:
+        async def aembed_query(self, query: str) -> list[float]:
+            nonlocal call_count
+            call_count += 1
+            return [0.1] * EMBEDDING_DIMENSIONS
+
+    settings = Settings(
+        openai_api_key="test-key",
+        embedding_cache_enabled=True,
+        _env_file=None,
+    )
+    service = EmbeddingService(
+        settings=settings,
+        redis=fake_redis,  # type: ignore[arg-type]
+    )
+    service._live = FakeEmbeddings()  # noqa: SLF001
+
+    first = await service.embed_query("  World   Cup  2022  ")
+    second = await service.embed_query("World Cup 2022")
+
+    assert first == second
+    assert call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_embed_query_cache_disabled_always_calls_provider(memory_redis):
+    fake_redis, _store = memory_redis
+    call_count = 0
+
+    class FakeEmbeddings:
+        async def aembed_query(self, query: str) -> list[float]:
+            nonlocal call_count
+            call_count += 1
+            return [0.2] * EMBEDDING_DIMENSIONS
+
+    settings = Settings(
+        openai_api_key="test-key",
+        embedding_cache_enabled=False,
+        _env_file=None,
+    )
+    service = EmbeddingService(
+        settings=settings,
+        redis=fake_redis,  # type: ignore[arg-type]
+    )
+    service._live = FakeEmbeddings()  # noqa: SLF001
+
+    await service.embed_query("same query")
+    await service.embed_query("same query")
+
+    assert call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_embed_texts_partial_cache_hit(memory_redis):
+    fake_redis, store = memory_redis
+    call_count = 0
+
+    class FakeEmbeddings:
+        async def aembed_documents(self, texts: list[str]) -> list[list[float]]:
+            nonlocal call_count
+            call_count += 1
+            return [[0.3] * EMBEDDING_DIMENSIONS for _ in texts]
+
+    settings = Settings(
+        openai_api_key="test-key",
+        embedding_cache_enabled=True,
+        _env_file=None,
+    )
+    service = EmbeddingService(
+        settings=settings,
+        redis=fake_redis,  # type: ignore[arg-type]
+    )
+    service._live = FakeEmbeddings()  # noqa: SLF001
+
+    first_batch = await service.embed_texts(["alpha", "beta"])
+    assert len(first_batch) == 2
+    assert call_count == 1
+    assert len(store) == 2
+
+    second_batch = await service.embed_texts(["alpha", "gamma"])
+    assert second_batch[0] == first_batch[0]
+    assert call_count == 2

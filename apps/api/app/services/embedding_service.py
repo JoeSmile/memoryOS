@@ -2,7 +2,9 @@ import hashlib
 import math
 
 from langchain_openai import OpenAIEmbeddings
+from redis.asyncio import Redis
 
+from app.cache.embedding_cache import EmbeddingCache
 from app.core.config import Settings, get_settings
 
 
@@ -27,8 +29,15 @@ def _mock_embedding(text: str, dimensions: int) -> list[float]:
 
 
 class EmbeddingService:
-    def __init__(self, settings: Settings | None = None) -> None:
+    def __init__(
+        self,
+        settings: Settings | None = None,
+        *,
+        redis: Redis | None = None,
+    ) -> None:
         self._settings = settings or get_settings()
+        self._redis = redis
+        self._cache: EmbeddingCache | None = None
         self._live: OpenAIEmbeddings | None = None
         if not self._settings.use_mock_embedding:
             kwargs: dict[str, object] = {
@@ -61,23 +70,87 @@ class EmbeddingService:
     def embedding_dimensions(self) -> int:
         return self._settings.embedding_dimensions
 
+    async def _cache_client(self) -> EmbeddingCache | None:
+        if not self._settings.embedding_cache_enabled:
+            return None
+        if self._cache is not None:
+            return self._cache
+        redis = self._redis
+        if redis is None:
+            from app.core.redis import ensure_redis
+
+            redis = await ensure_redis()
+        self._cache = EmbeddingCache(redis, self._settings)
+        return self._cache if self._cache.enabled else None
+
+    async def _read_cached_vector(self, text: str) -> list[float] | None:
+        cache = await self._cache_client()
+        if cache is None:
+            return None
+        return await cache.get_vector(
+            model_label=self.model_label,
+            dimensions=self.embedding_dimensions,
+            text=text,
+        )
+
+    async def _write_cached_vector(self, text: str, vector: list[float]) -> None:
+        cache = await self._cache_client()
+        if cache is None:
+            return
+        await cache.set_vector(
+            model_label=self.model_label,
+            dimensions=self.embedding_dimensions,
+            text=text,
+            vector=vector,
+        )
+
     async def embed_texts(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             return []
+
+        dim = self.embedding_dimensions
+        results: list[list[float] | None] = [None] * len(texts)
+        misses: list[tuple[int, str]] = []
+
+        for index, text in enumerate(texts):
+            cached = await self._read_cached_vector(text)
+            if cached is not None:
+                results[index] = cached
+            else:
+                misses.append((index, text))
+
+        if not misses:
+            return [vector for vector in results if vector is not None]
+
         if self.use_mock:
-            dim = self._settings.embedding_dimensions
-            return [_mock_embedding(text, dim) for text in texts]
+            for index, text in misses:
+                vector = _mock_embedding(text, dim)
+                results[index] = vector
+                await self._write_cached_vector(text, vector)
+            return [vector for vector in results if vector is not None]
+
         assert self._live is not None
-        vectors = await self._live.aembed_documents(texts)
+        miss_texts = [text for _, text in misses]
+        vectors = await self._live.aembed_documents(miss_texts)
         self._validate_batch(vectors)
-        return vectors
+        for (index, text), vector in zip(misses, vectors, strict=True):
+            results[index] = vector
+            await self._write_cached_vector(text, vector)
+        return [vector for vector in results if vector is not None]
 
     async def embed_query(self, query: str) -> list[float]:
+        cached = await self._read_cached_vector(query)
+        if cached is not None:
+            return cached
+
         if self.use_mock:
-            return _mock_embedding(query, self._settings.embedding_dimensions)
-        assert self._live is not None
-        vector = await self._live.aembed_query(query)
-        self._validate_one(vector)
+            vector = _mock_embedding(query, self.embedding_dimensions)
+        else:
+            assert self._live is not None
+            vector = await self._live.aembed_query(query)
+            self._validate_one(vector)
+
+        await self._write_cached_vector(query, vector)
         return vector
 
     def _validate_one(self, vector: list[float]) -> None:

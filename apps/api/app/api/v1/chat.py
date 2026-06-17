@@ -29,25 +29,21 @@ async def chat_completions(
     # Do not Depends(get_redis) here: enforce_chat_rate_limit already holds that
     # yield dependency until the SSE response completes (double inject deadlocks).
     redis: Redis | None = await ensure_redis()
-    stream_id = str(uuid.uuid4())
 
     async with AsyncSessionLocal() as db:
         service = ChatService(db, redis=redis)
         await service.conversations.get_owned_conversation(body.conversation_id, user.id)
-        quota_reserved = await service.prepare_completion_turn(
+        await service.prepare_completion_turn(
             conversation_id=body.conversation_id,
             user_id=user.id,
             content=body.content,
             client_message_id=body.client_message_id,
             regenerate=body.regenerate,
-            stream_id=stream_id,
         )
 
         stream_state = service.new_completion_stream_state(
             conversation_id=body.conversation_id,
             user_id=user.id,
-            stream_id=stream_id,
-            quota_reserved=quota_reserved,
         )
 
     async def event_generator():
@@ -79,7 +75,6 @@ async def chat_completions(
                         stream_state,
                         background_tasks=background_tasks,
                     )
-                await stream_service.release_quota_reservation(stream_state)
                 await stream_service.release_turn_inflight_lock(
                     body.conversation_id,
                     body.client_message_id,

@@ -1,8 +1,10 @@
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.runnables import RunnableConfig
 
 from app.core.config import settings
 from app.graphs.chat_state import ChatState
 from app.graphs.nodes.mock_model import mock_invoke
+from app.graphs.usage_collector import emit_usage
 from app.graphs.prompts.memory_context import (
     build_context_summary_system_message,
     build_memory_snippets_system_message,
@@ -13,6 +15,7 @@ from app.graphs.prompts.unified_react import (
     compute_rag_sufficient,
 )
 from app.schemas.knowledge import KnowledgeChunkHit
+from app.services.token_quota_service import usage_snapshot_from_ai_message
 from app.tools import build_tool_registry
 
 
@@ -126,9 +129,23 @@ async def _stream_text_only(messages: list[BaseMessage]) -> AIMessage:
     return AIMessage(content="".join(parts))
 
 
-async def call_model(state: ChatState) -> dict:
+def _call_model_update(
+    response: AIMessage,
+    *,
+    configurable: dict | None,
+) -> dict:
+    update: dict = {"messages": [response]}
+    usage = usage_snapshot_from_ai_message(response)
+    if usage is not None:
+        emit_usage(configurable, usage)
+        update["completion_usage"] = usage.to_mapping()
+    return update
+
+
+async def call_model(state: ChatState, config: RunnableConfig) -> dict:
     messages = _messages_with_system(state)
     rag_sufficient = _resolve_rag_sufficient(state)
+    configurable = config.get("configurable") or {}
 
     if settings.use_mock_llm:
         response = await mock_invoke(
@@ -136,11 +153,11 @@ async def call_model(state: ChatState) -> dict:
             rag_sufficient=rag_sufficient,
             agent_tools_enabled=settings.agent_tools_enabled,
         )
-        return {"messages": [response]}
+        return _call_model_update(response, configurable=configurable)
 
     if settings.agent_tools_enabled:
         response = await _invoke_with_tools(messages)
-        return {"messages": [response]}
+        return _call_model_update(response, configurable=configurable)
 
     response = await _stream_text_only(messages)
-    return {"messages": [response]}
+    return _call_model_update(response, configurable=configurable)

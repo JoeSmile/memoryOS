@@ -1,4 +1,4 @@
-"""Token usage metering protocol and embedded PG recorder (EP09 9.3)."""
+"""Token usage metering and daily quota checks (EP09 9.3)."""
 
 from __future__ import annotations
 
@@ -8,15 +8,17 @@ from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from typing import Protocol
 
-from redis.asyncio import Redis
+from langchain_core.messages import AIMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.cache.token_quota_reserve import TokenQuotaReserve, quota_reserve_amount
 from app.core.config import settings
 from app.core.exceptions import AppException
 from app.repositories.token_usage_repository import TokenUsageRepository
 
 logger = logging.getLogger(__name__)
+
+TOKEN_QUOTA_EXCEEDED_KEY = "token_quota_exceeded"
+DAILY_TOKEN_QUOTA_EXCEEDED_MESSAGE = "您今日的token量使用完请过几个小时后再试"
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,8 +31,12 @@ class TokenUsageSnapshot:
     def from_mapping(cls, data: dict) -> TokenUsageSnapshot | None:
         if not isinstance(data, dict):
             return None
-        prompt = int(data.get("prompt_tokens", 0) or 0)
-        completion = int(data.get("completion_tokens", 0) or 0)
+        prompt = int(
+            data.get("prompt_tokens", data.get("input_tokens", 0)) or 0
+        )
+        completion = int(
+            data.get("completion_tokens", data.get("output_tokens", 0)) or 0
+        )
         total = int(data.get("total_tokens", prompt + completion) or 0)
         if prompt <= 0 and completion <= 0 and total <= 0:
             return None
@@ -40,12 +46,39 @@ class TokenUsageSnapshot:
             total_tokens=total,
         )
 
+    def to_mapping(self) -> dict[str, int]:
+        return {
+            "prompt_tokens": self.prompt_tokens,
+            "completion_tokens": self.completion_tokens,
+            "total_tokens": self.total_tokens,
+        }
+
     def merged_with(self, other: TokenUsageSnapshot) -> TokenUsageSnapshot:
         return TokenUsageSnapshot(
             prompt_tokens=self.prompt_tokens + other.prompt_tokens,
             completion_tokens=self.completion_tokens + other.completion_tokens,
             total_tokens=self.total_tokens + other.total_tokens,
         )
+
+
+def usage_snapshot_from_ai_message(message: object) -> TokenUsageSnapshot | None:
+    """Read provider usage before LangGraph strips AIMessage response_metadata."""
+    if not isinstance(message, AIMessage):
+        return None
+    meta = getattr(message, "response_metadata", None) or {}
+    if isinstance(meta, dict):
+        raw = meta.get("token_usage") or meta.get("usage")
+        if isinstance(raw, dict):
+            snap = TokenUsageSnapshot.from_mapping(raw)
+            if snap is not None:
+                return snap
+    usage_meta = getattr(message, "usage_metadata", None)
+    if usage_meta is not None:
+        if hasattr(usage_meta, "model_dump"):
+            usage_meta = usage_meta.model_dump()
+        if isinstance(usage_meta, dict):
+            return TokenUsageSnapshot.from_mapping(usage_meta)
+    return None
 
 
 class UsageRecorder(Protocol):
@@ -84,52 +117,29 @@ class EmbeddedUsageRecorder:
 
 
 class TokenQuotaService:
-    def __init__(self, db: AsyncSession, redis: Redis | None = None) -> None:
+    def __init__(self, db: AsyncSession) -> None:
         self._repo = TokenUsageRepository(db)
-        self._reserve = TokenQuotaReserve(redis)
 
     @staticmethod
     def _utc_today() -> date:
         return datetime.now(timezone.utc).date()
 
-    async def _committed_tokens_today(self, user_id: uuid.UUID) -> int:
-        totals = await self._repo.sum_for_user_utc_day(user_id, self._utc_today())
-        return totals.total_tokens
-
-    async def reserve_for_completion(self, user_id: uuid.UUID, *, stream_id: str) -> int:
-        """Reserve headroom before SSE; rejects when committed + in-flight would exceed quota."""
-        if not settings.token_quota_enabled:
-            return 0
-
-        today = self._utc_today()
-        pg_used = await self._committed_tokens_today(user_id)
-        reserved = await self._reserve.try_reserve(
-            user_id=user_id,
-            day=today,
-            stream_id=stream_id,
-            pg_used=pg_used,
-        )
-        if not reserved:
-            raise AppException(
-                code=42902,
-                message="token_quota_exceeded",
-                status_code=429,
-            )
-
-        return quota_reserve_amount()
-
-    async def release_reservation(self, user_id: uuid.UUID, *, stream_id: str) -> None:
+    async def assert_under_daily_quota(self, user_id: uuid.UUID) -> None:
+        """Reject before chat/demo-turn when today's committed usage reached quota."""
         if not settings.token_quota_enabled:
             return
-        await self._reserve.release(
-            user_id=user_id,
-            day=self._utc_today(),
-            stream_id=stream_id,
-        )
+
+        totals = await self._repo.sum_for_user_utc_day(user_id, self._utc_today())
+        if totals.total_tokens >= settings.user_daily_token_quota:
+            raise AppException(
+                code=42902,
+                message=TOKEN_QUOTA_EXCEEDED_KEY,
+                status_code=429,
+                data={"detail": DAILY_TOKEN_QUOTA_EXCEEDED_MESSAGE},
+            )
 
     async def today_totals(self, user_id: uuid.UUID) -> TokenUsageSnapshot:
-        today = self._utc_today()
-        totals = await self._repo.sum_for_user_utc_day(user_id, today)
+        totals = await self._repo.sum_for_user_utc_day(user_id, self._utc_today())
         return TokenUsageSnapshot(
             prompt_tokens=totals.prompt_tokens,
             completion_tokens=totals.completion_tokens,

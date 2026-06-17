@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { TokenUsageButton } from "@/components/chat/token-usage-button";
 import { Wc2022MatchPicker } from "@/components/chat/wc2022-match-picker";
 import type { WcMatchBrief } from "@/lib/worldcup-types";
 
@@ -31,6 +32,7 @@ export function ChatHeader({
           ) : null}
         </div>
         <div className="flex shrink-0 items-center gap-3">
+          <TokenUsageButton />
           <Link
             href="/memories"
             className="text-sm text-zinc-600 hover:text-emerald-600 hover:underline dark:text-zinc-400"

@@ -5,6 +5,7 @@ from app.repositories.document_chunk_repository import DocumentChunkRepository
 from app.repositories.document_repository import DocumentRepository
 from app.repositories.memory_repository import MemoryRepository
 from app.repositories.message_repository import MessageRepository
+from app.repositories.token_usage_repository import TokenUsageRepository
 from app.repositories.user_repository import UserRepository
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "MemoryRepository",
     "DocumentRepository",
     "DocumentChunkRepository",
+    "TokenUsageRepository",
 ]

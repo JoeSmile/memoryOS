@@ -35,3 +35,8 @@ def stream_cancel_visible_len_key(stream_id: str) -> str:
 def worldcup_ingest_stem_lock_key(stem: str) -> str:
     """One in-flight ingest per jsonl stem (subset vs full ingest share stem locks)."""
     return f"memoryos:ingest:worldcup:stem:{stem}"
+
+
+def embedding_vector_key(*, model_label: str, dimensions: int, text_digest: str) -> str:
+    """Cached embedding vector for normalized text (model + width scoped)."""
+    return f"memoryos:embed:{model_label}:{dimensions}:{text_digest}"

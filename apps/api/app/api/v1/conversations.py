@@ -20,6 +20,7 @@ from app.repositories.message_repository import MessageRepository
 from app.repositories.wc_match_repository import WcMatchRepository
 from app.services.demo_analysis_service import DemoAnalysisService
 from app.services.conversation_service import ConversationService
+from app.services.token_quota_service import TokenQuotaService
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,7 @@ async def append_demo_analysis_turn(
     redis: Redis | None = Depends(get_redis),
 ):
     conversations = ConversationService(db, redis=redis)
+    await TokenQuotaService(db).assert_under_daily_quota(user.id)
     demo = DemoAnalysisService(
         conversations,
         MessageRepository(db),

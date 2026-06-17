@@ -1,4 +1,4 @@
-"""Token quota service unit tests (EP09 4.2)."""
+"""Token quota service unit tests (EP09 4.3 redo)."""
 
 import uuid
 from unittest.mock import AsyncMock, MagicMock
@@ -8,33 +8,33 @@ import pytest
 from app.core.config import settings
 from app.core.exceptions import AppException
 from app.repositories.token_usage_repository import TokenUsageTotals
-from app.services.token_quota_service import TokenQuotaService, TokenUsageSnapshot
+from app.services.token_quota_service import (
+    DAILY_TOKEN_QUOTA_EXCEEDED_MESSAGE,
+    TOKEN_QUOTA_EXCEEDED_KEY,
+    TokenQuotaService,
+    TokenUsageSnapshot,
+    usage_snapshot_from_ai_message,
+)
 
 
 @pytest.mark.asyncio
-async def test_reserve_for_completion_skipped_when_disabled(monkeypatch):
+async def test_assert_under_daily_quota_skipped_when_disabled(monkeypatch):
     monkeypatch.setattr(settings, "token_quota_enabled", False)
     db = MagicMock()
     service = TokenQuotaService(db)
     service._repo = MagicMock()
     service._repo.sum_for_user_utc_day = AsyncMock()
-    service._reserve = MagicMock()
-    service._reserve.try_reserve = AsyncMock()
 
-    reserved = await service.reserve_for_completion(uuid.uuid4(), stream_id="s1")
-    assert reserved == 0
+    await service.assert_under_daily_quota(uuid.uuid4())
     service._repo.sum_for_user_utc_day.assert_not_called()
-    service._reserve.try_reserve.assert_not_called()
 
 
 @pytest.mark.asyncio
-async def test_reserve_for_completion_raises_42902_when_committed_at_quota(monkeypatch):
+async def test_assert_under_daily_quota_raises_42902_when_at_quota(monkeypatch):
     monkeypatch.setattr(settings, "token_quota_enabled", True)
     monkeypatch.setattr(settings, "user_daily_token_quota", 100)
-    monkeypatch.setattr(settings, "token_quota_request_reserve", 51)
 
-    db = MagicMock()
-    service = TokenQuotaService(db)
+    service = TokenQuotaService(MagicMock())
     service._repo = MagicMock()
     service._repo.sum_for_user_utc_day = AsyncMock(
         return_value=TokenUsageTotals(
@@ -43,23 +43,20 @@ async def test_reserve_for_completion_raises_42902_when_committed_at_quota(monke
             total_tokens=100,
         )
     )
-    service._reserve = MagicMock()
-    service._reserve.try_reserve = AsyncMock(return_value=False)
 
     with pytest.raises(AppException) as exc:
-        await service.reserve_for_completion(uuid.uuid4(), stream_id="s1")
+        await service.assert_under_daily_quota(uuid.uuid4())
     assert exc.value.code == 42902
-    assert exc.value.message == "token_quota_exceeded"
+    assert exc.value.message == TOKEN_QUOTA_EXCEEDED_KEY
+    assert exc.value.data == {"detail": DAILY_TOKEN_QUOTA_EXCEEDED_MESSAGE}
 
 
 @pytest.mark.asyncio
-async def test_reserve_for_completion_allows_when_one_token_below_quota(monkeypatch):
+async def test_assert_under_daily_quota_allows_when_below_quota(monkeypatch):
     monkeypatch.setattr(settings, "token_quota_enabled", True)
     monkeypatch.setattr(settings, "user_daily_token_quota", 100)
-    monkeypatch.setattr(settings, "token_quota_request_reserve", 51)
 
-    db = MagicMock()
-    service = TokenQuotaService(db)
+    service = TokenQuotaService(MagicMock())
     service._repo = MagicMock()
     service._repo.sum_for_user_utc_day = AsyncMock(
         return_value=TokenUsageTotals(
@@ -68,74 +65,8 @@ async def test_reserve_for_completion_allows_when_one_token_below_quota(monkeypa
             total_tokens=48,
         )
     )
-    service._reserve = MagicMock()
-    service._reserve.try_reserve = AsyncMock(return_value=True)
 
-    reserved = await service.reserve_for_completion(uuid.uuid4(), stream_id="s1")
-    assert reserved == 51
-    service._reserve.try_reserve.assert_awaited_once()
-
-
-@pytest.mark.asyncio
-async def test_reserve_for_completion_rejects_near_quota_would_exceed(monkeypatch):
-    """used=99_949 + reserve=51 > quota=100_000 — blocked before stream."""
-    monkeypatch.setattr(settings, "token_quota_enabled", True)
-    monkeypatch.setattr(settings, "user_daily_token_quota", 100_000)
-    monkeypatch.setattr(settings, "token_quota_request_reserve", 51)
-
-    db = MagicMock()
-    service = TokenQuotaService(db)
-    service._repo = MagicMock()
-    service._repo.sum_for_user_utc_day = AsyncMock(
-        return_value=TokenUsageTotals(
-            prompt_tokens=90_000,
-            completion_tokens=9_949,
-            total_tokens=99_949,
-        )
-    )
-    service._reserve = MagicMock()
-    service._reserve.try_reserve = AsyncMock(return_value=False)
-
-    with pytest.raises(AppException) as exc:
-        await service.reserve_for_completion(uuid.uuid4(), stream_id="s1")
-    assert exc.value.code == 42902
-
-
-@pytest.mark.asyncio
-async def test_reserve_for_completion_blocks_second_inflight_request(monkeypatch):
-    monkeypatch.setattr(settings, "token_quota_enabled", True)
-    monkeypatch.setattr(settings, "user_daily_token_quota", 100)
-    monkeypatch.setattr(settings, "token_quota_request_reserve", 51)
-
-    from app.cache.token_quota_reserve import TokenQuotaReserve
-
-    user_id = uuid.uuid4()
-    day = TokenQuotaService._utc_today()
-    reserve = TokenQuotaReserve(None)
-
-    first = await reserve.try_reserve(
-        user_id=user_id,
-        day=day,
-        stream_id="stream-a",
-        pg_used=0,
-    )
-    second = await reserve.try_reserve(
-        user_id=user_id,
-        day=day,
-        stream_id="stream-b",
-        pg_used=0,
-    )
-    assert first is True
-    assert second is False
-
-    await reserve.release(user_id=user_id, day=day, stream_id="stream-a")
-    third = await reserve.try_reserve(
-        user_id=user_id,
-        day=day,
-        stream_id="stream-c",
-        pg_used=0,
-    )
-    assert third is True
+    await service.assert_under_daily_quota(uuid.uuid4())
 
 
 def test_token_usage_snapshot_from_mapping():
@@ -143,3 +74,26 @@ def test_token_usage_snapshot_from_mapping():
         {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15}
     )
     assert usage == TokenUsageSnapshot(10, 5, 15)
+
+
+def test_token_usage_snapshot_from_usage_metadata_keys():
+    usage = TokenUsageSnapshot.from_mapping(
+        {"input_tokens": 10, "output_tokens": 5, "total_tokens": 15}
+    )
+    assert usage == TokenUsageSnapshot(10, 5, 15)
+
+
+def test_usage_snapshot_from_ai_message_reads_response_metadata():
+    from langchain_core.messages import AIMessage
+
+    message = AIMessage(
+        content="x",
+        response_metadata={
+            "token_usage": {
+                "prompt_tokens": 12,
+                "completion_tokens": 3,
+                "total_tokens": 15,
+            }
+        },
+    )
+    assert usage_snapshot_from_ai_message(message) == TokenUsageSnapshot(12, 3, 15)

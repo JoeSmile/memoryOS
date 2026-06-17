@@ -9,7 +9,6 @@ MOCK_ASSISTANT_TEXT = "".join(MOCK_TOKEN_CHUNKS)
 MOCK_AFTER_TOOL_CHUNKS: list[str] = ["联", "网", "答", "案"]
 MOCK_AFTER_TOOL_TEXT = "".join(MOCK_AFTER_TOOL_CHUNKS)
 
-# Deterministic usage for harness / mock LLM metering (EP09 9.3).
 MOCK_TOKEN_USAGE: dict[str, int] = {
     "prompt_tokens": 48,
     "completion_tokens": len(MOCK_ASSISTANT_TEXT),

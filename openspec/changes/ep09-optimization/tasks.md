@@ -119,7 +119,7 @@
 
 ## 5. Story 9.2 — 性能（performance-cache）
 
-- [ ] 5.1 Embedding Redis 缓存（hash key + TTL）
+- [x] 5.1 Embedding Redis 缓存（hash key + TTL）
   - 预计文件：2 · 层：`embedding_service.py` + config
   - Unit：cache hit/miss
 
