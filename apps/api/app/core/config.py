@@ -190,6 +190,25 @@ class Settings(BaseSettings):
             "enable only behind a trusted reverse proxy (TRUST_PROXY_HEADERS)"
         ),
     )
+    token_quota_enabled: bool = Field(
+        default=False,
+        description="Enforce per-user daily token quota on chat (TOKEN_QUOTA_ENABLED)",
+    )
+    user_daily_token_quota: int = Field(
+        default=100_000,
+        ge=1,
+        le=100_000_000,
+        description="Max total tokens per user per UTC day (USER_DAILY_TOKEN_QUOTA)",
+    )
+    token_quota_request_reserve: int = Field(
+        default=4096,
+        ge=1,
+        le=1_000_000,
+        description=(
+            "Pessimistic per-completion reserve checked at stream start "
+            "(TOKEN_QUOTA_REQUEST_RESERVE); capped by USER_DAILY_TOKEN_QUOTA"
+        ),
+    )
 
     openai_api_key: str | None = Field(
         default=None,

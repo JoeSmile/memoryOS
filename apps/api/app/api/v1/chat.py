@@ -1,14 +1,15 @@
 import json
+import uuid
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import StreamingResponse
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db
+from app.core.database import AsyncSessionLocal, get_db
 from app.core.deps import get_current_user
 from app.core.rate_limit import enforce_chat_rate_limit
-from app.core.redis import get_redis
+from app.core.redis import ensure_redis
 from app.models import User
 from app.core.response import success
 from app.schemas.message import ChatCancelRequest, ChatCompletionRequest
@@ -24,55 +25,65 @@ async def chat_completions(
     background_tasks: BackgroundTasks,
     _: None = Depends(enforce_chat_rate_limit),
     user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-    redis: Redis | None = Depends(get_redis),
 ):
-    service = ChatService(db, redis=redis)
-    await service.conversations.get_owned_conversation(body.conversation_id, user.id)
-    await service.prepare_completion_turn(
-        conversation_id=body.conversation_id,
-        user_id=user.id,
-        content=body.content,
-        client_message_id=body.client_message_id,
-        regenerate=body.regenerate,
-    )
+    # Do not Depends(get_redis) here: enforce_chat_rate_limit already holds that
+    # yield dependency until the SSE response completes (double inject deadlocks).
+    redis: Redis | None = await ensure_redis()
+    stream_id = str(uuid.uuid4())
 
-    stream_state = service.new_completion_stream_state(
-        conversation_id=body.conversation_id,
-        user_id=user.id,
-    )
+    async with AsyncSessionLocal() as db:
+        service = ChatService(db, redis=redis)
+        await service.conversations.get_owned_conversation(body.conversation_id, user.id)
+        quota_reserved = await service.prepare_completion_turn(
+            conversation_id=body.conversation_id,
+            user_id=user.id,
+            content=body.content,
+            client_message_id=body.client_message_id,
+            regenerate=body.regenerate,
+            stream_id=stream_id,
+        )
+
+        stream_state = service.new_completion_stream_state(
+            conversation_id=body.conversation_id,
+            user_id=user.id,
+            stream_id=stream_id,
+            quota_reserved=quota_reserved,
+        )
 
     async def event_generator():
-        try:
-            async for event in service.stream_completion_events(
-                stream_state=stream_state,
-                request=request,
-            ):
-                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+        async with AsyncSessionLocal() as stream_db:
+            stream_service = ChatService(stream_db, redis=redis)
+            try:
+                async for event in stream_service.stream_completion_events(
+                    stream_state=stream_state,
+                    request=request,
+                ):
+                    yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 
-            assistant_id = await service.finalize_completion_stream(
-                stream_state,
-                background_tasks=background_tasks,
-            )
-            if assistant_id is not None:
-                done_data: dict = {
-                    "message_id": str(assistant_id),
-                    "stream_id": stream_state.stream_id,
-                }
-                if stream_state.rag_source_items:
-                    done_data["sources"] = stream_state.rag_source_items
-                done_frame = {"event": "done", "data": done_data}
-                yield f"data: {json.dumps(done_frame, ensure_ascii=False)}\n\n"
-        finally:
-            if not stream_state.persisted:
-                await service.finalize_completion_stream(
+                assistant_id = await stream_service.finalize_completion_stream(
                     stream_state,
                     background_tasks=background_tasks,
                 )
-            await service.release_turn_inflight_lock(
-                body.conversation_id,
-                body.client_message_id,
-            )
+                if assistant_id is not None:
+                    done_data: dict = {
+                        "message_id": str(assistant_id),
+                        "stream_id": stream_state.stream_id,
+                    }
+                    if stream_state.rag_source_items:
+                        done_data["sources"] = stream_state.rag_source_items
+                    done_frame = {"event": "done", "data": done_data}
+                    yield f"data: {json.dumps(done_frame, ensure_ascii=False)}\n\n"
+            finally:
+                if not stream_state.persisted:
+                    await stream_service.finalize_completion_stream(
+                        stream_state,
+                        background_tasks=background_tasks,
+                    )
+                await stream_service.release_quota_reservation(stream_state)
+                await stream_service.release_turn_inflight_lock(
+                    body.conversation_id,
+                    body.client_message_id,
+                )
 
     return StreamingResponse(
         event_generator(),
@@ -86,8 +97,8 @@ async def chat_completions_cancel(
     body: ChatCancelRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    redis: Redis | None = Depends(get_redis),
 ):
+    redis: Redis | None = await ensure_redis()
     service = ChatService(db, redis=redis)
     await service.cancel_stream(
         stream_id=str(body.stream_id),

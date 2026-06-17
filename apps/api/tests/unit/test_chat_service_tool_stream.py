@@ -83,6 +83,7 @@ async def test_stream_completion_events_weak_rag_tool_sse_order():
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
 
     events: list[dict] = []
@@ -111,6 +112,7 @@ async def test_stream_completion_events_sufficient_rag_no_tool_sse():
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
 
     events: list[dict] = []
@@ -130,6 +132,7 @@ async def test_finalize_persists_tool_steps_metadata():
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
 
     async for _event in service.stream_completion_events(stream_state=stream_state):
@@ -150,6 +153,7 @@ async def test_finalize_persists_tool_steps_when_stopped_before_tokens():
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
     stream_state.tool_steps = [
         {
@@ -188,6 +192,7 @@ async def test_stream_completion_events_ignores_unknown_runner_event():
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
 
     events: list[dict] = []
@@ -208,6 +213,7 @@ async def test_agent_tools_disabled_skips_tool_sse(monkeypatch):
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
 
     events: list[dict] = []

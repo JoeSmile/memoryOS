@@ -74,6 +74,7 @@ async def test_stream_persists_interrupted_assistant_on_disconnect(monkeypatch):
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
     events = []
     async for event in service.stream_completion_events(
@@ -157,6 +158,7 @@ async def test_stream_stops_when_cancelled_mid_stream(monkeypatch):
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
     events: list[dict] = []
     async for event in service.stream_completion_events(stream_state=stream_state):
@@ -219,6 +221,7 @@ async def test_stream_persists_interrupted_assistant_on_cancel(monkeypatch):
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
 
     async def cancel_after_start() -> None:
@@ -292,6 +295,7 @@ async def test_finalize_truncates_to_visible_content_on_cancel(monkeypatch):
     stream_state = service.new_completion_stream_state(
         conversation_id=conversation_id,
         user_id=user_id,
+        stream_id="test-stream",
     )
 
     import asyncio
@@ -332,6 +336,7 @@ async def test_finalize_skips_empty_content_when_visible_length_zero():
     stream_state = service.new_completion_stream_state(
         conversation_id=uuid.uuid4(),
         user_id=uuid.uuid4(),
+        stream_id="test-stream",
     )
     stream_state.assistant_parts = ["你"]
 

@@ -30,6 +30,11 @@ from app.services.memory.summary_service import (
     run_summary_background,
     should_schedule_summary,
 )
+from app.services.token_quota_service import (
+    TokenQuotaService,
+    TokenUsageSnapshot,
+    record_completion_usage_safe,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +55,8 @@ class CompletionStreamState:
     disconnected: bool = False
     terminal_error: bool = False
     persisted: bool = False
+    usage: TokenUsageSnapshot | None = None
+    quota_reserved: int = 0
 
 
 class ChatService:
@@ -60,6 +67,7 @@ class ChatService:
         runner: ChatGraphRunner | None = None,
     ) -> None:
         self.db = db
+        self.redis = redis
         self.conversations = ConversationService(db, redis=redis)
         self.messages = MessageRepository(db)
         self.stream_cache = StreamCache(redis)
@@ -172,11 +180,16 @@ class ChatService:
         content: str,
         client_message_id: uuid.UUID | None = None,
         regenerate: bool = False,
-    ) -> None:
+        stream_id: str,
+    ) -> int:
         await self.conversations.get_owned_conversation(conversation_id, user_id)
         if not regenerate:
             assert_chat_content_length(content)
             run_user_input_guards(content)
+        quota_reserved = await TokenQuotaService(self.db, self.redis).reserve_for_completion(
+            user_id,
+            stream_id=stream_id,
+        )
         await self._prepare_user_turn(
             conversation_id=conversation_id,
             user_id=user_id,
@@ -190,11 +203,25 @@ class ChatService:
                 client_message_id,
             )
             if not acquired:
+                await TokenQuotaService(self.db, self.redis).release_reservation(
+                    user_id,
+                    stream_id=stream_id,
+                )
                 raise AppException(
                     code=40902,
                     message="duplicate_message",
                     status_code=409,
                 )
+        return quota_reserved
+
+    async def release_quota_reservation(self, stream_state: CompletionStreamState) -> None:
+        if stream_state.quota_reserved <= 0:
+            return
+        await TokenQuotaService(self.db, self.redis).release_reservation(
+            stream_state.user_id,
+            stream_id=stream_state.stream_id,
+        )
+        stream_state.quota_reserved = 0
 
     async def release_turn_inflight_lock(
         self,
@@ -353,10 +380,14 @@ class ChatService:
         *,
         conversation_id: uuid.UUID,
         user_id: uuid.UUID,
+        stream_id: str,
+        quota_reserved: int = 0,
     ) -> CompletionStreamState:
         return CompletionStreamState(
             conversation_id=conversation_id,
             user_id=user_id,
+            stream_id=stream_id,
+            quota_reserved=quota_reserved,
         )
 
     async def stream_completion_events(
@@ -456,6 +487,7 @@ class ChatService:
                 stream_state.stream_id,
             )
             yield {"event": "error", "data": {"message": "stream_failed"}}
+        stream_state.usage = self.runner.last_completion_usage
 
     async def _maybe_schedule_summary_background(
         self,
@@ -552,6 +584,14 @@ class ChatService:
             metadata["tool_steps"] = stream_state.tool_steps
         if metadata:
             assistant.metadata_ = metadata
+        if stream_state.usage is not None:
+            await record_completion_usage_safe(
+                self.db,
+                user_id=stream_state.user_id,
+                conversation_id=stream_state.conversation_id,
+                usage=stream_state.usage,
+                message_id=assistant.id,
+            )
         await self.conversations.touch_activity(stream_state.conversation_id)
         await self.db.commit()
         await self.conversations.invalidate_list_cache(stream_state.user_id)

@@ -105,10 +105,10 @@
 
 ## 4. Story 9.3 — Token 与成本（token-usage）
 
-- [ ] 4.1 Alembic `token_usage` 表 + repository
+- [x] 4.1 Alembic `token_usage` 表 + repository
   - 预计文件：2 · 层：migration + `repositories/token_usage_repository.py`
 
-- [ ] 4.2 `UsageRecorder` 协议 + `ChatService` finalize 写入；日聚合查配额
+- [x] 4.2 `UsageRecorder` 协议 + `ChatService` finalize 写入；日聚合查配额
   - 预计文件：2 · 层：`services/token_quota_service.py` + `chat_service.py`（embedded recorder）
   - Harness：mock usage 落库；超配额 42902
   - **EP13**：remote 模式由 EP13 接 SSE usage 回传，复用同一 `UsageRecorder`（EP09 仅 protocol + embedded 实现）
