@@ -109,7 +109,7 @@ HTTP 状态码与 `code` 可分离：例如鉴权失败 HTTP 401，`code` 为业
 - `app/core/deps.py`：`get_current_user` 解析 Bearer，失败 `401` + `code` 40101。
 - `POST /api/v1/users` 保留供 harness/开发，**deprecated**（无密码快捷建用户）。
 
-**业务码**：`40101` 未认证/无效 token · `40102` 登录凭证错误 · `40901` 邮箱已存在 · `50301` JWT 未配置（`JWT_SECRET` 缺失时 login/me）。
+**业务码**：`40101` 未认证/无效 token · `40102` 登录凭证错误 · `40901` 邮箱已存在 · `42901` 限流超限 · `50301` JWT 未配置（`JWT_SECRET` 缺失时 login/me）· `50302` 限流依赖 Redis 不可用且 fail-closed。
 
 **前端**：`apps/web/lib/api-client.ts` 自动附加 Bearer；已登录时 HTTP 401 清 `localStorage` 的 `memoryos_access_token` 并跳转 `/login`（首版 localStorage，EP09 可改 httpOnly）。
 

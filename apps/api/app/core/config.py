@@ -145,6 +145,52 @@ class Settings(BaseSettings):
         description="llm-injection-guard PromptScanner threshold (LLM_INJECTION_GUARD_THRESHOLD_SCORE)",
     )
 
+    rate_limit_enabled: bool = Field(
+        default=False,
+        description="Redis sliding-window rate limits (RATE_LIMIT_ENABLED)",
+    )
+    rate_limit_fail_open: bool = Field(
+        default=True,
+        description="Allow requests when Redis is unavailable (RATE_LIMIT_FAIL_OPEN)",
+    )
+    rate_limit_window_seconds: int = Field(
+        default=60,
+        ge=1,
+        le=3600,
+        description="Sliding window size in seconds (RATE_LIMIT_WINDOW_SECONDS)",
+    )
+    rate_limit_chat_per_min: int = Field(
+        default=60,
+        ge=1,
+        le=10_000,
+        description="Chat completions per window per user (RATE_LIMIT_CHAT_PER_MIN)",
+    )
+    rate_limit_demo_turn_per_min: int = Field(
+        default=30,
+        ge=1,
+        le=10_000,
+        description="Demo-turn per window per user (RATE_LIMIT_DEMO_TURN_PER_MIN)",
+    )
+    rate_limit_login_per_ip_per_min: int = Field(
+        default=10,
+        ge=1,
+        le=10_000,
+        description="Login attempts per window per IP (RATE_LIMIT_LOGIN_PER_IP_PER_MIN)",
+    )
+    rate_limit_register_per_ip_per_min: int = Field(
+        default=10,
+        ge=1,
+        le=10_000,
+        description="Register attempts per window per IP (RATE_LIMIT_REGISTER_PER_IP_PER_MIN)",
+    )
+    trust_proxy_headers: bool = Field(
+        default=False,
+        description=(
+            "Trust X-Forwarded-For for client_ip (rate limit / audit); "
+            "enable only behind a trusted reverse proxy (TRUST_PROXY_HEADERS)"
+        ),
+    )
+
     openai_api_key: str | None = Field(
         default=None,
         description="OpenAI API key — unset enables mock LLM in ep02-langgraph",

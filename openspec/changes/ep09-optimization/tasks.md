@@ -90,15 +90,15 @@
 
 > 设计：[`docs/tech/rate-limit-audit.md`](../../../docs/tech/rate-limit-audit.md)
 
-- [ ] 3.1 Redis 滑动窗口 limiter 工具 + env 开关
+- [x] 3.1 Redis 滑动窗口 limiter 工具 + env 开关
   - 预计文件：2 · 层：`core/rate_limit.py` + `core/config.py`
   - Key：`rl:{route_class}:{user_id|ip}`；**多 API Pod 共享 Redis**（§12.3）
 
-- [ ] 3.2 接入 login / chat completions / demo-turn 路由
+- [x] 3.2 接入 login / chat completions / demo-turn 路由
   - 预计文件：2 · 层：`middleware/rate_limit.py` 或 router Depends
   - **仅北向 FastAPI**；Remote Graph 不对公网；Harness：超限 42901
 
-- [ ] 3.3 Alembic `audit_log` 表 + 写入 demo-turn / login 失败
+- [x] 3.3 Alembic `audit_log` 表 + 写入 demo-turn / login 失败
   - 预计文件：3 · 层：migration + `repositories/audit_repository.py` + demo-turn 钩子
   - Harness：demo-turn 后 audit 行存在
   - 敏感操作在 **API handler** 写入；EP13 internal 路由扩展留 metadata 字段

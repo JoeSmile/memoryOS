@@ -10,6 +10,12 @@ logger = logging.getLogger(__name__)
 _redis: Redis | None = None
 
 
+def discard_redis() -> None:
+    """Drop cached client without closing (safe when the event loop may be closed)."""
+    global _redis
+    _redis = None
+
+
 def create_redis_client() -> Redis | None:
     if not settings.redis_url:
         return None
@@ -36,8 +42,16 @@ async def get_redis() -> AsyncGenerator[Redis | None, None]:
 
 async def close_redis() -> None:
     global _redis
-    if _redis is not None:
+    if _redis is None:
+        return
+    try:
         await _redis.aclose()
+    except RuntimeError:
+        # pytest may tear down the event loop before fixture teardown runs.
+        logger.debug("Redis close skipped (event loop closed)", exc_info=True)
+    except Exception:
+        logger.debug("Redis close failed", exc_info=True)
+    finally:
         _redis = None
 
 

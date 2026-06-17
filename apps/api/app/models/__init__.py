@@ -1,3 +1,4 @@
+from app.models.audit_log import AuditLog
 from app.models.base import Base
 from app.models.conversation import Conversation
 from app.models.knowledge import Document, DocumentChunk, EMBEDDING_DIMENSIONS
@@ -29,6 +30,7 @@ from app.models.worldcup import (
 
 __all__ = [
     "Base",
+    "AuditLog",
     "User",
     "Conversation",
     "Message",

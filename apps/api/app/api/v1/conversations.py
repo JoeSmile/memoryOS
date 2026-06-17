@@ -1,14 +1,18 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+import logging
+
+from fastapi import APIRouter, Depends, Request
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.deps import get_current_user
+from app.core.rate_limit import client_ip, enforce_demo_turn_rate_limit
 from app.core.redis import get_redis
 from app.core.response import success
 from app.models import User
+from app.repositories.audit_repository import AuditRepository
 from app.schemas.conversation import ConversationCreate, ConversationRead
 from app.schemas.demo_analysis import DemoTurnRequest, DemoTurnResponse
 from app.schemas.message import MessageRead
@@ -16,6 +20,8 @@ from app.repositories.message_repository import MessageRepository
 from app.repositories.wc_match_repository import WcMatchRepository
 from app.services.demo_analysis_service import DemoAnalysisService
 from app.services.conversation_service import ConversationService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/conversations", tags=["conversations"])
 
@@ -75,6 +81,8 @@ async def list_my_conversations(
 async def append_demo_analysis_turn(
     conversation_id: UUID,
     body: DemoTurnRequest,
+    request: Request,
+    _: None = Depends(enforce_demo_turn_rate_limit),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     redis: Redis | None = Depends(get_redis),
@@ -91,6 +99,21 @@ async def append_demo_analysis_turn(
         match_id=body.match_id,
         template_id=body.template_id,
     )
+    try:
+        await AuditRepository(db).append_demo_turn(
+            user_id=user.id,
+            conversation_id=conversation_id,
+            template_id=body.template_id,
+            match_id=body.match_id,
+            ip_address=client_ip(request),
+            user_agent=request.headers.get("user-agent"),
+        )
+    except Exception:
+        logger.exception(
+            "audit_append_failed action=demo_turn conversation_id=%s user_id=%s",
+            conversation_id,
+            user.id,
+        )
     await db.commit()
     return success(
         data=DemoTurnResponse(
