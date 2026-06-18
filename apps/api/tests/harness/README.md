@@ -80,6 +80,7 @@ pytest tests/harness -q
 | `test_conversations_contract.py` | 会话 CRUD |
 | `test_conversations_cache_contract.py` | 会话列表 Redis 缓存 |
 | `test_chat_sse_contract.py` | 聊天 SSE、消息落库 |
+| `test_chat_stream_lifecycle_contract.py` | 慢 SSE 期间 DB 请求不假死；可选 TCP（`HARNESS_TCP_URL`） |
 | `test_chat_cancel_contract.py` | Stop / cancel API |
 | `test_rag_contract.py` | 检索 API |
 | `test_rag_chat_contract.py` | RAG + chat SSE、sources |
@@ -96,7 +97,7 @@ pytest tests/harness -q
 | 层 | 位置 | 命令 | 职责 |
 |:---|:-----|:-----|:-----|
 | API L1 | `apps/api/tests/harness/` | `pnpm test:api:harness` | FastAPI + SSE 契约 |
-| API unit | `apps/api/tests/unit/` | `pytest tests/unit` | service / sanitizer / 限流算法 |
+| API unit | `apps/api/tests/unit/` | `pytest tests/unit` | service / sanitizer / 限流算法 / **SSE route guards** |
 | Web unit | `apps/web/tests/unit/` | `pnpm --filter @memoryos/web test` | BFF 帧映射、UI 纯函数（如 `chat-thinking-state`） |
 
 流式全链路 = **Harness（API 形状）+ Web unit（BFF 映射）**；不替代手工 smoke。

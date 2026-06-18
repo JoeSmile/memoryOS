@@ -38,6 +38,80 @@ function mockSseResponse(body: string): Response {
   );
 }
 
+/** Enqueue one SSE chunk per pull with delay — simulates slow upstream LLM. */
+function mockSlowSseResponse(frames: string[], delayMs: number): Response {
+  let index = 0;
+  return new Response(
+    new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        if (index >= frames.length) {
+          controller.close();
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        controller.enqueue(new TextEncoder().encode(frames[index]));
+        index += 1;
+      },
+    }),
+    {
+      headers: { "Content-Type": "text/event-stream" },
+    },
+  );
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Consume UI stream like useChat: one pull() at a time with delay between reads. */
+async function readUiStreamPartsThrottled(
+  stream: ReadableStream<Uint8Array>,
+  consumerDelayMs: number,
+): Promise<{ parts: UiStreamPart[]; firstTextDeltaMs: number | null }> {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  const parts: UiStreamPart[] = [];
+  let firstTextDeltaMs: number | null = null;
+  const startedAt = Date.now();
+
+  while (true) {
+    await sleep(consumerDelayMs);
+    const { done, value } = await reader.read();
+    if (value) {
+      buffer += decoder.decode(value, { stream: true });
+    }
+    if (done) {
+      buffer += decoder.decode();
+    }
+
+    const blocks = buffer.split("\n\n");
+    buffer = done ? "" : (blocks.pop() ?? "");
+
+    for (const block of blocks) {
+      const trimmed = block.trim();
+      if (!trimmed.startsWith("data:")) {
+        continue;
+      }
+      const payload = trimmed.slice(5).trim();
+      if (payload === "[DONE]") {
+        continue;
+      }
+      const part = JSON.parse(payload) as UiStreamPart;
+      parts.push(part);
+      if (firstTextDeltaMs === null && part.type === "text-delta") {
+        firstTextDeltaMs = Date.now() - startedAt;
+      }
+    }
+
+    if (done) {
+      break;
+    }
+  }
+
+  return { parts, firstTextDeltaMs };
+}
+
 type UiStreamPart = Record<string, unknown>;
 
 async function readUiStreamParts(
@@ -251,5 +325,55 @@ describe("memoryosSseResponseToDataStream", () => {
 
     const textDeltas = parts.filter((part) => part.type === "text-delta");
     expect(textDeltas.map((part) => part.delta).join("")).toEqual("根据1.");
+  });
+
+  it("emits text-delta under slow upstream and throttled consumer (backpressure)", async () => {
+    const longText = "一二三四五六七八九十十一十二十三十四十五";
+    const tokenFrames = [...longText].map((char) =>
+      sseFrame("token", { content: char }),
+    );
+    const upstream = mockSlowSseResponse(
+      [
+        sseFrame("start", { stream_id: "stream-backpressure" }),
+        ...tokenFrames,
+        sseFrame("done", { message_id: MESSAGE_ID }),
+      ],
+      15,
+    );
+
+    const { parts, firstTextDeltaMs } = await readUiStreamPartsThrottled(
+      memoryosSseResponseToDataStream(upstream),
+      40,
+    );
+
+    expect(firstTextDeltaMs).not.toBeNull();
+    expect(firstTextDeltaMs!).toBeLessThan(5_000);
+
+    const textDeltas = parts.filter((part) => part.type === "text-delta");
+    expect(textDeltas.map((part) => part.delta).join("")).toEqual(longText);
+    expect(partTypes(parts).at(-1)).toBe("finish");
+  });
+
+  it("completes within timeout when coalesced tokens arrive one char at a time", async () => {
+    const chars = "abcdefghijklmnopqrstuvwxyz";
+    const upstream = mockSlowSseResponse(
+      [
+        sseFrame("start", { stream_id: "stream-coalesce" }),
+        ...[...chars].map((char) => sseFrame("token", { content: char })),
+        sseFrame("done", { message_id: MESSAGE_ID }),
+      ],
+      10,
+    );
+
+    const startedAt = Date.now();
+    const { parts } = await readUiStreamPartsThrottled(
+      memoryosSseResponseToDataStream(upstream),
+      30,
+    );
+    const elapsedMs = Date.now() - startedAt;
+
+    expect(elapsedMs).toBeLessThan(15_000);
+    const textDeltas = parts.filter((part) => part.type === "text-delta");
+    expect(textDeltas.map((part) => part.delta).join("")).toEqual(chars);
   });
 });
