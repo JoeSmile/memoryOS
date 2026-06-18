@@ -5,6 +5,7 @@ from collections.abc import AsyncIterator
 from typing import Any, Literal, TypedDict
 
 from langchain_core.messages import AIMessage, ToolMessage
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
@@ -111,13 +112,13 @@ def _events_from_call_model_output(output: dict[str, Any]) -> list[RunnerStreamE
         if not isinstance(message, AIMessage):
             continue
         tool_calls = getattr(message, "tool_calls", None) or []
+        text = _text_content(message)
+        if text:
+            for chunk in _chunk_content_for_stream(text):
+                events.append({"type": "token", "content": chunk})
         if tool_calls:
             for call in tool_calls:
                 events.append({"type": "tool_call", "data": _format_tool_call(call)})
-            continue
-        text = _text_content(message)
-        for chunk in _chunk_content_for_stream(text):
-            events.append({"type": "token", "content": chunk})
     return events
 
 
@@ -221,12 +222,15 @@ class ChatGraphRunner:
         *,
         db: AsyncSession | None,
         thread_id: str | None,
+        redis: Redis | None = None,
     ) -> dict[str, Any]:
         configurable: dict[str, Any] = {}
         if db is not None:
             configurable["db"] = db
         if thread_id:
             configurable["thread_id"] = thread_id
+        if redis is not None:
+            configurable["redis"] = redis
         return {"configurable": configurable} if configurable else {}
 
     def _run_config(
@@ -234,10 +238,12 @@ class ChatGraphRunner:
         *,
         db: AsyncSession | None,
         thread_id: str | None,
+        redis: Redis | None = None,
     ) -> dict[str, Any]:
         config = self._graph_config(
             db=db,
             thread_id=thread_id,
+            redis=redis,
         )
         if settings.agent_tools_enabled:
             recursion_limit = settings.agent_max_iterations
@@ -255,13 +261,14 @@ class ChatGraphRunner:
         state: ChatState,
         *,
         db: AsyncSession | None,
+        redis: Redis | None = None,
     ) -> None:
         self._last_retrieved_chunks = []
-        if not settings.rag_chat_enabled or db is None:
+        if not settings.rag_chat_enabled:
             return
         update = await retrieve_knowledge(
             state,
-            self._graph_config(db=db, thread_id=None),
+            self._graph_config(db=db, thread_id=None, redis=redis),
         )
         self._last_retrieved_chunks = update.get("retrieved_chunks") or []
 
@@ -270,9 +277,10 @@ class ChatGraphRunner:
         state: ChatState,
         *,
         db: AsyncSession | None,
+        redis: Redis | None = None,
     ) -> AsyncIterator[RunnerStreamEvent]:
         """EP04 mock path when AGENT_TOOLS_ENABLED=false."""
-        await self._retrieve_for_mock_stream(state, db=db)
+        await self._retrieve_for_mock_stream(state, db=db, redis=redis)
         self._add_completion_usage(
             TokenUsageSnapshot.from_mapping(mock_model.MOCK_TOKEN_USAGE)
         )
@@ -285,10 +293,11 @@ class ChatGraphRunner:
         *,
         thread_id: str | None,
         db: AsyncSession | None,
+        redis: Redis | None = None,
     ) -> AsyncIterator[RunnerStreamEvent]:
         """ReAct path: astream(updates) preserves completion_usage (astream_events does not)."""
         self._last_retrieved_chunks = []
-        config = self._run_config(db=db, thread_id=thread_id)
+        config = self._run_config(db=db, thread_id=thread_id, redis=redis)
 
         async for chunk in self._graph.astream(
             state,
@@ -323,9 +332,10 @@ class ChatGraphRunner:
         *,
         thread_id: str | None,
         db: AsyncSession | None,
+        redis: Redis | None = None,
     ) -> AsyncIterator[RunnerStreamEvent]:
         self._last_retrieved_chunks = []
-        config = self._run_config(db=db, thread_id=thread_id)
+        config = self._run_config(db=db, thread_id=thread_id, redis=redis)
 
         async with contextlib.aclosing(
             self._graph.astream_events(state, config=config, version="v2")
@@ -373,9 +383,10 @@ class ChatGraphRunner:
         *,
         thread_id: str | None,
         db: AsyncSession | None,
+        redis: Redis | None = None,
     ) -> AsyncIterator[RunnerStreamEvent]:
         if settings.use_mock_llm and not settings.agent_tools_enabled:
-            async for event in self._iter_legacy_mock_tokens(state, db=db):
+            async for event in self._iter_legacy_mock_tokens(state, db=db, redis=redis):
                 yield event
             return
 
@@ -384,6 +395,7 @@ class ChatGraphRunner:
                 state,
                 thread_id=thread_id,
                 db=db,
+                redis=redis,
             ):
                 yield event
             return
@@ -392,6 +404,7 @@ class ChatGraphRunner:
             state,
             thread_id=thread_id,
             db=db,
+            redis=redis,
         ):
             yield event
 
@@ -439,6 +452,7 @@ class ChatGraphRunner:
         *,
         thread_id: str | None = None,
         db: AsyncSession | None = None,
+        redis: Redis | None = None,
         request: Request | None = None,
         stream_id: str | None = None,
         cancel_cache: StreamCancelCache | None = None,
@@ -449,6 +463,7 @@ class ChatGraphRunner:
             state,
             thread_id=thread_id,
             db=db,
+            redis=redis,
         )
         async for event in self._stream_with_cancel(
             agen,

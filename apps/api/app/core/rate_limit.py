@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
+import uuid
 from dataclasses import dataclass
 from enum import StrEnum
 from uuid import uuid4
@@ -13,10 +14,9 @@ from redis.asyncio import Redis
 from redis.exceptions import NoScriptError, RedisError
 
 from app.core.config import settings
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user_id
 from app.core.exceptions import AppException
-from app.core.redis import get_redis
-from app.models import User
+from app.core.redis import ensure_redis, get_redis
 
 logger = logging.getLogger(__name__)
 
@@ -219,22 +219,22 @@ async def enforce_register_rate_limit(
 
 
 async def enforce_chat_rate_limit(
-    user: User = Depends(get_current_user),
-    redis: Redis | None = Depends(get_redis),
+    user_id: uuid.UUID = Depends(get_current_user_id),
 ) -> None:
+    redis = await ensure_redis()
     await assert_rate_limit_allowed(
         redis,
         route_class=RouteClass.CHAT,
-        identity=user_identity(str(user.id)),
+        identity=user_identity(str(user_id)),
     )
 
 
 async def enforce_demo_turn_rate_limit(
-    user: User = Depends(get_current_user),
-    redis: Redis | None = Depends(get_redis),
+    user_id: uuid.UUID = Depends(get_current_user_id),
 ) -> None:
+    redis = await ensure_redis()
     await assert_rate_limit_allowed(
         redis,
         route_class=RouteClass.DEMO_TURN,
-        identity=user_identity(str(user.id)),
+        identity=user_identity(str(user_id)),
     )

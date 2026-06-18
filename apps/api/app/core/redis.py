@@ -23,6 +23,8 @@ def create_redis_client() -> Redis | None:
         settings.redis_url,
         encoding="utf-8",
         decode_responses=True,
+        socket_connect_timeout=2.0,
+        socket_timeout=5.0,
     )
 
 
@@ -37,7 +39,8 @@ async def ensure_redis() -> Redis | None:
 
 
 async def get_redis() -> AsyncGenerator[Redis | None, None]:
-    yield await ensure_redis()
+    client = await ensure_redis()
+    yield client
 
 
 async def close_redis() -> None:

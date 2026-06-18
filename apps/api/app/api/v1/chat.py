@@ -1,17 +1,17 @@
 import json
 import uuid
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import AsyncSessionLocal, get_db
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, get_current_user_id
 from app.core.rate_limit import enforce_chat_rate_limit
 from app.core.redis import ensure_redis
-from app.models import User
 from app.core.response import success
+from app.models import User
 from app.schemas.message import ChatCancelRequest, ChatCompletionRequest
 from app.services.chat_service import ChatService
 
@@ -22,20 +22,18 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 async def chat_completions(
     body: ChatCompletionRequest,
     request: Request,
-    background_tasks: BackgroundTasks,
     _: None = Depends(enforce_chat_rate_limit),
-    user: User = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user_id),
 ):
-    # Do not Depends(get_redis) here: enforce_chat_rate_limit already holds that
-    # yield dependency until the SSE response completes (double inject deadlocks).
+    # No Depends(get_db/get_redis) on SSE — yield deps would stay open for the whole stream.
     redis: Redis | None = await ensure_redis()
 
     async with AsyncSessionLocal() as db:
         service = ChatService(db, redis=redis)
-        await service.conversations.get_owned_conversation(body.conversation_id, user.id)
+        await service.conversations.get_owned_conversation(body.conversation_id, user_id)
         await service.prepare_completion_turn(
             conversation_id=body.conversation_id,
-            user_id=user.id,
+            user_id=user_id,
             content=body.content,
             client_message_id=body.client_message_id,
             regenerate=body.regenerate,
@@ -43,22 +41,24 @@ async def chat_completions(
 
         stream_state = service.new_completion_stream_state(
             conversation_id=body.conversation_id,
-            user_id=user.id,
+            user_id=user_id,
         )
 
     async def event_generator():
+        yield f"data: {json.dumps({'event': 'start', 'data': {'stream_id': stream_state.stream_id}}, ensure_ascii=False)}\n\n"
+
         async with AsyncSessionLocal() as stream_db:
             stream_service = ChatService(stream_db, redis=redis)
             try:
                 async for event in stream_service.stream_completion_events(
                     stream_state=stream_state,
                     request=request,
+                    skip_start_event=True,
                 ):
                     yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 
                 assistant_id = await stream_service.finalize_completion_stream(
                     stream_state,
-                    background_tasks=background_tasks,
                 )
                 if assistant_id is not None:
                     done_data: dict = {
@@ -73,17 +73,28 @@ async def chat_completions(
                 if not stream_state.persisted:
                     await stream_service.finalize_completion_stream(
                         stream_state,
-                        background_tasks=background_tasks,
                     )
                 await stream_service.release_turn_inflight_lock(
                     body.conversation_id,
                     body.client_message_id,
                 )
 
+    gen = event_generator()
+    first_frame = await gen.__anext__()
+
+    async def stream_body():
+        yield first_frame
+        async for chunk in gen:
+            yield chunk
+
     return StreamingResponse(
-        event_generator(),
+        stream_body(),
         media_type="text/event-stream",
-        headers={"X-Stream-Id": stream_state.stream_id},
+        headers={
+            "X-Stream-Id": stream_state.stream_id,
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
     )
 
 

@@ -11,6 +11,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END
 
 from app.graphs.chat_state import ChatState
+from app.graphs.db_scope import graph_db_session
 from app.tools import ToolContext, build_tool_executor
 
 logger = logging.getLogger(__name__)
@@ -96,40 +97,40 @@ async def execute_tools(state: ChatState, config: RunnableConfig) -> dict:
         return {}
 
     configurable = config.get("configurable") or {}
-    db = configurable.get("db")
     user_id = state.get("user_id", "")
 
     executor = build_tool_executor()
     tool_messages: list[ToolMessage] = []
 
-    for index, call in enumerate(tool_calls):
-        name, tool_call_id, arguments = _tool_call_fields(call)
-        if not tool_call_id:
-            tool_call_id = f"malformed_{index}"
-            logger.warning("tool call missing id, using placeholder: %r", call)
+    async with graph_db_session(config) as db:
+        for index, call in enumerate(tool_calls):
+            name, tool_call_id, arguments = _tool_call_fields(call)
+            if not tool_call_id:
+                tool_call_id = f"malformed_{index}"
+                logger.warning("tool call missing id, using placeholder: %r", call)
 
-        if not name:
-            logger.warning("malformed tool call missing name: %r", call)
+            if not name:
+                logger.warning("malformed tool call missing name: %r", call)
+                tool_messages.append(
+                    ToolMessage(
+                        content=_error_tool_content("malformed_tool_call: missing tool name"),
+                        tool_call_id=tool_call_id,
+                        name="unknown",
+                    )
+                )
+                continue
+
+            result = await executor.run(
+                name,
+                arguments,
+                ToolContext(user_id=user_id, db=db),
+            )
             tool_messages.append(
                 ToolMessage(
-                    content=_error_tool_content("malformed_tool_call: missing tool name"),
+                    content=_tool_result_content(result),
                     tool_call_id=tool_call_id,
-                    name="unknown",
+                    name=name,
                 )
             )
-            continue
-
-        result = await executor.run(
-            name,
-            arguments,
-            ToolContext(user_id=user_id, db=db),
-        )
-        tool_messages.append(
-            ToolMessage(
-                content=_tool_result_content(result),
-                tool_call_id=tool_call_id,
-                name=name,
-            )
-        )
 
     return {"messages": tool_messages}

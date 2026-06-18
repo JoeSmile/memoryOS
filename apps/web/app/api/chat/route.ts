@@ -8,7 +8,7 @@ import {
 } from "@/lib/memoryos-upstream";
 import { evaluateBffPromptGuard } from "@/lib/prompt-guard";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 const EMPTY_UI_MESSAGE_STREAM_BODY = [
   'data: {"type":"start"}\n\n',

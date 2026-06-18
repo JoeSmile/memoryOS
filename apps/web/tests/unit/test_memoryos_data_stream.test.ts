@@ -109,11 +109,13 @@ describe("memoryosSseResponseToDataStream", () => {
       types.indexOf("text-start"),
     );
 
-    const ragPart = parts.find((part) => part.type === RAG_SOURCES_UI_DATA_TYPE);
+    const ragPart = parts.find(
+      (part) => part.type === RAG_SOURCES_UI_DATA_TYPE,
+    );
     expect(ragPart?.data).toEqual({ items: SAMPLE_SOURCES });
 
     const textDeltas = parts.filter((part) => part.type === "text-delta");
-    expect(textDeltas.map((part) => part.delta)).toEqual(["你", "好"]);
+    expect(textDeltas.map((part) => part.delta).join("")).toEqual("你好");
 
     const metadataPart = parts.find((part) => part.type === "message-metadata");
     expect(metadataPart?.messageMetadata).toEqual({
@@ -146,7 +148,9 @@ describe("memoryosSseResponseToDataStream", () => {
     expect(types).toContain("text-end");
 
     const metadataPart = parts.find((part) => part.type === "message-metadata");
-    expect(metadataPart?.messageMetadata).toEqual({ messageId: plainMessageId });
+    expect(metadataPart?.messageMetadata).toEqual({
+      messageId: plainMessageId,
+    });
   });
 
   it("maps tool_call and tool_result before text in ReAct order", async () => {
@@ -184,7 +188,9 @@ describe("memoryosSseResponseToDataStream", () => {
     expect(toolResultIndex).toBeGreaterThan(toolCallIndex);
     expect(textStartIndex).toBeGreaterThan(toolResultIndex);
 
-    const toolCallPart = parts.find((part) => part.type === TOOL_CALL_UI_DATA_TYPE);
+    const toolCallPart = parts.find(
+      (part) => part.type === TOOL_CALL_UI_DATA_TYPE,
+    );
     expect(toolCallPart?.data).toEqual({
       id: "mock_call_tavily",
       name: "tavily_search",
@@ -203,6 +209,47 @@ describe("memoryosSseResponseToDataStream", () => {
     });
 
     const textDeltas = parts.filter((part) => part.type === "text-delta");
-    expect(textDeltas.map((part) => part.delta)).toEqual(["联", "网"]);
+    expect(textDeltas.map((part) => part.delta).join("")).toEqual("联网");
+  });
+
+  it("closes text before tool round then resumes text after tool_result", async () => {
+    const upstream = mockSseResponse(
+      [
+        sseFrame("start", { stream_id: "stream-react-mid" }),
+        sseFrame("sources", { items: SAMPLE_SOURCES }),
+        sseFrame("token", { content: "根" }),
+        sseFrame("token", { content: "据" }),
+        sseFrame("tool_call", {
+          id: "call_1",
+          name: "tavily_search",
+          arguments: { query: "2022 top scorers" },
+        }),
+        sseFrame("tool_result", {
+          id: "call_1",
+          name: "tavily_search",
+          success: true,
+          summary: "mock summary",
+        }),
+        sseFrame("token", { content: "1" }),
+        sseFrame("token", { content: "." }),
+        sseFrame("done", { message_id: MESSAGE_ID }),
+      ].join(""),
+    );
+
+    const parts = await readUiStreamParts(
+      memoryosSseResponseToDataStream(upstream),
+    );
+    const types = partTypes(parts);
+
+    const firstTextEnd = types.indexOf("text-end");
+    const toolCallIndex = types.indexOf(TOOL_CALL_UI_DATA_TYPE);
+    const secondTextStart = types.indexOf("text-start", firstTextEnd + 1);
+
+    expect(firstTextEnd).toBeGreaterThan(types.indexOf("text-delta"));
+    expect(toolCallIndex).toBeGreaterThan(firstTextEnd);
+    expect(secondTextStart).toBeGreaterThan(toolCallIndex);
+
+    const textDeltas = parts.filter((part) => part.type === "text-delta");
+    expect(textDeltas.map((part) => part.delta).join("")).toEqual("根据1.");
   });
 });

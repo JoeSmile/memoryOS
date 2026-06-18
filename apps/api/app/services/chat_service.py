@@ -1,14 +1,13 @@
 import asyncio
 import logging
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Coroutine
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, TypeVar
 
 from langchain_core.messages import AIMessage, HumanMessage
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.background import BackgroundTasks
 from starlette.requests import Request
 
 from app.cache.completion_turn_lock import CompletionTurnLock
@@ -37,6 +36,22 @@ from app.services.token_quota_service import (
 )
 
 logger = logging.getLogger(__name__)
+
+_T = TypeVar("_T")
+
+
+def _schedule_detached_background(coro: Coroutine[Any, Any, _T], *, name: str) -> None:
+    """Fire-and-forget — must not use Starlette BackgroundTasks on SSE (blocks BFF until done)."""
+    task = asyncio.create_task(coro, name=name)
+
+    def _log_failure(done: asyncio.Task[_T]) -> None:
+        if done.cancelled():
+            return
+        exc = done.exception()
+        if exc is not None:
+            logger.exception("detached background task %s failed", name, exc_info=exc)
+
+    task.add_done_callback(_log_failure)
 
 
 class _ClientDisconnected(Exception):
@@ -283,7 +298,8 @@ class ChatService:
         async for event in self.runner.stream_events(
             state,
             thread_id=str(conversation_id),
-            db=self.db,
+            db=None,
+            redis=self.stream_cache.redis,
             request=request,
             stream_id=stream_id,
             cancel_cache=self.cancel_cache,
@@ -372,6 +388,7 @@ class ChatService:
         *,
         stream_state: CompletionStreamState,
         request: Request | None = None,
+        skip_start_event: bool = False,
     ) -> AsyncIterator[dict]:
         history = await self.messages.list_by_conversation_id(
             stream_state.conversation_id,
@@ -391,7 +408,8 @@ class ChatService:
             stream_state.conversation_id,
             stream_state.user_id,
         )
-        yield {"event": "start", "data": {"stream_id": stream_state.stream_id}}
+        if not skip_start_event:
+            yield {"event": "start", "data": {"stream_id": stream_state.stream_id}}
 
         sources_emitted = False
         pending_tool_calls: dict[str, dict[str, Any]] = {}
@@ -469,7 +487,6 @@ class ChatService:
     async def _maybe_schedule_summary_background(
         self,
         conversation_id: uuid.UUID,
-        background_tasks: BackgroundTasks | None,
     ) -> None:
         conversation = await self.conversations.conversations.get_by_id(
             conversation_id,
@@ -482,32 +499,23 @@ class ChatService:
         if not decision.should_schedule:
             return
 
-        if background_tasks is None:
-            logger.warning(
-                "summary scheduled but BackgroundTasks missing conversation_id=%s",
-                conversation_id,
-            )
-            return
-
-        background_tasks.add_task(run_summary_background, conversation_id)
+        _schedule_detached_background(
+            run_summary_background(conversation_id),
+            name=f"summary-{conversation_id}",
+        )
 
     def _maybe_schedule_memory_extract_background(
         self,
         conversation_id: uuid.UUID,
         user_id: uuid.UUID,
-        background_tasks: BackgroundTasks | None,
     ) -> None:
         if not settings.memory_enabled or not settings.memory_long_term_enabled:
             return
 
-        if background_tasks is None:
-            logger.warning(
-                "memory extract scheduled but BackgroundTasks missing conversation_id=%s",
-                conversation_id,
-            )
-            return
-
-        background_tasks.add_task(run_extract_background, conversation_id, user_id)
+        _schedule_detached_background(
+            run_extract_background(conversation_id, user_id),
+            name=f"memory-extract-{conversation_id}",
+        )
 
     async def _record_completion_usage_for_turn(
         self,
@@ -529,8 +537,6 @@ class ChatService:
     async def finalize_completion_stream(
         self,
         stream_state: CompletionStreamState,
-        *,
-        background_tasks: BackgroundTasks | None = None,
     ) -> uuid.UUID | None:
         """Always run from router finally — BFF may close before generator postamble."""
         visible_content = await self.cancel_cache.get_visible_content(
@@ -601,10 +607,8 @@ class ChatService:
             self._maybe_schedule_memory_extract_background(
                 stream_state.conversation_id,
                 stream_state.user_id,
-                background_tasks,
             )
             await self._maybe_schedule_summary_background(
                 stream_state.conversation_id,
-                background_tasks,
             )
         return assistant_id

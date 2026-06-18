@@ -7,10 +7,10 @@ from typing import Any
 
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.graphs.chat_state import ChatState
+from app.graphs.db_scope import graph_db_session
 from app.repositories.memory_repository import MemoryRepository, SimilarMemoryRow
 from app.services.embedding_service import EmbeddingService
 
@@ -43,11 +43,6 @@ async def load_user_memories(state: ChatState, config: RunnableConfig) -> dict:
     if not settings.memory_enabled or not settings.memory_long_term_enabled:
         return {"memory_snippets": []}
 
-    configurable = config.get("configurable") or {}
-    db = configurable.get("db")
-    if not isinstance(db, AsyncSession):
-        return {"memory_snippets": []}
-
     query = _last_human_message_text(state.get("messages") or [])
     if not query:
         return {"memory_snippets": []}
@@ -63,12 +58,14 @@ async def load_user_memories(state: ChatState, config: RunnableConfig) -> dict:
 
     embeddings = EmbeddingService()
     query_vector = await embeddings.embed_query(query)
-    repository = MemoryRepository(db)
-    rows = await repository.search_similar_for_user(
-        user_id,
-        query_vector,
-        top_k=settings.memory_long_term_top_k,
-    )
+
+    async with graph_db_session(config) as db:
+        repository = MemoryRepository(db)
+        rows = await repository.search_similar_for_user(
+            user_id,
+            query_vector,
+            top_k=settings.memory_long_term_top_k,
+        )
 
     min_score = settings.memory_min_score
     snippets = [

@@ -32,6 +32,9 @@ export const TOOL_RESULT_UI_DATA_TYPE = "data-tool-result" as const;
 const UI_MESSAGE_TEXT_PART_ID = "text-1";
 const UI_MESSAGE_STREAM_DONE = "data: [DONE]\n\n";
 
+/** Batch upstream char tokens before emitting UI text-delta frames (fewer React updates). */
+const TOKEN_COALESCE_MIN_CHARS = 16;
+
 export type UpstreamChatParams = {
   conversationId: string;
   content: string;
@@ -228,44 +231,39 @@ export function memoryosSseResponseToTextStream(
         return;
       }
 
-      while (true) {
+      const { done, value } = await state.reader.read();
+      if (value) {
+        buffer += state.decoder.decode(value, { stream: true });
+      }
+
+      const blocks = buffer.split("\n\n");
+      buffer = done ? "" : (blocks.pop() ?? "");
+
+      for (const block of blocks) {
         if (state.clientStopped) {
           controller.close();
           return;
         }
 
-        const { done, value } = await state.reader.read();
-        if (done) {
-          controller.close();
-          return;
-        }
-
-        buffer += state.decoder.decode(value, { stream: true });
-        const blocks = buffer.split("\n\n");
-        buffer = blocks.pop() ?? "";
-
-        for (const block of blocks) {
-          if (state.clientStopped) {
-            controller.close();
+        for (const line of block.split("\n")) {
+          const frame = parseSseDataLine(line);
+          if (!frame) {
+            continue;
+          }
+          if (handleMemoryosSseFrame(frame, options) === "error") {
+            controller.error(streamErrorFromFrame(frame));
             return;
           }
 
-          for (const line of block.split("\n")) {
-            const frame = parseSseDataLine(line);
-            if (!frame) {
-              continue;
-            }
-            if (handleMemoryosSseFrame(frame, options) === "error") {
-              controller.error(streamErrorFromFrame(frame));
-              return;
-            }
-
-            const token = extractTokenContent(frame);
-            if (token && !state.clientStopped) {
-              controller.enqueue(encoder.encode(token));
-            }
+          const token = extractTokenContent(frame);
+          if (token && !state.clientStopped) {
+            controller.enqueue(encoder.encode(token));
           }
         }
+      }
+
+      if (done) {
+        controller.close();
       }
     },
     cancel() {
@@ -285,6 +283,9 @@ export function memoryosSseResponseToDataStream(
   let textStarted = false;
   let streamFinalized = false;
 
+  let pendingTokenText = "";
+  let pullEmitCount = 0;
+
   function enqueuePart(
     controller: ReadableStreamDefaultController<Uint8Array>,
     part: MemoryosUiDataStreamPart,
@@ -292,6 +293,7 @@ export function memoryosSseResponseToDataStream(
     if (state.clientStopped || streamFinalized) {
       return;
     }
+    pullEmitCount += 1;
     controller.enqueue(encodeUiMessageStreamPart(part));
   }
 
@@ -306,11 +308,26 @@ export function memoryosSseResponseToDataStream(
     enqueuePart(controller, { type: "start-step" });
   }
 
+  function endTextStreamIfOpen(
+    controller: ReadableStreamDefaultController<Uint8Array>,
+  ): void {
+    if (!textStarted) {
+      return;
+    }
+    enqueuePart(controller, {
+      type: "text-end",
+      id: UI_MESSAGE_TEXT_PART_ID,
+    });
+    textStarted = false;
+  }
+
   function enqueueRagSources(
     controller: ReadableStreamDefaultController<Uint8Array>,
     items: RagSourceItem[],
   ): void {
+    flushPendingTokenDelta(controller);
     initializeStream(controller);
+    endTextStreamIfOpen(controller);
     enqueuePart(controller, {
       type: RAG_SOURCES_UI_DATA_TYPE,
       data: { items },
@@ -321,7 +338,9 @@ export function memoryosSseResponseToDataStream(
     controller: ReadableStreamDefaultController<Uint8Array>,
     payload: ToolCallPayload,
   ): void {
+    flushPendingTokenDelta(controller);
     initializeStream(controller);
+    endTextStreamIfOpen(controller);
     enqueuePart(controller, {
       type: TOOL_CALL_UI_DATA_TYPE,
       data: payload,
@@ -332,7 +351,9 @@ export function memoryosSseResponseToDataStream(
     controller: ReadableStreamDefaultController<Uint8Array>,
     payload: ToolResultPayload,
   ): void {
+    flushPendingTokenDelta(controller);
     initializeStream(controller);
+    endTextStreamIfOpen(controller);
     enqueuePart(controller, {
       type: TOOL_RESULT_UI_DATA_TYPE,
       data: payload,
@@ -365,6 +386,7 @@ export function memoryosSseResponseToDataStream(
     if (streamFinalized || state.clientStopped) {
       return;
     }
+    flushPendingTokenDelta(controller);
     if (!streamInitialized) {
       initializeStream(controller);
     }
@@ -392,75 +414,124 @@ export function memoryosSseResponseToDataStream(
     controller.close();
   }
 
-  return new ReadableStream<Uint8Array>({
-    async pull(controller) {
+  function flushPendingTokenDelta(
+    controller: ReadableStreamDefaultController<Uint8Array>,
+  ): void {
+    if (!pendingTokenText) {
+      return;
+    }
+    const batch = pendingTokenText;
+    pendingTokenText = "";
+    enqueueTokenDelta(controller, batch);
+  }
+
+  function appendToken(
+    controller: ReadableStreamDefaultController<Uint8Array>,
+    token: string,
+  ): void {
+    pendingTokenText += token;
+    if (pendingTokenText.length >= TOKEN_COALESCE_MIN_CHARS) {
+      flushPendingTokenDelta(controller);
+    }
+  }
+
+  function processBufferedFrames(
+    controller: ReadableStreamDefaultController<Uint8Array>,
+    blocks: string[],
+  ): boolean {
+    for (const block of blocks) {
       if (state.clientStopped) {
         controller.close();
+        return true;
+      }
+
+      for (const line of block.split("\n")) {
+        const frame = parseSseDataLine(line);
+        if (!frame) {
+          continue;
+        }
+        if (handleMemoryosSseFrame(frame, options) === "error") {
+          controller.error(streamErrorFromFrame(frame));
+          return true;
+        }
+
+        const sources = extractSourcesItems(frame);
+        if (sources) {
+          enqueueRagSources(controller, sources);
+          continue;
+        }
+
+        const toolCall = extractToolCallPayload(frame);
+        if (toolCall) {
+          enqueueToolCall(controller, toolCall);
+          continue;
+        }
+
+        const toolResult = extractToolResultPayload(frame);
+        if (toolResult) {
+          enqueueToolResult(controller, toolResult);
+          continue;
+        }
+
+        const token = extractTokenContent(frame);
+        if (token) {
+          appendToken(controller, token);
+          continue;
+        }
+
+        const donePayload = extractDonePayload(frame);
+        if (donePayload) {
+          finalizeStream(controller, donePayload);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      if (state.clientStopped || streamFinalized) {
+        if (!streamFinalized) {
+          controller.close();
+        }
         return;
       }
 
+      pullEmitCount = 0;
+
       while (true) {
-        if (state.clientStopped) {
-          controller.close();
+        if (state.clientStopped || streamFinalized) {
           return;
         }
 
+        const emitCountBefore = pullEmitCount;
         const { done, value } = await state.reader.read();
+        if (value) {
+          buffer += state.decoder.decode(value, { stream: true });
+        }
+
+        const blocks = buffer.split("\n\n");
+        buffer = done ? "" : (blocks.pop() ?? "");
+
+        if (processBufferedFrames(controller, blocks)) {
+          return;
+        }
+
+        if (
+          pendingTokenText.length >= TOKEN_COALESCE_MIN_CHARS &&
+          pullEmitCount === emitCountBefore
+        ) {
+          flushPendingTokenDelta(controller);
+        }
+
+        if (pullEmitCount > emitCountBefore) {
+          return;
+        }
+
         if (done) {
           finalizeStream(controller, null);
           return;
-        }
-
-        buffer += state.decoder.decode(value, { stream: true });
-        const blocks = buffer.split("\n\n");
-        buffer = blocks.pop() ?? "";
-
-        for (const block of blocks) {
-          if (state.clientStopped) {
-            controller.close();
-            return;
-          }
-
-          for (const line of block.split("\n")) {
-            const frame = parseSseDataLine(line);
-            if (!frame) {
-              continue;
-            }
-            if (handleMemoryosSseFrame(frame, options) === "error") {
-              controller.error(streamErrorFromFrame(frame));
-              return;
-            }
-
-            const sources = extractSourcesItems(frame);
-            if (sources) {
-              enqueueRagSources(controller, sources);
-              continue;
-            }
-
-            const toolCall = extractToolCallPayload(frame);
-            if (toolCall) {
-              enqueueToolCall(controller, toolCall);
-              continue;
-            }
-
-            const toolResult = extractToolResultPayload(frame);
-            if (toolResult) {
-              enqueueToolResult(controller, toolResult);
-              continue;
-            }
-
-            const token = extractTokenContent(frame);
-            if (token) {
-              enqueueTokenDelta(controller, token);
-              continue;
-            }
-
-            const donePayload = extractDonePayload(frame);
-            if (donePayload) {
-              finalizeStream(controller, donePayload);
-              return;
-            }
-          }
         }
       }
     },

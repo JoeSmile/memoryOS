@@ -1,18 +1,30 @@
-"""ChatService context_summary graph state and summary BackgroundTasks scheduling."""
+"""ChatService context_summary graph state and detached background scheduling."""
 
 import uuid
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from starlette.background import BackgroundTasks
 
 from app.core.config import settings
 from app.models import Conversation, Message
 from app.models.message import COMPLETION_INTERRUPTED
+from app.services import chat_service
 from app.services.chat_service import ChatService, CompletionStreamState
 from app.services.memory.long_term import run_extract_background
 from app.services.memory.summary_service import run_summary_background
+
+
+@pytest.fixture
+def capture_detached_background(monkeypatch):
+    scheduled: list[tuple[str, object]] = []
+
+    def _fake_schedule(coro, *, name: str) -> None:
+        scheduled.append((name, coro))
+        coro.close()
+
+    monkeypatch.setattr(chat_service, "_schedule_detached_background", _fake_schedule)
+    return scheduled
 
 
 @pytest.fixture(autouse=True)
@@ -89,7 +101,10 @@ async def test_stream_completion_events_passes_context_summary_to_graph():
 
 
 @pytest.mark.asyncio
-async def test_finalize_schedules_summary_background_task_when_triggered(monkeypatch):
+async def test_finalize_schedules_summary_background_task_when_triggered(
+    monkeypatch,
+    capture_detached_background,
+):
     monkeypatch.setattr(settings, "summary_trigger_tokens", 512)
     db = AsyncMock()
     db.commit = AsyncMock()
@@ -141,23 +156,21 @@ async def test_finalize_schedules_summary_background_task_when_triggered(monkeyp
     stream_state.assistant_parts = ["reply"]
     stream_state.stream_exhausted = True
 
-    background_tasks = BackgroundTasks()
-    await service.finalize_completion_stream(
-        stream_state,
-        background_tasks=background_tasks,
-    )
+    await service.finalize_completion_stream(stream_state)
 
-    assert len(background_tasks.tasks) == 2
-    extract_task = background_tasks.tasks[0]
-    summary_task = background_tasks.tasks[1]
-    assert extract_task.func is run_extract_background
-    assert extract_task.args == (conversation_id, user_id)
-    assert summary_task.func is run_summary_background
-    assert summary_task.args == (conversation_id,)
+    assert len(capture_detached_background) == 2
+    extract_name, extract_coro = capture_detached_background[0]
+    summary_name, summary_coro = capture_detached_background[1]
+    assert extract_name == f"memory-extract-{conversation_id}"
+    assert extract_coro.cr_code.co_name == run_extract_background.__name__
+    assert summary_name == f"summary-{conversation_id}"
+    assert summary_coro.cr_code.co_name == run_summary_background.__name__
 
 
 @pytest.mark.asyncio
-async def test_finalize_skips_summary_schedule_when_below_threshold():
+async def test_finalize_skips_summary_schedule_when_below_threshold(
+    capture_detached_background,
+):
     db = AsyncMock()
     db.commit = AsyncMock()
     conversation_id = uuid.uuid4()
@@ -200,18 +213,19 @@ async def test_finalize_skips_summary_schedule_when_below_threshold():
     stream_state.assistant_parts = ["ok"]
     stream_state.stream_exhausted = True
 
-    background_tasks = BackgroundTasks()
-    await service.finalize_completion_stream(
-        stream_state,
-        background_tasks=background_tasks,
-    )
+    await service.finalize_completion_stream(stream_state)
 
-    assert len(background_tasks.tasks) == 1
-    assert background_tasks.tasks[0].func is run_extract_background
+    assert len(capture_detached_background) == 1
+    name, coro = capture_detached_background[0]
+    assert name == f"memory-extract-{conversation_id}"
+    assert coro.cr_code.co_name == run_extract_background.__name__
 
 
 @pytest.mark.asyncio
-async def test_finalize_skips_extract_when_long_term_disabled(monkeypatch):
+async def test_finalize_skips_extract_when_long_term_disabled(
+    monkeypatch,
+    capture_detached_background,
+):
     monkeypatch.setattr(settings, "memory_long_term_enabled", False)
     monkeypatch.setattr(settings, "summary_trigger_tokens", 512)
 
@@ -264,18 +278,18 @@ async def test_finalize_skips_extract_when_long_term_disabled(monkeypatch):
     stream_state.assistant_parts = ["reply"]
     stream_state.stream_exhausted = True
 
-    background_tasks = BackgroundTasks()
-    await service.finalize_completion_stream(
-        stream_state,
-        background_tasks=background_tasks,
-    )
+    await service.finalize_completion_stream(stream_state)
 
-    assert len(background_tasks.tasks) == 1
-    assert background_tasks.tasks[0].func is run_summary_background
+    assert len(capture_detached_background) == 1
+    name, coro = capture_detached_background[0]
+    assert name == f"summary-{conversation_id}"
+    assert coro.cr_code.co_name == run_summary_background.__name__
 
 
 @pytest.mark.asyncio
-async def test_finalize_skips_summary_schedule_when_interrupted():
+async def test_finalize_skips_summary_schedule_when_interrupted(
+    capture_detached_background,
+):
     db = AsyncMock()
     db.commit = AsyncMock()
     conversation_id = uuid.uuid4()
@@ -300,12 +314,8 @@ async def test_finalize_skips_summary_schedule_when_interrupted():
     stream_state.assistant_parts = ["partial"]
     stream_state.disconnected = True
 
-    background_tasks = BackgroundTasks()
-    await service.finalize_completion_stream(
-        stream_state,
-        background_tasks=background_tasks,
-    )
+    await service.finalize_completion_stream(stream_state)
 
-    assert background_tasks.tasks == []
+    assert capture_detached_background == []
     create_kwargs = service.messages.create.await_args.kwargs
     assert create_kwargs["completion_status"] == COMPLETION_INTERRUPTED

@@ -176,7 +176,11 @@ export function useChatSession() {
     onError: (err) => {
       clearSendMeta();
       if (conversationId) {
-        if (err.name === "AbortError") {
+        const lastMessage = messagesRef.current.at(-1);
+        const partialAssistant =
+          lastMessage?.role === "assistant" &&
+          getTextFromUIMessage(lastMessage).length > 0;
+        if (err.name === "AbortError" || partialAssistant) {
           void syncPersistedMessagesRef.current?.({
             retryUntilAssistant: true,
             replaceLocal: true,

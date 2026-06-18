@@ -42,8 +42,16 @@ class InjectionGuardMiddleware:
             body += message.get("body", b"")
             more_body = message.get("more_body", False)
 
+        body_sent = False
+
         async def replay_receive() -> dict:
-            return {"type": "http.request", "body": body, "more_body": False}
+            # Replay buffered body once, then delegate to the original receive so
+            # Request.is_disconnected() can observe http.disconnect during SSE.
+            nonlocal body_sent
+            if not body_sent:
+                body_sent = True
+                return {"type": "http.request", "body": body, "more_body": False}
+            return await receive()
 
         rejection = _scan_chat_completion_body(body)
         if rejection is not None:
