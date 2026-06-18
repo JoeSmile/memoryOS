@@ -2,7 +2,8 @@
 
 > 记录当前 **已落地** 与 **规划中**
 > 的前端工程能力，便于学习、回顾与 onboarding。  
-> 对应代码目录：`apps/web`、`packages/shared`、`packages/ui`。
+> 对应代码目录：`apps/web`、`packages/shared`、`packages/ui`。  
+> **代码地图（Chat 全链路 / BFF）**：[code-map.md](./code-map.md)
 
 **文档版本**：2026-05（Story 1.3 完成后）  
 **前端版本**：`next@15.5.18`、`react@19.1.0`（以 `apps/web/package.json` 为准）  

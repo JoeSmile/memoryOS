@@ -1,6 +1,7 @@
 # MemoryOS 后端工程说明
 
-> EP01 Story 1.5 初稿；随 EP03（数据库）、EP02（SSE）持续补充。
+> EP01 Story 1.5 初稿；随 EP03（数据库）、EP02（SSE）持续补充。  
+> **代码地图（Chat 全链路 / 领域索引）**：[code-map.md](./code-map.md)
 
 ---
 

@@ -47,9 +47,10 @@ AI **禁止** 在同一会话 propose 后直接写业务代码，除非用户明
 
 ## 0. Orient（必做）
 
-1. 读 `docs/tasks/epics/EP0x-*.md` 对应 Story 勾选项。
-2. `openspec list --json` — 是否已有 active change？
-3. 读相关 `openspec/specs/` 或已归档 change（若 brownfield）。
+1. 读 **[docs/tech/code-map.md](../../docs/tech/code-map.md)**（或 invoke skill **codebase-orient**）建立改动落点。
+2. 读 `docs/tasks/epics/EP0x-*.md` 对应 Story 勾选项。
+3. `openspec list --json` — 是否已有 active change？
+4. 读相关 `openspec/specs/` 或已归档 change（若 brownfield）。
 
 ---
 
